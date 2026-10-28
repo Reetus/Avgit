@@ -110,9 +110,12 @@
               <CheckBox Content="GPG sign" IsChecked="{Binding GpgSign, Mode=TwoWay}"
                         FontSize="11" VerticalAlignment="Center" />
             </StackPanel>
+            <CheckBox Grid.Row="1" Content="Push after committing" IsChecked="{Binding PushAfterCommit, Mode=TwoWay}"
+                      FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Left" />
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
               <Button Classes="toolbar" Content="Stash" Command="{Binding StashCommand}" />
-              <Button Classes="accent" Content="Commit" Width="110" Height="32"
+              <Button Classes="accent" Content="{Binding CommitButtonText}" MinWidth="110" Height="32"
+                      HorizontalContentAlignment="Center"
                       Command="{Binding CommitCommand}" IsEnabled="{Binding CanCommit}" />
             </StackPanel>
           </Grid>

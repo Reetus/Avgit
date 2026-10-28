@@ -26,6 +26,7 @@ public sealed class AppSettings
     public bool AutoRefresh { get; set; } = true;
     public bool CommitSignOff { get; set; }
     public bool CommitGpgSign { get; set; }
+    public bool CommitPushAfter { get; set; }
     public bool ShowAllBranches { get; set; } = true;
     /// <summary>Download new releases from GitHub in the background; they install on restart.</summary>
     public bool CheckForUpdates { get; set; } = true;

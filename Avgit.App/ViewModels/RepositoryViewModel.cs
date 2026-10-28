@@ -38,6 +38,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private int _amendGeneration;
     private bool _signOff;
     private bool _gpgSign;
+    private bool _pushAfterCommit;
     private string _selectedBranchFilter = "(all branches)";
     private int _diffContext;
     private bool _ignoreWhitespace;
@@ -111,6 +112,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         _ignoreWhitespace = settings.Settings.IgnoreWhitespace;
         _signOff = settings.Settings.CommitSignOff;
         _gpgSign = settings.Settings.CommitGpgSign;
+        _pushAfterCommit = settings.Settings.CommitPushAfter;
 
         CommitDiff = new DiffViewModel();
         WorkingDiff = new DiffViewModel();
@@ -120,6 +122,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         FetchCommand = new AsyncRelayCommand(() => RunOperationAsync("Fetch", ct => Handler.FetchAsync(Path, null, ct)));
         PullCommand = new AsyncRelayCommand(() => RunOperationAsync("Pull", ct => Handler.PullAsync(Path, null, ct)));
         PushCommand = new AsyncRelayCommand(PushAsync);
+        OpenRemoteCommand = new RelayCommand(OpenRemote);
         PushToRemoteCommand = new AsyncRelayCommand(PushToRemoteAsync);
         ForcePushCommand = new AsyncRelayCommand(ForcePushAsync);
         PullRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync("Pull with rebase", ct => Handler.PullAsync(Path, true, ct)));
@@ -472,6 +475,72 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>Push the branch after each successful commit (remembered across sessions).</summary>
+    public bool PushAfterCommit
+    {
+        get => _pushAfterCommit;
+        set
+        {
+            if (SetProperty(ref _pushAfterCommit, value))
+            {
+                Settings.Settings.CommitPushAfter = value;
+                Settings.Save();
+                OnPropertyChanged(nameof(CommitButtonText));
+            }
+        }
+    }
+
+    public string CommitButtonText => PushAfterCommit ? "Commit & Push" : "Commit";
+
+    /// <summary>The web page of origin (or the only remote) when its URL is http(s); otherwise null.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasRemoteWebUrl))]
+    [NotifyPropertyChangedFor(nameof(RemoteWebUrlToolTip))]
+    public partial string? RemoteWebUrl { get; private set; }
+
+    public bool HasRemoteWebUrl => RemoteWebUrl is not null;
+    public string RemoteWebUrlToolTip => $"Open {RemoteWebUrl} in the browser";
+
+    /// <summary>
+    /// The browser address for a remote URL: http(s) only, without credentials or a
+    /// trailing <c>.git</c>. SSH URLs return null; their web host cannot be inferred reliably.
+    /// </summary>
+    internal static string? WebUrlFor(string? remoteUrl)
+    {
+        if (!Uri.TryCreate(remoteUrl?.Trim(), UriKind.Absolute, out Uri? uri)
+            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            || string.IsNullOrEmpty(uri.Host))
+        {
+            return null;
+        }
+
+        var path = uri.AbsolutePath.TrimEnd('/');
+        if (path.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
+        {
+            path = path[..^4];
+        }
+
+        var port = uri.IsDefaultPort ? string.Empty : ":" + uri.Port;
+        return $"{uri.Scheme}://{uri.Host}{port}{path}";
+    }
+
+    private void OpenRemote()
+    {
+        if (RemoteWebUrl is not { } url)
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            StatusMessage = $"Could not open {url}: {ex.Message}";
+        }
+    }
+
     [ObservableProperty]
     public partial string StatusMessage { get; set; } = "Ready";
 
@@ -693,6 +762,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ICommand FetchCommand { get; }
     public ICommand PullCommand { get; }
     public ICommand PushCommand { get; }
+    public ICommand OpenRemoteCommand { get; }
     public ICommand PushToRemoteCommand { get; }
     public ICommand ForcePushCommand { get; }
     public ICommand PullRebaseCommand { get; }
@@ -956,6 +1026,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         {
             Remotes.Add(new RemoteEntry { Name = remote.Key, Url = remote.Value });
         }
+
+        RemoteEntry? webRemote = Remotes.FirstOrDefault(r => r.Name == "origin") ?? (Remotes.Count == 1 ? Remotes[0] : null);
+        RemoteWebUrl = WebUrlFor(webRemote?.Url);
 
         Stashes.Clear();
         foreach (StashRecord stash in refs.Stashes)
@@ -2152,6 +2225,17 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 Amend = false;
                 StatusMessage = "Commit created.";
                 await ReloadAllCoreAsync().ConfigureAwait(true);
+                if (PushAfterCommit)
+                {
+                    if (Remotes.Count == 0)
+                    {
+                        StatusMessage = "Commit created. Not pushed: no remotes are configured.";
+                    }
+                    else
+                    {
+                        await PushAsync().ConfigureAwait(true);
+                    }
+                }
             }
         }
         finally
