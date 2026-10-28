@@ -16,19 +16,85 @@
                       Command="{Binding CreateBranchCommand}" />
               <ListBox ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch, Mode=TwoWay}"
                        DoubleTapped="OnBranchDoubleTapped" HorizontalAlignment="Stretch">
+                <ListBox.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Checkout" Command="{Binding CheckoutBranchCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding !SelectedBranch.IsInOtherWorktree, FallbackValue=True}" />
+                    <MenuItem Header="Open worktree" Command="{Binding OpenBranchWorktreeCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding SelectedBranch.IsInOtherWorktree, FallbackValue=False}" />
+                    <MenuItem Header="Create worktree..." Command="{Binding AddWorktreeForBranchCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding SelectedBranch.CanAddWorktree, FallbackValue=False}" />
+                    <MenuItem Header="Delete branch" Command="{Binding DeleteBranchCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding SelectedBranch.CanDelete, FallbackValue=False}" />
+                  </ContextMenu>
+                </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                   <DataTemplate>
-                    <Grid ColumnDefinitions="14,*,Auto,Auto" Height="22">
+                    <Grid ColumnDefinitions="14,*,Auto,Auto,Auto" Height="22">
                       <TextBlock Text="●" Foreground="#3FB950" FontSize="10" VerticalAlignment="Center"
                                  IsVisible="{Binding IsCheckedOut}" />
                       <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11"
                                  TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                      <TextBlock Grid.Column="2" Text="{Binding UpstreamText}" Foreground="#D29922"
+                      <!-- Checked out in another worktree: it cannot be checked out here. -->
+                      <PathIcon Grid.Column="2" Data="{StaticResource IconWorktree}" Width="13" Height="11"
+                                Foreground="#58A6FF" Margin="6,0,0,0" VerticalAlignment="Center"
+                                Background="Transparent"
+                                IsVisible="{Binding IsInOtherWorktree}" ToolTip.Tip="{Binding WorktreeToolTip}" />
+                      <TextBlock Grid.Column="3" Text="{Binding UpstreamText}" Foreground="#D29922"
                                  FontSize="10" Margin="6,0" VerticalAlignment="Center" />
-                      <Button Grid.Column="3" Classes="flat" Content="×" FontSize="12" Padding="4,0"
+                      <Button Grid.Column="4" Classes="flat" Content="×" FontSize="12" Padding="4,0"
                               IsVisible="{Binding CanDelete}"
                               Command="{Binding $parent[ListBox].DataContext.DeleteBranchCommand}"
                               CommandParameter="{Binding}" ToolTip.Tip="Delete branch" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </StackPanel>
+          </Expander>
+
+          <Expander Header="WORKTREES" IsExpanded="True" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Classes="flat" Content="+ New worktree" Command="{Binding AddWorktreeCommand}"
+                        ToolTip.Tip="Create a new branch in its own folder" />
+                <Button Classes="flat" Content="Prune" Command="{Binding PruneWorktreesCommand}"
+                        IsVisible="{Binding HasPrunableWorktrees}"
+                        ToolTip.Tip="Forget worktrees whose folders are missing" />
+              </StackPanel>
+              <TextBlock Text="No linked worktrees." Classes="muted" FontSize="10" Margin="8,3"
+                         IsVisible="{Binding !HasLinkedWorktrees}" />
+              <ListBox ItemsSource="{Binding Worktrees}" DoubleTapped="OnWorktreeDoubleTapped"
+                       HorizontalAlignment="Stretch" IsVisible="{Binding HasLinkedWorktrees}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="14,*,Auto,Auto" Background="Transparent" ToolTip.Tip="{Binding ToolTip}">
+                      <TextBlock Text="●" Foreground="#3FB950" FontSize="10" VerticalAlignment="Center"
+                                 IsVisible="{Binding IsCurrent}" />
+                      <StackPanel Grid.Column="1" Margin="0,2">
+                        <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconWorktree}" Width="11" Height="9"
+                                    Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+                          <TextBlock Text="{Binding BranchText}" Classes="muted" FontSize="10"
+                                     TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Badges}" Foreground="#D29922" FontSize="10"
+                                     IsVisible="{Binding HasBadges}" />
+                        </StackPanel>
+                      </StackPanel>
+                      <Button Grid.Column="2" Classes="flat" Content="Open" FontSize="10" Padding="4,0"
+                              IsVisible="{Binding CanOpen}" VerticalAlignment="Center"
+                              Command="{Binding $parent[ListBox].DataContext.OpenWorktreeCommand}"
+                              CommandParameter="{Binding}" ToolTip.Tip="Open this worktree in a tab" />
+                      <Button Grid.Column="3" Classes="flat" Content="×" FontSize="12" Padding="4,0"
+                              IsVisible="{Binding CanRemove}" VerticalAlignment="Center"
+                              Command="{Binding $parent[ListBox].DataContext.RemoveWorktreeCommand}"
+                              CommandParameter="{Binding}" ToolTip.Tip="Remove worktree (keeps the branch)" />
                     </Grid>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -142,6 +208,8 @@
               <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" />
               <TextBlock Text="{Binding RepoTypeText}" Classes="muted" FontSize="10" />
               <TextBlock Text="{Binding Path}" Classes="muted" FontSize="10" TextWrapping="Wrap" />
+              <TextBlock Classes="muted" FontSize="10" TextWrapping="Wrap" IsVisible="{Binding IsLinkedWorktree}"
+                         Text="{Binding MainWorktreePath, StringFormat='Main worktree: {0}'}" />
               <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
                 <Button Classes="flat" Content="Open folder" Command="{Binding OpenInExplorerCommand}" />
                 <Button Classes="flat" Content="Refresh" Command="{Binding RefreshCommand}" />

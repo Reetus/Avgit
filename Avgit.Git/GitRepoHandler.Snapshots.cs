@@ -27,12 +27,13 @@ public sealed record CommitSnapshot(CommitRecord Details, IReadOnlyList<ChangedF
 
 public sealed record CommitResult(CommitSnapshot? Commit, string? Error);
 
-/// <summary>Branches, tags, remotes and stashes loaded together.</summary>
+/// <summary>Branches, tags, remotes, stashes and worktrees loaded together.</summary>
 public sealed record RefsSnapshot(
     IReadOnlyList<BranchRef> Branches,
     IReadOnlyList<string> Tags,
     IReadOnlyDictionary<string, string> Remotes,
     IReadOnlyList<StashRecord> Stashes,
+    IReadOnlyList<WorktreeInfo> Worktrees,
     string? Error);
 
 public sealed record LogPage(IReadOnlyList<HistoryRow> Rows, string? Error);
@@ -552,12 +553,15 @@ public sealed partial class GitRepoHandler
             "refs/heads", "refs/remotes", "refs/tags");
         Task<ProcessResult> remotesTask = GitAsync(path, cancellationToken, "remote", "-v");
         Task<ProcessResult> stashesTask = GitAsync(path, cancellationToken, "stash", "list", "--format=%gd\t%ci\t%s");
-        await Task.WhenAll(refsTask, remotesTask, stashesTask).ConfigureAwait(false);
+        Task<ProcessResult> worktreesTask = GitAsync(path, cancellationToken, "worktree", "list", "--porcelain");
+        await Task.WhenAll(refsTask, remotesTask, stashesTask, worktreesTask).ConfigureAwait(false);
 
         ProcessResult refs = refsTask.Result;
         ProcessResult remotes = remotesTask.Result;
         ProcessResult stashes = stashesTask.Result;
-        var error = FirstFailure(("git for-each-ref", refs), ("git remote", remotes), ("git stash", stashes));
+        ProcessResult worktreeList = worktreesTask.Result;
+        var error = FirstFailure(("git for-each-ref", refs), ("git remote", remotes), ("git stash", stashes),
+            ("git worktree list", worktreeList));
 
         var tags = new List<string>();
         if (refs.Success)
@@ -572,12 +576,103 @@ public sealed partial class GitRepoHandler
             }
         }
 
+        List<BranchRef> branches = refs.Success ? ParseBranches(refs.Output) : [];
+        IReadOnlyList<WorktreeInfo> worktrees = worktreeList.Success ? ParseWorktrees(worktreeList.Output) : [];
+        foreach (WorktreeInfo worktree in worktrees)
+        {
+            if (worktree.BranchName.Length > 0
+                && branches.FirstOrDefault(b => b.Kind == RefKind.Branch && b.Name == worktree.BranchName) is { } branch)
+            {
+                branch.WorktreePath = worktree.Path;
+            }
+        }
+
         return new RefsSnapshot(
-            refs.Success ? ParseBranches(refs.Output) : [],
+            branches,
             tags,
             remotes.Success ? ParseRemotes(remotes.Output) : new Dictionary<string, string>(StringComparer.Ordinal),
             stashes.Success ? ParseStashes(stashes.Output) : [],
+            worktrees,
             error);
+    }
+
+    /// <summary>
+    /// Parses <c>git worktree list --porcelain</c>. Paths are returned in the platform's
+    /// form (git prints forward slashes on Windows).
+    /// </summary>
+    public static IReadOnlyList<WorktreeInfo> ParseWorktrees(string output)
+    {
+        var list = new List<WorktreeInfo>();
+        string? path = null;
+        var head = string.Empty;
+        var branch = string.Empty;
+        bool bare = false, detached = false, locked = false, prunable = false;
+
+        void Flush()
+        {
+            if (path is not null)
+            {
+                list.Add(new WorktreeInfo(path, head, branch, bare, detached, locked, prunable));
+            }
+
+            path = null;
+            head = branch = string.Empty;
+            bare = detached = locked = prunable = false;
+        }
+
+        foreach (var line in output.Split('\n'))
+        {
+            var text = line.TrimEnd('\r');
+            if (text.Length == 0)
+            {
+                Flush();
+            }
+            else if (text.StartsWith("worktree ", StringComparison.Ordinal))
+            {
+                Flush();
+                path = NormalizeWorktreePath(text["worktree ".Length..]);
+            }
+            else if (text.StartsWith("HEAD ", StringComparison.Ordinal))
+            {
+                head = text["HEAD ".Length..];
+            }
+            else if (text.StartsWith("branch ", StringComparison.Ordinal))
+            {
+                branch = text["branch ".Length..];
+            }
+            else if (text == "bare")
+            {
+                bare = true;
+            }
+            else if (text == "detached")
+            {
+                detached = true;
+            }
+            // "locked" and "prunable" may be followed by a reason.
+            else if (text == "locked" || text.StartsWith("locked ", StringComparison.Ordinal))
+            {
+                locked = true;
+            }
+            else if (text == "prunable" || text.StartsWith("prunable ", StringComparison.Ordinal))
+            {
+                prunable = true;
+            }
+        }
+
+        Flush();
+        return list;
+    }
+
+    private static string NormalizeWorktreePath(string path)
+    {
+        try
+        {
+            return Path.GetFullPath(path);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return path;
+        }
     }
 
     /// <summary>One page of history; the error (if any) is returned rather than stored.</summary>

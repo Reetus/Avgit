@@ -70,6 +70,17 @@ public interface IGitEngine
     Task<ProcessResult> CreateBranchAsync(string path, string name, string? startPoint, bool checkout, CancellationToken cancellationToken = default);
     Task<ProcessResult> CheckoutAsync(string path, string reference, CancellationToken cancellationToken = default);
     Task<ProcessResult> DeleteBranchAsync(string path, string name, bool force, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Adds a worktree at <paramref name="worktreePath"/>. With <paramref name="createBranch"/>, creates
+    /// <paramref name="branch"/> at <paramref name="startPoint"/> (HEAD when null); otherwise checks out the
+    /// existing <paramref name="branch"/>.
+    /// </summary>
+    Task<ProcessResult> AddWorktreeAsync(string path, string worktreePath, string? branch, bool createBranch, string? startPoint, CancellationToken cancellationToken = default);
+    Task<ProcessResult> RemoveWorktreeAsync(string path, string worktreePath, bool force, CancellationToken cancellationToken = default);
+
+    /// <summary>Forgets worktrees whose folders were deleted outside git.</summary>
+    Task<ProcessResult> PruneWorktreesAsync(string path, CancellationToken cancellationToken = default);
     Task<ProcessResult> CreateTagAsync(string path, string name, string? revision, string? message, CancellationToken cancellationToken = default);
     Task<ProcessResult> DeleteTagAsync(string path, string name, CancellationToken cancellationToken = default);
 

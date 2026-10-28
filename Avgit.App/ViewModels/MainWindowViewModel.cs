@@ -375,8 +375,22 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private RepositoryViewModel CreateRepository(string root) => new(_gitManager.CreateEngine(), root, SettingsService, _dialogs)
     {
-        CopyText = text => CopyText?.Invoke(text)
+        CopyText = text => CopyText?.Invoke(text),
+        OpenRepositoryAction = OpenPathAsync,
+        WorktreeRemoved = CloseRemovedWorktree
     };
+
+    /// <summary>Closes the tab of a worktree that was just removed; its folder is gone.</summary>
+    private void CloseRemovedWorktree(string folder)
+    {
+        var root = CanonicalPath(folder);
+        RepositoryViewModel? tab = Repositories.FirstOrDefault(r =>
+            string.Equals(CanonicalPath(r.Path), root, AppSettingsService.PathComparison));
+        if (tab is not null)
+        {
+            CloseRepository(tab);
+        }
+    }
 
     private void CloseOtherRepositories(RepositoryViewModel? keep)
     {

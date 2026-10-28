@@ -135,9 +135,14 @@
                   Content="Terminal" Command="{Binding Repository.OpenTerminalCommand}"
                   ToolTip.Tip="Open a terminal in the repository folder (Ctrl+Shift+C)" />
         </StackPanel>
-        <TextBlock Grid.Column="1" Text="{Binding Repository.BranchAndRevisionText}"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"
-                   IsVisible="{Binding ShowRepositoryContent}" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" IsVisible="{Binding ShowRepositoryContent}">
+          <PathIcon Data="{StaticResource IconWorktree}" Width="14" Height="12" Foreground="#58A6FF"
+                    Background="Transparent" VerticalAlignment="Center"
+                    IsVisible="{Binding Repository.IsLinkedWorktree, FallbackValue=False}"
+                    ToolTip.Tip="{Binding Repository.MainWorktreePath, StringFormat='Linked worktree of {0}', FallbackValue=''}" />
+          <TextBlock Text="{Binding Repository.BranchAndRevisionText}" VerticalAlignment="Center" FontSize="12" />
+        </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
           <ProgressBar Width="90" Height="4" IsIndeterminate="True" VerticalAlignment="Center"
                        IsVisible="{Binding Repository.IsBusy, FallbackValue=False}" />

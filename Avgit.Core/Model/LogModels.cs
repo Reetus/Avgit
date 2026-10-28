@@ -129,7 +129,18 @@ public class BranchRef
     public RefKind Kind { get; set; }
     public UpstreamTrack? Upstream { get; set; }
 
-    public bool CanDelete => !IsCheckedOut;
+    /// <summary>The worktree that has this branch checked out (this one or another), if any.</summary>
+    public string? WorktreePath { get; set; }
+
+    /// <summary>Checked out in a different worktree, so it cannot be checked out or deleted here.</summary>
+    public bool IsInOtherWorktree => WorktreePath is not null && !IsCheckedOut;
+
+    public string WorktreeToolTip => $"Checked out in worktree {WorktreePath}";
+
+    public bool CanDelete => !IsCheckedOut && WorktreePath is null;
+
+    /// <summary>A branch can be given its own worktree only while no worktree has it checked out.</summary>
+    public bool CanAddWorktree => Kind == RefKind.Branch && !IsCheckedOut && WorktreePath is null;
 
     public string UpstreamText
     {

@@ -88,7 +88,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             Name = path;
         }
 
-        RepoTypeText = "Git";
+        IsLinkedWorktree = !string.Equals(GitRepoHandler.GetGitDir(path), GitRepoHandler.GetCommonGitDir(path),
+            AppSettingsService.PathComparison);
+        RepoTypeText = IsLinkedWorktree ? "Git · linked worktree" : "Git";
         // Tests may wrap the handler; Advanced Git then gets its own instance.
         Advanced = new AdvancedGitService(handler as GitRepoHandler ?? new GitRepoHandler(handler.ExecutablePath), path);
         if (handler is GitRepoHandler git)
@@ -127,6 +129,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         CheckoutBranchCommand = new AsyncRelayCommand(p => CheckoutBranchAsync(p as BranchRef));
         CheckoutReferenceCommand = new AsyncRelayCommand(p => CheckoutReferenceAsync(p as string));
         DeleteBranchCommand = new AsyncRelayCommand(p => DeleteBranchAsync(p as BranchRef));
+        AddWorktreeCommand = new AsyncRelayCommand(() => AddWorktreeAsync(null));
+        AddWorktreeForBranchCommand = new AsyncRelayCommand(p => p is BranchRef branch ? AddWorktreeAsync(branch) : Task.CompletedTask);
+        OpenWorktreeCommand = new AsyncRelayCommand(p => OpenWorktreeAsync(p as WorktreeEntry));
+        OpenBranchWorktreeCommand = new AsyncRelayCommand(p => p is BranchRef { WorktreePath: { } worktree } ? OpenWorktreePathAsync(worktree) : Task.CompletedTask);
+        RemoveWorktreeCommand = new AsyncRelayCommand(p => RemoveWorktreeAsync(p as WorktreeEntry));
+        PruneWorktreesCommand = new AsyncRelayCommand(PruneWorktreesAsync);
         DeleteTagCommand = new AsyncRelayCommand(p => DeleteTagAsync(p as string));
         CheckoutCommitCommand = new AsyncRelayCommand(CheckoutCommitAsync);
         CreateBranchAtCommitCommand = new AsyncRelayCommand(CreateBranchAsync);
@@ -184,6 +192,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public string Path { get; }
     public string Name { get; }
     public string RepoTypeText { get; }
+
+    /// <summary>This tab is a linked worktree (created by <c>git worktree add</c>), not the main one.</summary>
+    public bool IsLinkedWorktree { get; }
+
+    /// <summary>The main worktree's folder, shown when this tab is a linked worktree.</summary>
+    [ObservableProperty]
+    public partial string MainWorktreePath { get; private set; } = string.Empty;
+
+    /// <summary>Opens a folder as a repository tab (or switches to it when already open).</summary>
+    public Func<string, Task>? OpenRepositoryAction { get; set; }
+
+    /// <summary>Called with a worktree's folder after it is removed, so its tab can close.</summary>
+    public Action<string>? WorktreeRemoved { get; set; }
     public AdvancedGitService Advanced { get; }
     public IDialogService Dialogs { get; }
     public AppSettingsService Settings { get; }
@@ -219,6 +240,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ObservableCollection<ChangedFile> UnstagedFiles { get; } = [];
     public ObservableCollection<BranchRef> Branches { get; } = [];
     public ObservableCollection<BranchRef> RemoteBranches { get; } = [];
+    public ObservableCollection<WorktreeEntry> Worktrees { get; } = [];
+    public bool HasLinkedWorktrees => Worktrees.Count > 1;
+    public bool HasPrunableWorktrees => Worktrees.Any(w => w.IsPrunable);
     public ObservableCollection<RemoteEntry> Remotes { get; } = [];
     public ObservableCollection<string> Tags { get; } = [];
     public ObservableCollection<StashEntry> Stashes { get; } = [];
@@ -675,6 +699,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ICommand CheckoutBranchCommand { get; }
     public ICommand CheckoutReferenceCommand { get; }
     public ICommand DeleteBranchCommand { get; }
+    public ICommand AddWorktreeCommand { get; }
+    public ICommand AddWorktreeForBranchCommand { get; }
+    public ICommand OpenWorktreeCommand { get; }
+    public ICommand OpenBranchWorktreeCommand { get; }
+    public ICommand RemoveWorktreeCommand { get; }
+    public ICommand PruneWorktreesCommand { get; }
     public ICommand DeleteTagCommand { get; }
     public ICommand CheckoutCommitCommand { get; }
     public ICommand CreateBranchAtCommitCommand { get; }
@@ -922,6 +952,16 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             Stashes.Add(new StashEntry(stash));
         }
 
+        Worktrees.Clear();
+        for (var i = 0; i < refs.Worktrees.Count; i++)
+        {
+            WorktreeInfo worktree = refs.Worktrees[i];
+            Worktrees.Add(new WorktreeEntry(worktree, IsSamePath(worktree.Path, Path), isMain: i == 0));
+        }
+
+        MainWorktreePath = IsLinkedWorktree && Worktrees.Count > 0 ? Worktrees[0].Path : string.Empty;
+        OnPropertyChanged(nameof(HasLinkedWorktrees));
+        OnPropertyChanged(nameof(HasPrunableWorktrees));
         OnPropertyChanged(nameof(HasRemotes));
         OnPropertyChanged(nameof(HasRemoteBranches));
         OnPropertyChanged(nameof(HasTags));
@@ -2524,6 +2564,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
+        // git refuses to check out a branch that another worktree has; offer that worktree instead.
+        if (branch is { IsInOtherWorktree: true, WorktreePath: { } worktree })
+        {
+            if (await Dialogs.ConfirmAsync("Branch is in another worktree",
+                    $"'{branch.Name}' is checked out in the worktree at\n{worktree}\n\nOpen that worktree?").ConfigureAwait(true))
+            {
+                await OpenWorktreePathAsync(worktree).ConfigureAwait(true);
+            }
+
+            return;
+        }
+
         ProcessResult result = await Handler.CheckoutAsync(Path, branch.Name).ConfigureAwait(true);
         await HandleOperationResultAsync("Checkout", result, reloadAll: true).ConfigureAwait(true);
     }
@@ -2558,6 +2610,130 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         ProcessResult result = await Handler.DeleteBranchAsync(Path, branch.Name, force: false).ConfigureAwait(true);
         await HandleOperationResultAsync("Delete branch", result, reloadAll: true).ConfigureAwait(true);
+    }
+
+    private static bool IsSamePath(string a, string b)
+    {
+        static string Normalize(string path)
+            => System.IO.Path.GetFullPath(path).TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+
+        try
+        {
+            return string.Equals(Normalize(a), Normalize(b), AppSettingsService.PathComparison);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// A sibling of the main worktree named after the repository and branch,
+    /// e.g. <c>D:\Code\Avgit-feature-login</c> for branch <c>feature/login</c>.
+    /// </summary>
+    internal string SuggestWorktreePath(string branch)
+    {
+        var main = Worktrees.FirstOrDefault()?.Path ?? Path;
+        main = main.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+        var parent = System.IO.Path.GetDirectoryName(main) ?? main;
+        var invalid = System.IO.Path.GetInvalidFileNameChars();
+        var safe = new string([.. branch.Select(c => c == '/' || c == '\\' || invalid.Contains(c) ? '-' : c)]);
+        var baseName = $"{System.IO.Path.GetFileName(main)}-{safe}";
+        var candidate = System.IO.Path.Combine(parent, baseName);
+        for (var n = 2; Directory.Exists(candidate) || File.Exists(candidate); n++)
+        {
+            candidate = System.IO.Path.Combine(parent, $"{baseName}-{n}");
+        }
+
+        return candidate;
+    }
+
+    /// <summary>
+    /// Creates a worktree. For <paramref name="branch"/> it checks that branch out there;
+    /// otherwise it asks for a new branch name and starts it at HEAD.
+    /// </summary>
+    private async Task AddWorktreeAsync(BranchRef? branch)
+    {
+        if (branch is { IsCheckedOut: true } or { IsInOtherWorktree: true })
+        {
+            await Dialogs.ShowMessageAsync("Create worktree",
+                $"'{branch.Name}' is already checked out in {branch.WorktreePath ?? "this worktree"}.").ConfigureAwait(true);
+            return;
+        }
+
+        var branchName = branch?.Name;
+        if (branchName is null)
+        {
+            branchName = (await Dialogs.PromptAsync("New worktree", "Name of the new branch (starts at HEAD)").ConfigureAwait(true))?.Trim();
+            if (string.IsNullOrEmpty(branchName))
+            {
+                return;
+            }
+        }
+
+        var folder = (await Dialogs.PromptAsync("New worktree", $"Folder for '{branchName}'", SuggestWorktreePath(branchName))
+            .ConfigureAwait(true))?.Trim();
+        if (string.IsNullOrEmpty(folder))
+        {
+            return;
+        }
+
+        ProcessResult result = await Handler.AddWorktreeAsync(Path, folder, branchName, createBranch: branch is null, startPoint: null)
+            .ConfigureAwait(true);
+        await HandleOperationResultAsync("Create worktree", result, reloadAll: true).ConfigureAwait(true);
+        if (result.Success
+            && await Dialogs.ConfirmAsync("Worktree created", $"Created a worktree for '{branchName}' at\n{folder}\n\nOpen it in a new tab?")
+                .ConfigureAwait(true))
+        {
+            await OpenWorktreePathAsync(folder).ConfigureAwait(true);
+        }
+    }
+
+    private Task OpenWorktreeAsync(WorktreeEntry? worktree)
+        => worktree is { CanOpen: true } ? OpenWorktreePathAsync(worktree.Path) : Task.CompletedTask;
+
+    private Task OpenWorktreePathAsync(string folder)
+        => OpenRepositoryAction?.Invoke(folder) ?? Task.CompletedTask;
+
+    private async Task RemoveWorktreeAsync(WorktreeEntry? worktree)
+    {
+        if (worktree is not { CanRemove: true })
+        {
+            return;
+        }
+
+        if (!await Dialogs.ConfirmAsync("Remove worktree",
+                $"Remove the worktree at\n{worktree.Path}\n\nIts folder is deleted. The branch '{worktree.BranchText}' is kept.").ConfigureAwait(true))
+        {
+            return;
+        }
+
+        ProcessResult result = await Handler.RemoveWorktreeAsync(Path, worktree.Path, force: false).ConfigureAwait(true);
+        // git refuses to delete uncommitted work without --force; ask before discarding it.
+        if (!result.Success && result.Error.Contains("modified or untracked files", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!await Dialogs.ConfirmAsync("Remove worktree",
+                    "The worktree has uncommitted changes or untracked files. Remove it anyway and lose them?").ConfigureAwait(true))
+            {
+                await LoadRefsCoreAsync().ConfigureAwait(true);
+                return;
+            }
+
+            result = await Handler.RemoveWorktreeAsync(Path, worktree.Path, force: true).ConfigureAwait(true);
+        }
+
+        if (result.Success)
+        {
+            WorktreeRemoved?.Invoke(worktree.Path);
+        }
+
+        await HandleOperationResultAsync("Remove worktree", result, reloadAll: true).ConfigureAwait(true);
+    }
+
+    private async Task PruneWorktreesAsync()
+    {
+        ProcessResult result = await Handler.PruneWorktreesAsync(Path).ConfigureAwait(true);
+        await HandleOperationResultAsync("Prune worktrees", result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task DeleteTagAsync(string? tag)
