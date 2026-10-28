@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Avgit.App.Controls">
   <Style Selector="Window">
     <Setter Property="Background" Value="{StaticResource AppBackground}" />
     <Setter Property="Foreground" Value="{StaticResource Text}" />
@@ -49,6 +50,23 @@
 
   <Style Selector="Button.toolbar:pointerover /template/ ContentPresenter">
     <Setter Property="Background" Value="#3E3E42" />
+  </Style>
+
+  <!-- Icon above the text, set with controls:ButtonIcon.Data. The text follows the presenter's
+       foreground (the global TextBlock style would otherwise keep it bright when disabled). -->
+  <Style Selector="Button.toolbar.icon">
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="MinWidth" Value="54" />
+    <Setter Property="ContentTemplate">
+      <DataTemplate x:DataType="x:String">
+        <StackPanel Spacing="3">
+          <PathIcon Width="20" Height="16" HorizontalAlignment="Center"
+                    Data="{Binding $parent[Button].(controls:ButtonIcon.Data)}" />
+          <TextBlock Text="{Binding}" HorizontalAlignment="Center" FontSize="11"
+                     Foreground="{Binding $parent[ContentPresenter].Foreground}" />
+        </StackPanel>
+      </DataTemplate>
+    </Setter>
   </Style>
 
   <Style Selector="Button.flat">

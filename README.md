@@ -145,6 +145,8 @@ dotnet run branding/generate-icons.cs
 
 Windows and Linux icons are cropped close to the tile so they stay legible at small sizes. The macOS icon keeps the artwork's padding, which matches Apple's icon grid.
 
+The toolbar icons in `Avgit.App/Styles/Icons.axaml` are [Font Awesome Free](https://fontawesome.com) 6.7.2 solid icons, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Each is the icon's SVG path data stored as a `StreamGeometry`. To add one, copy the `d` attribute from `svgs/solid/<name>.svg` in the `@fortawesome/fontawesome-free` package. Set it on a `Button.toolbar.icon` with `controls:ButtonIcon.Data`.
+
 ### Installing on Linux
 
 After publishing, `branding/linux/install.sh` installs Avgit for the current user (no root needed):

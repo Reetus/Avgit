@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Avgit.App.ViewModels"
         xmlns:views="using:Avgit.App.Views"
+        xmlns:controls="using:Avgit.App.Controls"
         x:Class="Avgit.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{Binding Title}"
@@ -111,17 +112,27 @@
             BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,1" Padding="8,6">
       <Grid ColumnDefinitions="Auto,*,Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" IsEnabled="{Binding ShowRepositoryContent}">
-          <Button Classes="toolbar" Content="Open" Command="{Binding OpenRepositoryCommand}" />
-          <Button Classes="toolbar" Content="Refresh" Command="{Binding Repository.RefreshCommand}" />
-          <Button Classes="toolbar" Content="Fetch" Command="{Binding Repository.FetchCommand}" />
-          <Button Classes="toolbar" Content="Pull" Command="{Binding Repository.PullCommand}" />
-          <Button Classes="toolbar" Content="Push" Command="{Binding Repository.PushCommand}" />
-          <Button Classes="toolbar" Content="Commit" Command="{Binding Repository.CommitCommand}"
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconOpen}"
+                  Content="Open" Command="{Binding OpenRepositoryCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconRefresh}"
+                  Content="Refresh" Command="{Binding Repository.RefreshCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconFetch}"
+                  Content="Fetch" Command="{Binding Repository.FetchCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconPull}"
+                  Content="Pull" Command="{Binding Repository.PullCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconPush}"
+                  Content="Push" Command="{Binding Repository.PushCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconCommit}"
+                  Content="Commit" Command="{Binding Repository.CommitCommand}"
                   IsEnabled="{Binding Repository.CanCommit, FallbackValue=False}" />
-          <Button Classes="toolbar" Content="Branch" Command="{Binding Repository.CreateBranchCommand}" />
-          <Button Classes="toolbar" Content="Tag" Command="{Binding Repository.CreateTagCommand}" />
-          <Button Classes="toolbar" Content="Stash" Command="{Binding Repository.StashCommand}" />
-          <Button Classes="toolbar" Content="Terminal" Command="{Binding Repository.OpenTerminalCommand}"
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconBranch}"
+                  Content="Branch" Command="{Binding Repository.CreateBranchCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconTag}"
+                  Content="Tag" Command="{Binding Repository.CreateTagCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconStash}"
+                  Content="Stash" Command="{Binding Repository.StashCommand}" />
+          <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconTerminal}"
+                  Content="Terminal" Command="{Binding Repository.OpenTerminalCommand}"
                   ToolTip.Tip="Open a terminal in the repository folder (Ctrl+Shift+C)" />
         </StackPanel>
         <TextBlock Grid.Column="1" Text="{Binding Repository.BranchAndRevisionText}"
