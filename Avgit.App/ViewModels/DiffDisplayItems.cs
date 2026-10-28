@@ -43,13 +43,40 @@ public sealed partial class CommitRowViewModel(HistoryRow row) : ObservableObjec
     public string ParentsText => Row.ParentIds.Length > 1 ? $"merge {Row.ParentIds.Length}" : string.Empty;
     public bool IsMerge => Row.ParentIds.Length > 1;
     public bool HasLabels => Row.Refs.Length > 0;
-    public IReadOnlyList<RefPill> Pills => field ??= RefPill.FromLabels(Row.Refs);
+    public IReadOnlyList<RefPill> Pills => _pills ??= RefPill.FromLabels(Row.Refs, _worktreeBranches);
     public string LabelsToolTip => string.Join("\n", Row.Refs.Select(l => l.Kind switch
     {
         RefKind.Tag => $"tag: {l.Name}",
         RefKind.RemoteBranch => l.Name,
+        RefKind.Branch when _worktreeBranches.Contains(l.Name) => $"{l.Name} (in another worktree)",
         _ => l.Name
     }));
+
+    private IReadOnlyList<RefPill>? _pills;
+    private IReadOnlySet<string> _worktreeBranches = EmptyNames;
+    private static readonly IReadOnlySet<string> EmptyNames = new HashSet<string>();
+
+    /// <summary>
+    /// Sets the local branches checked out in other worktrees; their pills get a worktree icon.
+    /// Rows whose labels are unaffected are not redrawn.
+    /// </summary>
+    public void SetWorktreeBranches(IReadOnlySet<string> branches)
+    {
+        if (ReferenceEquals(branches, _worktreeBranches))
+        {
+            return;
+        }
+
+        var changed = Row.Refs.Any(l => l.Kind == RefKind.Branch
+                                        && _worktreeBranches.Contains(l.Name) != branches.Contains(l.Name));
+        _worktreeBranches = branches;
+        if (changed)
+        {
+            _pills = null;
+            OnPropertyChanged(nameof(Pills));
+            OnPropertyChanged(nameof(LabelsToolTip));
+        }
+    }
     public string LabelColor => $"#{Row.Tint.R:X2}{Row.Tint.G:X2}{Row.Tint.B:X2}";
 }
 
@@ -62,8 +89,11 @@ public enum RefPillKind
     Other
 }
 
-/// <summary>A ref label drawn as a pill in the history list.</summary>
-public sealed record RefPill(string Text, RefPillKind Kind, string? Remotes = null)
+/// <summary>
+/// A ref label drawn as a pill in the history list. <paramref name="InWorktree"/> marks a
+/// local branch checked out in another worktree.
+/// </summary>
+public sealed record RefPill(string Text, RefPillKind Kind, string? Remotes = null, bool InWorktree = false)
 {
     /// <summary>
     /// Orders labels current branch, local branches, remote-only branches, tags, then
@@ -71,7 +101,7 @@ public sealed record RefPill(string Text, RefPillKind Kind, string? Remotes = nu
     /// commit folds into that pill (shown as its remote names), and remote/HEAD is dropped
     /// because it always sits beside the remote's default branch.
     /// </summary>
-    public static IReadOnlyList<RefPill> FromLabels(IReadOnlyList<RefBadge> labels)
+    public static IReadOnlyList<RefPill> FromLabels(IReadOnlyList<RefBadge> labels, IReadOnlySet<string>? worktreeBranches = null)
     {
         var locals = labels.Where(l => l.Kind == RefKind.Branch).Select(l => l.Name).ToHashSet(StringComparer.Ordinal);
         var folded = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -105,7 +135,8 @@ public sealed record RefPill(string Text, RefPillKind Kind, string? Remotes = nu
         foreach (RefBadge? label in labels.Where(l => l.Kind == RefKind.Branch).OrderByDescending(l => l.IsCheckedOut))
         {
             var remotes = folded.TryGetValue(label.Name, out List<string>? names) ? string.Join(", ", names) : null;
-            pills.Add(new RefPill(label.Name, label.IsCheckedOut ? RefPillKind.CurrentBranch : RefPillKind.Branch, remotes));
+            pills.Add(new RefPill(label.Name, label.IsCheckedOut ? RefPillKind.CurrentBranch : RefPillKind.Branch, remotes,
+                worktreeBranches?.Contains(label.Name) == true));
         }
         pills.AddRange(remoteOnly.Select(name => new RefPill(name, RefPillKind.RemoteBranch)));
         pills.AddRange(labels.Where(l => l.Kind == RefKind.Tag).Select(l => new RefPill(l.Name, RefPillKind.Tag)));

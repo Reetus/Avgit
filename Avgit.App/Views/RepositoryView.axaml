@@ -9,8 +9,14 @@
             BorderThickness="0,0,1,0">
       <ScrollViewer>
         <StackPanel Margin="4,6,4,12">
-          <Expander Header="BRANCHES" IsExpanded="True" HorizontalAlignment="Stretch"
+          <Expander IsExpanded="True" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconBranch}" />
+                <TextBlock Text="BRANCHES" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <Button Classes="flat" Content="+ New branch" HorizontalAlignment="Left"
                       Command="{Binding CreateBranchCommand}" />
@@ -57,8 +63,14 @@
             </StackPanel>
           </Expander>
 
-          <Expander Header="WORKTREES" IsExpanded="True" HorizontalAlignment="Stretch"
+          <Expander IsExpanded="True" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconWorktree}" />
+                <TextBlock Text="WORKTREES" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <StackPanel Orientation="Horizontal" Spacing="4">
                 <Button Classes="flat" Content="+ New worktree" Command="{Binding AddWorktreeCommand}"
@@ -102,8 +114,14 @@
             </StackPanel>
           </Expander>
 
-          <Expander Header="REMOTES" IsExpanded="True" HorizontalAlignment="Stretch"
+          <Expander IsExpanded="True" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconRemotes}" />
+                <TextBlock Text="REMOTES" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <Button Classes="flat" Content="+ Add remote" HorizontalAlignment="Left"
                       Command="{Binding AddRemoteCommand}" />
@@ -132,8 +150,14 @@
             </StackPanel>
           </Expander>
 
-          <Expander Header="REMOTE BRANCHES" IsExpanded="True" HorizontalAlignment="Stretch"
+          <Expander IsExpanded="True" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconRemoteBranches}" />
+                <TextBlock Text="REMOTE BRANCHES" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <TextBlock Text="No remote branches." Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasRemoteBranches}" />
@@ -151,8 +175,14 @@
             </StackPanel>
           </Expander>
 
-          <Expander Header="TAGS" IsExpanded="True" HorizontalAlignment="Stretch"
+          <Expander IsExpanded="True" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconTag}" />
+                <TextBlock Text="TAGS" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <TextBlock Text="No tags." Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasTags}" />
@@ -173,8 +203,14 @@
             </StackPanel>
           </Expander>
 
-          <Expander Header="STASHES" IsExpanded="True" HorizontalAlignment="Stretch"
+          <Expander IsExpanded="True" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconStash}" />
+                <TextBlock Text="STASHES" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <Button Classes="flat" Content="+ Stash changes" HorizontalAlignment="Left"
                       Command="{Binding StashCommand}" />
@@ -203,7 +239,13 @@
             </StackPanel>
           </Expander>
 
-          <Expander Header="REPOSITORY" IsExpanded="True">
+          <Expander IsExpanded="True">
+            <Expander.Header>
+              <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
+                <PathIcon Data="{StaticResource IconRepository}" />
+                <TextBlock Text="REPOSITORY" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel Spacing="3" Margin="6,2">
               <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" />
               <TextBlock Text="{Binding RepoTypeText}" Classes="muted" FontSize="10" />
