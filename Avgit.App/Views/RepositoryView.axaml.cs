@@ -31,6 +31,14 @@ public partial class RepositoryView : UserControl
         }
     }
 
+    private void OnWorktreeDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is ListBox { SelectedItem: WorktreeEntry worktree } && DataContext is RepositoryViewModel vm)
+        {
+            vm.OpenWorktreeCommand.Execute(worktree);
+        }
+    }
+
     private void OnStashDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (sender is ListBox { SelectedItem: StashEntry stash } && DataContext is RepositoryViewModel vm)

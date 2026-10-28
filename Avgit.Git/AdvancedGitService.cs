@@ -5,7 +5,15 @@ namespace Avgit.Git;
 
 public sealed record SubmoduleInfo(string Sha, string Path, string Description, char State);
 
-public sealed record WorktreeInfo(string Path, string Head, string Branch, bool IsBare, bool IsDetached);
+/// <summary>
+/// One entry of <c>git worktree list --porcelain</c>. <see cref="Branch"/> is the full ref
+/// (<c>refs/heads/name</c>), empty when detached. The first entry is the main worktree.
+/// </summary>
+public sealed record WorktreeInfo(string Path, string Head, string Branch, bool IsBare, bool IsDetached,
+    bool IsLocked = false, bool IsPrunable = false)
+{
+    public string BranchName => Branch.StartsWith("refs/heads/", StringComparison.Ordinal) ? Branch["refs/heads/".Length..] : Branch;
+}
 
 public sealed record ReflogEntry(string ShortSha, string Selector, string Subject, string Date);
 
@@ -269,97 +277,23 @@ public sealed class AdvancedGitService(GitRepoHandler git, string path)
     {
         LastError = null;
         ProcessResult result = await RunAsync("worktree", "list", "--porcelain");
-        var list = new List<WorktreeInfo>();
         if (!result.Success)
         {
             LastError = result.Combined;
-            return list;
+            return [];
         }
 
-        string? path = null;
-        var head = string.Empty;
-        var branch = string.Empty;
-        var bare = false;
-        var detached = false;
-
-        void Commit()
-        {
-            if (path is not null)
-            {
-                list.Add(new WorktreeInfo(path, head, branch, bare, detached));
-            }
-
-            path = null;
-            head = string.Empty;
-            branch = string.Empty;
-            bare = false;
-            detached = false;
-        }
-
-        foreach (var line in result.Output.Split('\n'))
-        {
-            var text = line.TrimEnd('\r');
-            if (text.Length == 0)
-            {
-                Commit();
-                continue;
-            }
-
-            if (text.StartsWith("worktree ", StringComparison.Ordinal))
-            {
-                Commit();
-                path = text["worktree ".Length..];
-            }
-            else if (text.StartsWith("HEAD ", StringComparison.Ordinal))
-            {
-                head = text["HEAD ".Length..];
-            }
-            else if (text.StartsWith("branch ", StringComparison.Ordinal))
-            {
-                branch = text["branch ".Length..];
-            }
-            else if (text == "bare")
-            {
-                bare = true;
-            }
-            else if (text == "detached")
-            {
-                detached = true;
-            }
-        }
-
-        Commit();
-        return list;
+        return GitRepoHandler.ParseWorktrees(result.Output);
     }
 
+    /// <summary>With <paramref name="branch"/>, creates it at <paramref name="startPoint"/>; otherwise checks out the start point.</summary>
     public Task<ProcessResult> WorktreeAddAsync(string path, string? branch, string? startPoint)
-    {
-        var args = new List<string> { "worktree", "add" };
-        if (!string.IsNullOrWhiteSpace(branch))
-        {
-            args.Add("-b");
-            args.Add(branch);
-        }
-        args.Add(path);
-        if (!string.IsNullOrWhiteSpace(startPoint))
-        {
-            args.Add(startPoint);
-        }
-
-        return RunAsync(args);
-    }
+        => string.IsNullOrWhiteSpace(branch)
+            ? _git.AddWorktreeAsync(Path, path, startPoint, createBranch: false, startPoint: null)
+            : _git.AddWorktreeAsync(Path, path, branch, createBranch: true, startPoint);
 
     public Task<ProcessResult> WorktreeRemoveAsync(string path, bool force)
-    {
-        var args = new List<string> { "worktree", "remove" };
-        if (force)
-        {
-            args.Add("--force");
-        }
-
-        args.Add(path);
-        return RunAsync(args);
-    }
+        => _git.RemoveWorktreeAsync(Path, path, force);
 
     // Patch / archive ------------------------------------------------------
     public async Task<string> CreatePatchAsync(string revision)

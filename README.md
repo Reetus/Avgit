@@ -11,6 +11,7 @@ Inspired by Sourcetree. Avgit is an independent project and is not affiliated wi
 - Commit history with a rendered **commit graph** (lanes, merge edges, branch colours).
 - Commit details, changed-file list and per-file diffs.
 - Unified diff viewer with line numbers, added/removed highlighting, configurable context and whitespace-ignoring.
+- Worktrees in the sidebar: each worktree with its branch, Open (in a tab) and Remove, "+ New worktree", and Prune for worktrees whose folders are gone. Branches checked out in another worktree are marked; checking one out offers to open its worktree. A linked worktree shows an icon beside the branch in the toolbar.
 - Image diffs: PNG, JPEG, GIF, BMP, WebP and ICO files show as pictures, with Old File and New File side by side, or a single panel for an added or deleted image. Git LFS images show their real content when Git LFS is installed.
 - Staging at **file**, **hunk** and **selected-line** level; discarding at file and hunk level.
 - Commit and amend, with `commit.template` prefill, sign-off and GPG signing.
@@ -146,7 +147,7 @@ dotnet run branding/generate-icons.cs
 
 Windows and Linux icons are cropped close to the tile so they stay legible at small sizes. The macOS icon keeps the artwork's padding, which matches Apple's icon grid.
 
-The toolbar icons in `Avgit.App/Styles/Icons.axaml` are [Font Awesome Free](https://fontawesome.com) 6.7.2 solid icons, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Each is the icon's SVG path data stored as a `StreamGeometry`. To add one, copy the `d` attribute from `svgs/solid/<name>.svg` in the `@fortawesome/fontawesome-free` package. Set it on a `Button.toolbar.icon` with `controls:ButtonIcon.Data`.
+The icons in `Avgit.App/Styles/Icons.axaml` are [Font Awesome Free](https://fontawesome.com) 6.7.2 solid icons, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Each is the icon's SVG path data stored as a `StreamGeometry`. To add one, copy the `d` attribute from `svgs/solid/<name>.svg` in the `@fortawesome/fontawesome-free` package. Set it on a `Button.toolbar.icon` with `controls:ButtonIcon.Data`.
 
 ### Installing on Linux
 

@@ -820,6 +820,34 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
     public async Task<ProcessResult> DeleteBranchAsync(string path, string name, bool force, CancellationToken cancellationToken = default)
         => await GitAsync(path, cancellationToken, "branch", force ? "-D" : "-d", name).ConfigureAwait(false);
 
+    public async Task<ProcessResult> AddWorktreeAsync(string path, string worktreePath, string? branch, bool createBranch,
+        string? startPoint, CancellationToken cancellationToken = default)
+    {
+        var args = new List<string> { "worktree", "add" };
+        if (createBranch && !string.IsNullOrWhiteSpace(branch))
+        {
+            args.Add("-b");
+            args.Add(branch);
+        }
+
+        args.Add("--");
+        args.Add(worktreePath);
+        var commitish = createBranch ? startPoint : branch;
+        if (!string.IsNullOrWhiteSpace(commitish))
+        {
+            args.Add(commitish);
+        }
+
+        return await GitAsync(path, cancellationToken, args).ConfigureAwait(false);
+    }
+
+    public async Task<ProcessResult> RemoveWorktreeAsync(string path, string worktreePath, bool force, CancellationToken cancellationToken = default)
+        => await GitAsync(path, cancellationToken,
+            force ? ["worktree", "remove", "--force", "--", worktreePath] : ["worktree", "remove", "--", worktreePath]).ConfigureAwait(false);
+
+    public async Task<ProcessResult> PruneWorktreesAsync(string path, CancellationToken cancellationToken = default)
+        => await GitAsync(path, cancellationToken, "worktree", "prune").ConfigureAwait(false);
+
     public async Task<ProcessResult> CreateTagAsync(string path, string name, string? revision, string? message, CancellationToken cancellationToken = default)
     {
         var args = new List<string> { "tag" };
