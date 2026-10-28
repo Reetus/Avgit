@@ -88,6 +88,14 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             Name = path;
         }
 
+        // Rows are added in several places (cache, first page, more pages); mark worktree branches on all.
+        LogRows.CollectionChanged += (_, e) =>
+        {
+            foreach (CommitRowViewModel row in e.NewItems?.OfType<CommitRowViewModel>() ?? [])
+            {
+                row.SetWorktreeBranches(_worktreeBranches);
+            }
+        };
         IsLinkedWorktree = !string.Equals(GitRepoHandler.GetGitDir(path), GitRepoHandler.GetCommonGitDir(path),
             AppSettingsService.PathComparison);
         RepoTypeText = IsLinkedWorktree ? "Git · linked worktree" : "Git";
@@ -241,6 +249,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ObservableCollection<BranchRef> Branches { get; } = [];
     public ObservableCollection<BranchRef> RemoteBranches { get; } = [];
     public ObservableCollection<WorktreeEntry> Worktrees { get; } = [];
+
+    // Local branches checked out in other worktrees, for the history's branch pills.
+    private IReadOnlySet<string> _worktreeBranches = new HashSet<string>();
     public bool HasLinkedWorktrees => Worktrees.Count > 1;
     public bool HasPrunableWorktrees => Worktrees.Any(w => w.IsPrunable);
     public ObservableCollection<RemoteEntry> Remotes { get; } = [];
@@ -960,6 +971,15 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
 
         MainWorktreePath = IsLinkedWorktree && Worktrees.Count > 0 ? Worktrees[0].Path : string.Empty;
+        var worktreeBranches = Branches.Where(b => b.IsInOtherWorktree).Select(b => b.Name).ToHashSet(StringComparer.Ordinal);
+        if (!worktreeBranches.SetEquals(_worktreeBranches))
+        {
+            _worktreeBranches = worktreeBranches;
+            foreach (CommitRowViewModel row in LogRows)
+            {
+                row.SetWorktreeBranches(worktreeBranches);
+            }
+        }
         OnPropertyChanged(nameof(HasLinkedWorktrees));
         OnPropertyChanged(nameof(HasPrunableWorktrees));
         OnPropertyChanged(nameof(HasRemotes));

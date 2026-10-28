@@ -149,6 +149,11 @@ public class WorktreeTests
             Assert.True(main.Worktrees[1].CanOpen);
             Assert.True(main.Branches.Single(b => b.Name == "feature/login").IsInOtherWorktree);
 
+            // Its pill in the main tab's history carries the worktree icon; the current branch's does not.
+            RefPill FeaturePill() => main.LogRows.SelectMany(r => r.Pills).Single(p => p.Text == "feature/login");
+            Assert.True(FeaturePill().InWorktree);
+            Assert.False(main.LogRows.SelectMany(r => r.Pills).Single(p => p.Kind == RefPillKind.CurrentBranch).InWorktree);
+
             // Checking out that branch in the main tab switches to its worktree instead of failing.
             vm.Repository = main;
             main.CheckoutBranchCommand.Execute(main.Branches.Single(b => b.Name == "feature/login"));
@@ -169,6 +174,7 @@ public class WorktreeTests
             await WaitForAsync(() => vm.Repositories.Count == 1 && main.Worktrees.Count == 1 && !main.IsBusy);
             Assert.False(Directory.Exists(folder));
             Assert.True(main.Branches.Single(b => b.Name == "feature/login").CanDelete);
+            Assert.False(FeaturePill().InWorktree);
             Assert.Empty(dialogs.Messages);
         }
         finally

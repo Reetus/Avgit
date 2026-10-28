@@ -100,6 +100,14 @@ public sealed class RefPillsPanel : Panel
         InvalidateMeasure();
     }
 
+    private static Geometry? _worktreeIcon;
+
+    /// <summary>The sidebar's worktree icon, from the application resources.</summary>
+    private static Geometry? WorktreeIcon
+        => _worktreeIcon ??= Application.Current?.TryGetResource("IconWorktree", null, out var value) == true
+            ? value as Geometry
+            : null;
+
     private static Control MakePill(RefPill pill, Color lane)
     {
         var laneBrush = new SolidColorBrush(lane);
@@ -149,12 +157,29 @@ public sealed class RefPillsPanel : Panel
                 break;
         }
 
-        return MakeBorder(text, background, border, radius);
+        Control content = text;
+        if (pill.InWorktree && WorktreeIcon is { } icon)
+        {
+            // Docked so the text still trims when the pill is squeezed.
+            var marker = new PathIcon
+            {
+                Data = icon,
+                Width = 11,
+                Height = 9,
+                Margin = new Thickness(0, 0, 4, 0),
+                Foreground = text.Foreground,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            DockPanel.SetDock(marker, Dock.Left);
+            content = new DockPanel { Children = { marker, text } };
+        }
+
+        return MakeBorder(content, background, border, radius);
     }
 
-    private static Border MakeBorder(TextBlock text, IBrush background, IBrush border, CornerRadius radius) => new()
+    private static Border MakeBorder(Control content, IBrush background, IBrush border, CornerRadius radius) => new()
     {
-        Child = text,
+        Child = content,
         Background = background,
         BorderBrush = border,
         BorderThickness = new Thickness(1),
