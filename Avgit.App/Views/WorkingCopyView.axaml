@@ -1,0 +1,146 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avgit.App.ViewModels"
+             xmlns:views="using:Avgit.App.Views"
+             x:Class="Avgit.App.Views.WorkingCopyView"
+             x:DataType="vm:RepositoryViewModel">
+  <Grid ColumnDefinitions="430,5,*" Background="{StaticResource AppBackground}">
+    <Grid Grid.Column="0" RowDefinitions="Auto,130,Auto,*,Auto">
+      <!-- Thin per-pane loading indicator (overlays the top edge). -->
+      <ProgressBar Grid.Row="1" VerticalAlignment="Top" Height="2" MinHeight="2" ZIndex="1"
+                   IsIndeterminate="True" IsVisible="{Binding IsLoadingStatus}" />
+      <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="8,5"
+              BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Text="{Binding StagedHeader}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+            <Button Classes="flat" Content="Unstage selected" Command="{Binding UnstageSelectedCommand}" />
+            <Button Classes="flat" Content="Unstage all" Command="{Binding UnstageAllCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <ListBox Grid.Row="1" ItemsSource="{Binding StagedFiles}"
+               SelectedItem="{Binding SelectedStagedFile, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="26,20,*,Auto" Height="24">
+              <CheckBox Grid.Column="0" Classes="diffcheck" IsChecked="{Binding Included, Mode=TwoWay}"
+                        MinWidth="0" MinHeight="0" Padding="0" Margin="2,0,0,0" HorizontalAlignment="Left"
+                        VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontFamily="{StaticResource MonoFont}" FontWeight="Bold"
+                         Foreground="{Binding Status, Converter={StaticResource StatusBrush}}" />
+              <TextBlock Grid.Column="2" Text="{Binding RelativePath}" FontSize="11" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="3" Text="{Binding OldPath}" Classes="muted" FontSize="10"
+                         IsVisible="{Binding HasOldPath}" Margin="8,0,0,0" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Border Grid.Row="2" Background="{StaticResource Panel}" Padding="8,5"
+              BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,1">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Text="{Binding UnstagedHeader}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+            <Button Classes="flat" Content="Stage selected" Command="{Binding StageSelectedCommand}" />
+            <Button Classes="flat" Content="Stage all" Command="{Binding StageAllCommand}" />
+            <Button Classes="flat" Content="Discard" Command="{Binding DiscardSelectedCommand}" />
+            <Button Classes="flat" Content="Discard all" Command="{Binding DiscardAllCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <ListBox Grid.Row="3" ItemsSource="{Binding UnstagedFiles}"
+               SelectedItem="{Binding SelectedUnstagedFile, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="26,20,*,Auto" Height="24">
+              <CheckBox Grid.Column="0" Classes="diffcheck" IsChecked="{Binding Included, Mode=TwoWay}"
+                        MinWidth="0" MinHeight="0" Padding="0" Margin="2,0,0,0" HorizontalAlignment="Left"
+                        VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontFamily="{StaticResource MonoFont}" FontWeight="Bold"
+                         Foreground="{Binding Status, Converter={StaticResource StatusBrush}}" />
+              <TextBlock Grid.Column="2" Text="{Binding RelativePath}" FontSize="11" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="3" Text="{Binding OldPath}" Classes="muted" FontSize="10"
+                         IsVisible="{Binding HasOldPath}" Margin="8,0,0,0" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Border Grid.Row="4" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
+              BorderThickness="0,1,0,0" Padding="10,8">
+        <StackPanel Spacing="6">
+          <Border Background="#3D2E1E" BorderBrush="#8A5A1F" BorderThickness="1" CornerRadius="3"
+                  Padding="8" IsVisible="{Binding HasConflict}">
+            <StackPanel Spacing="5">
+              <TextBlock Text="{Binding ConflictText}" FontSize="11" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Button Classes="flat" Content="Abort merge" Command="{Binding AbortMergeCommand}"
+                        IsVisible="{Binding IsMergeInProgress}" />
+                <Button Classes="flat" Content="Abort rebase" Command="{Binding AbortRebaseCommand}"
+                        IsVisible="{Binding IsRebaseInProgress}" />
+                <Button Classes="flat" Content="Continue rebase" Command="{Binding ContinueRebaseCommand}"
+                        IsVisible="{Binding IsRebaseInProgress}" />
+                <Button Classes="flat" Content="Skip commit" Command="{Binding SkipRebaseCommitCommand}"
+                        IsVisible="{Binding IsRebaseInProgress}" />
+                <Button Classes="flat" Content="Continue cherry-pick" Command="{Binding CherryPickContinueCommand}"
+                        IsVisible="{Binding IsCherryPickInProgress}" />
+                <Button Classes="flat" Content="Skip cherry-pick" Command="{Binding CherryPickSkipCommand}"
+                        IsVisible="{Binding IsCherryPickInProgress}" />
+                <Button Classes="flat" Content="Abort cherry-pick" Command="{Binding CherryPickAbortCommand}"
+                        IsVisible="{Binding IsCherryPickInProgress}" />
+                <Button Classes="flat" Content="Continue revert" Command="{Binding RevertContinueCommand}"
+                        IsVisible="{Binding IsRevertInProgress}" />
+                <Button Classes="flat" Content="Abort revert" Command="{Binding RevertAbortCommand}"
+                        IsVisible="{Binding IsRevertInProgress}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <TextBlock Text="{Binding SummaryText}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+          <TextBox Text="{Binding CommitMessage, Mode=TwoWay}" PlaceholderText="Commit message"
+                   AcceptsReturn="True" TextWrapping="Wrap" Height="70" FontSize="12" />
+          <Grid RowDefinitions="Auto,Auto" RowSpacing="6">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+              <CheckBox Content="Amend last commit" IsChecked="{Binding Amend, Mode=TwoWay}"
+                        FontSize="11" VerticalAlignment="Center" />
+              <CheckBox Content="Sign off" IsChecked="{Binding SignOff, Mode=TwoWay}"
+                        FontSize="11" VerticalAlignment="Center" />
+              <CheckBox Content="GPG sign" IsChecked="{Binding GpgSign, Mode=TwoWay}"
+                        FontSize="11" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+              <Button Classes="toolbar" Content="Stash" Command="{Binding StashCommand}" />
+              <Button Classes="accent" Content="Commit" Width="110" Height="32"
+                      Command="{Binding CommitCommand}" IsEnabled="{Binding CanCommit}" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" />
+
+    <Grid Grid.Column="2" RowDefinitions="Auto,*">
+      <!-- Thin per-pane loading indicator (overlays the top edge). -->
+      <ProgressBar Grid.Row="1" VerticalAlignment="Top" Height="2" MinHeight="2" ZIndex="1"
+                   IsIndeterminate="True" IsVisible="{Binding IsLoadingWorkingDiff}" />
+      <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
+              BorderThickness="0,0,0,1" Padding="8,5">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+          <TextBlock Text="Context" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
+          <ComboBox Grid.Column="1" ItemsSource="{Binding ContextOptions}"
+                    SelectedItem="{Binding DiffContext, Mode=TwoWay}" Width="70" Height="26" FontSize="12" />
+          <CheckBox Grid.Column="2" Content="Ignore whitespace" IsChecked="{Binding IgnoreWhitespace, Mode=TwoWay}"
+                    FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" />
+          <Button Grid.Column="3" Classes="flat" Content="Open file" Command="{Binding OpenSelectedFileCommand}" />
+          <Button Grid.Column="4" Classes="flat" Content="Open folder" Command="{Binding OpenInExplorerCommand}" />
+        </Grid>
+      </Border>
+      <views:DiffView Grid.Row="1" DataContext="{Binding WorkingDiff}" />
+    </Grid>
+  </Grid>
+</UserControl>
+
+

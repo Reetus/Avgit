@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <RootNamespace>Avgit.App</RootNamespace>
+    <AssemblyName>Avgit</AssemblyName>
+    <!-- Release version; branding/linux/build-appimage.sh passes it to vpk. -->
+    <Version>0.1.0</Version>
+    <!-- Surface trim/AOT problems at build time; publish with -p:PublishProfile=NativeAot or SingleFile. -->
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+    <!-- Keep in step with the vpk tool version in dotnet-tools.json. -->
+    <PackageReference Include="Velopack" Version="1.2.161" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Avgit.Core\Avgit.Core.csproj" />
+    <ProjectReference Include="..\Avgit.Git\Avgit.Git.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Avgit.Tests" />
+  </ItemGroup>
+
+  <!-- Icons are generated from branding/avgit-logo-original.png by branding/generate-icons.cs. -->
+  <PropertyGroup>
+    <ApplicationIcon>Assets\avgit.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\avgit-256.png" />
+  </ItemGroup>
+</Project>

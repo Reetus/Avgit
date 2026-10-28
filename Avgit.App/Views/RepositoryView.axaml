@@ -1,0 +1,169 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avgit.App.ViewModels"
+             xmlns:views="using:Avgit.App.Views"
+             x:Class="Avgit.App.Views.RepositoryView"
+             x:DataType="vm:RepositoryViewModel">
+  <Grid ColumnDefinitions="245,5,*" Background="{StaticResource AppBackground}">
+    <Border Grid.Column="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
+            BorderThickness="0,0,1,0">
+      <ScrollViewer>
+        <StackPanel Margin="4,6,4,12">
+          <Expander Header="BRANCHES" IsExpanded="True" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
+              <Button Classes="flat" Content="+ New branch" HorizontalAlignment="Left"
+                      Command="{Binding CreateBranchCommand}" />
+              <ListBox ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch, Mode=TwoWay}"
+                       DoubleTapped="OnBranchDoubleTapped" HorizontalAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="14,*,Auto,Auto" Height="22">
+                      <TextBlock Text="●" Foreground="#3FB950" FontSize="10" VerticalAlignment="Center"
+                                 IsVisible="{Binding IsCheckedOut}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11"
+                                 TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Text="{Binding UpstreamText}" Foreground="#D29922"
+                                 FontSize="10" Margin="6,0" VerticalAlignment="Center" />
+                      <Button Grid.Column="3" Classes="flat" Content="×" FontSize="12" Padding="4,0"
+                              IsVisible="{Binding CanDelete}"
+                              Command="{Binding $parent[ListBox].DataContext.DeleteBranchCommand}"
+                              CommandParameter="{Binding}" ToolTip.Tip="Delete branch" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </StackPanel>
+          </Expander>
+
+          <Expander Header="REMOTES" IsExpanded="True" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
+              <Button Classes="flat" Content="+ Add remote" HorizontalAlignment="Left"
+                      Command="{Binding AddRemoteCommand}" />
+              <TextBlock Text="No remotes configured." Classes="muted" FontSize="10" Margin="8,3"
+                         IsVisible="{Binding !HasRemotes}" />
+              <ItemsControl ItemsSource="{Binding Remotes}" HorizontalAlignment="Stretch">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="4,2">
+                      <StackPanel Margin="2,0">
+                        <TextBlock Text="{Binding Display}" FontSize="11" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Url}" Classes="muted" FontSize="10" TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="flat" Content="Edit" FontSize="10" Padding="4,0"
+                              ToolTip.Tip="Rename or change remote URL"
+                              Command="{Binding $parent[ItemsControl].DataContext.EditRemoteCommand}"
+                              CommandParameter="{Binding}" />
+                      <Button Grid.Column="2" Classes="flat" Content="×" FontSize="12" Padding="4,0"
+                              ToolTip.Tip="Remove remote"
+                              Command="{Binding $parent[ItemsControl].DataContext.DeleteRemoteCommand}"
+                              CommandParameter="{Binding}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Expander>
+
+          <Expander Header="REMOTE BRANCHES" IsExpanded="True" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
+              <TextBlock Text="No remote branches." Classes="muted" FontSize="10" Margin="8,3"
+                         IsVisible="{Binding !HasRemoteBranches}" />
+              <ListBox ItemsSource="{Binding RemoteBranches}" SelectedItem="{Binding SelectedRemoteBranch, Mode=TwoWay}" DoubleTapped="OnBranchDoubleTapped"
+                       HorizontalAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*" Height="22">
+                      <TextBlock Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </StackPanel>
+          </Expander>
+
+          <Expander Header="TAGS" IsExpanded="True" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
+              <TextBlock Text="No tags." Classes="muted" FontSize="10" Margin="8,3"
+                         IsVisible="{Binding !HasTags}" />
+            <ListBox ItemsSource="{Binding Tags}" DoubleTapped="OnTagDoubleTapped"
+                     HorizontalAlignment="Stretch">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Height="22">
+                    <TextBlock Text="{Binding}" FontSize="11" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <Button Grid.Column="1" Classes="flat" Content="×" FontSize="12" Padding="4,0"
+                            Command="{Binding $parent[ListBox].DataContext.DeleteTagCommand}"
+                            CommandParameter="{Binding}" ToolTip.Tip="Delete tag" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            </StackPanel>
+          </Expander>
+
+          <Expander Header="STASHES" IsExpanded="True" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
+              <Button Classes="flat" Content="+ Stash changes" HorizontalAlignment="Left"
+                      Command="{Binding StashCommand}" />
+              <TextBlock Text="No stashes." Classes="muted" FontSize="10" Margin="8,3"
+                         IsVisible="{Binding !HasStashes}" />
+              <ListBox ItemsSource="{Binding Stashes}" DoubleTapped="OnStashDoubleTapped"
+                       HorizontalAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Height="22">
+                      <TextBlock Text="{Binding Display}" FontSize="11" VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis" />
+                      <Button Grid.Column="1" Classes="flat" Content="Apply" FontSize="10" Padding="4,0"
+                              Command="{Binding $parent[ListBox].DataContext.ApplyStashCommand}"
+                              CommandParameter="{Binding}" />
+                      <Button Grid.Column="2" Classes="flat" Content="Pop" FontSize="10" Padding="4,0"
+                              Command="{Binding $parent[ListBox].DataContext.PopStashCommand}"
+                              CommandParameter="{Binding}" />
+                      <Button Grid.Column="3" Classes="flat" Content="×" FontSize="12" Padding="4,0"
+                              Command="{Binding $parent[ListBox].DataContext.DropStashCommand}"
+                              CommandParameter="{Binding}" ToolTip.Tip="Drop stash" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </StackPanel>
+          </Expander>
+
+          <Expander Header="REPOSITORY" IsExpanded="True">
+            <StackPanel Spacing="3" Margin="6,2">
+              <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding RepoTypeText}" Classes="muted" FontSize="10" />
+              <TextBlock Text="{Binding Path}" Classes="muted" FontSize="10" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
+                <Button Classes="flat" Content="Open folder" Command="{Binding OpenInExplorerCommand}" />
+                <Button Classes="flat" Content="Refresh" Command="{Binding RefreshCommand}" />
+              </StackPanel>
+            </StackPanel>
+          </Expander>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" />
+
+    <TabControl Grid.Column="2">
+      <TabItem Header="History">
+        <views:HistoryView />
+      </TabItem>
+      <TabItem Header="File Status">
+        <views:WorkingCopyView />
+      </TabItem>
+    </TabControl>
+  </Grid>
+</UserControl>
+
+
+

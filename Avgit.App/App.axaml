@@ -1,0 +1,46 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:Avgit.App.Converters"
+             x:Class="Avgit.App.App"
+             RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <Color x:Key="AppBackgroundColor">#1E1E1E</Color>
+    <Color x:Key="PanelColor">#252526</Color>
+    <Color x:Key="PanelAltColor">#2D2D30</Color>
+    <Color x:Key="BorderColor">#3F3F46</Color>
+    <Color x:Key="TextColor">#F1F1F1</Color>
+    <Color x:Key="MutedColor">#A0A0A0</Color>
+    <Color x:Key="AccentColor">#0E639C</Color>
+    <Color x:Key="GreenColor">#3FB950</Color>
+    <Color x:Key="RedColor">#F85149</Color>
+
+    <SolidColorBrush x:Key="AppBackground" Color="{StaticResource AppBackgroundColor}" />
+    <SolidColorBrush x:Key="Panel" Color="{StaticResource PanelColor}" />
+    <SolidColorBrush x:Key="PanelAlt" Color="{StaticResource PanelAltColor}" />
+    <SolidColorBrush x:Key="Border" Color="{StaticResource BorderColor}" />
+    <SolidColorBrush x:Key="Text" Color="{StaticResource TextColor}" />
+    <SolidColorBrush x:Key="Muted" Color="{StaticResource MutedColor}" />
+    <SolidColorBrush x:Key="Accent" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="Green" Color="{StaticResource GreenColor}" />
+    <SolidColorBrush x:Key="Red" Color="{StaticResource RedColor}" />
+
+    <!-- The Fluent expander defaults to near-black chrome; the sidebar is flat. -->
+    <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="ExpanderHeaderBackgroundPointerOver" Color="#3E3E42" />
+    <SolidColorBrush x:Key="ExpanderHeaderBackgroundPressed" Color="#3E3E42" />
+    <SolidColorBrush x:Key="ExpanderHeaderBorderBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ExpanderContentBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="ExpanderContentBorderBrush" Color="Transparent" />
+
+    <!-- Consolas is Windows-only; fall back to common monospace fonts elsewhere. -->
+    <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas, Menlo, SF Mono, DejaVu Sans Mono, Liberation Mono, Noto Sans Mono, monospace</FontFamily>
+
+    <conv:StatusBrushConverter x:Key="StatusBrush" />
+    <conv:HexBrushConverter x:Key="HexBrush" />
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avgit/Styles/AppStyles.axaml" />
+  </Application.Styles>
+</Application>

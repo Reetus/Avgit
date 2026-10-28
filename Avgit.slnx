@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Avgit.App/Avgit.App.csproj" />
+  <Project Path="Avgit.Core/Avgit.Core.csproj" />
+  <Project Path="Avgit.Git/Avgit.Git.csproj" />
+  <Project Path="Avgit.Tests/Avgit.Tests.csproj" />
+</Solution>

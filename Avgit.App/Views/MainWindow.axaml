@@ -1,0 +1,160 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Avgit.App.ViewModels"
+        xmlns:views="using:Avgit.App.Views"
+        x:Class="Avgit.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding Title}"
+        Width="1360" Height="860"
+        MinWidth="1100" MinHeight="650"
+        Background="{StaticResource AppBackground}">
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Ctrl+T" Command="{Binding ShowHomeCommand}" />
+    <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenRepositoryCommand}" />
+    <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseRepositoryCommand}" />
+    <KeyBinding Gesture="Ctrl+Tab" Command="{Binding NextRepositoryCommand}" />
+    <KeyBinding Gesture="Ctrl+Shift+Tab" Command="{Binding PreviousRepositoryCommand}" />
+    <KeyBinding Gesture="Ctrl+Shift+T" Command="{Binding ReopenClosedRepositoryCommand}" />
+    <KeyBinding Gesture="Ctrl+Shift+C" Command="{Binding Repository.OpenTerminalCommand}" />
+  </Window.KeyBindings>
+  <DockPanel>
+    <Menu DockPanel.Dock="Top" Background="{StaticResource Panel}">
+      <MenuItem Header="_File">
+        <MenuItem Header="Open Repository..." Command="{Binding OpenRepositoryCommand}" />
+        <MenuItem Header="Reopen Closed Repository" Command="{Binding ReopenClosedRepositoryCommand}" />
+        <MenuItem Header="Clone Repository..." Command="{Binding CloneRepositoryCommand}" />
+        <MenuItem Header="Create Repository..." Command="{Binding InitRepositoryCommand}" />
+        <Separator />
+        <MenuItem Header="Close Repository" Command="{Binding CloseRepositoryCommand}" />
+        <Separator />
+        <MenuItem Header="Settings..." Command="{Binding SettingsCommand}" />
+        <Separator />
+        <MenuItem Header="Exit" Command="{Binding ExitCommand}" />
+      </MenuItem>
+      <MenuItem Header="_Repository">
+        <MenuItem Header="Refresh" Command="{Binding Repository.RefreshCommand}" />
+        <Separator />
+        <MenuItem Header="Fetch" Command="{Binding Repository.FetchCommand}" />
+        <MenuItem Header="Fetch All Remotes" Command="{Binding Repository.FetchAllCommand}" />
+        <MenuItem Header="Pull" Command="{Binding Repository.PullCommand}" />
+        <MenuItem Header="Pull with Rebase" Command="{Binding Repository.PullRebaseCommand}" />
+        <MenuItem Header="Push" Command="{Binding Repository.PushCommand}" />
+        <MenuItem Header="Push to Remote..." Command="{Binding Repository.PushToRemoteCommand}" />
+        <MenuItem Header="Force Push (with lease)" Command="{Binding Repository.ForcePushCommand}" />
+        <Separator />
+        <MenuItem Header="Create Branch..." Command="{Binding Repository.CreateBranchCommand}" />
+        <MenuItem Header="Create Tag..." Command="{Binding Repository.CreateTagCommand}" />
+        <MenuItem Header="Stash Changes..." Command="{Binding Repository.StashCommand}" />
+        <Separator />
+        <MenuItem Header="Advanced Git..." Click="OnAdvancedGitClick" />
+        <MenuItem Header="Open in File Explorer" Command="{Binding Repository.OpenInExplorerCommand}" />
+        <MenuItem Header="Open in Terminal" Command="{Binding Repository.OpenTerminalCommand}" InputGesture="Ctrl+Shift+C" />
+      </MenuItem>
+      <MenuItem Header="_Help">
+        <MenuItem Header="About Avgit" Command="{Binding AboutCommand}" />
+      </MenuItem>
+    </Menu>
+
+    <Border DockPanel.Dock="Top" Background="{StaticResource Panel}"
+            BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,1" Padding="6,2">
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <ListBox x:Name="RepositoryTabs" Grid.Column="0" Classes="repotabs"
+                 ItemsSource="{Binding Repositories}"
+                 SelectedItem="{Binding Repository, Mode=TwoWay}"
+                 SelectionMode="Single"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Border Padding="10,5" Background="Transparent">
+                <Border.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Close" Click="OnTabCloseClick" />
+                    <MenuItem Header="Close Others" Click="OnTabCloseOthersClick" />
+                    <MenuItem Header="Close All" Click="OnTabCloseAllClick" />
+                    <Separator />
+                    <MenuItem Header="Copy repository path" Click="OnTabCopyPathClick" />
+                  </ContextMenu>
+                </Border.ContextMenu>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Name}" FontSize="12" VerticalAlignment="Center"
+                             Opacity="{Binding TabOpacity}"
+                             MaxWidth="260" TextTrimming="CharacterEllipsis"
+                             ToolTip.Tip="{Binding Path}" />
+                  <Button Classes="flat" Content="×" FontSize="14" Width="20" Height="20"
+                          Padding="0" MinWidth="0" MinHeight="0"
+                          ToolTip.Tip="Close repository"
+                          Command="{Binding $parent[ListBox].DataContext.CloseRepositoryCommand}"
+                          CommandParameter="{Binding}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <ProgressBar Grid.Column="1" Width="70" Height="4" IsIndeterminate="True"
+                     IsVisible="{Binding IsHomeBusy}" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <Button Grid.Column="2" Classes="flat" Content="+" FontSize="18" Width="32" Height="30"
+                Margin="6,0,0,0" VerticalAlignment="Center"
+                ToolTip.Tip="Home / recent repositories"
+                Command="{Binding ShowHomeCommand}" />
+      </Grid>
+    </Border>
+
+    <Border DockPanel.Dock="Top" Background="{StaticResource PanelAlt}"
+            BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,1" Padding="8,6">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" IsEnabled="{Binding ShowRepositoryContent}">
+          <Button Classes="toolbar" Content="Open" Command="{Binding OpenRepositoryCommand}" />
+          <Button Classes="toolbar" Content="Refresh" Command="{Binding Repository.RefreshCommand}" />
+          <Button Classes="toolbar" Content="Fetch" Command="{Binding Repository.FetchCommand}" />
+          <Button Classes="toolbar" Content="Pull" Command="{Binding Repository.PullCommand}" />
+          <Button Classes="toolbar" Content="Push" Command="{Binding Repository.PushCommand}" />
+          <Button Classes="toolbar" Content="Commit" Command="{Binding Repository.CommitCommand}"
+                  IsEnabled="{Binding Repository.CanCommit, FallbackValue=False}" />
+          <Button Classes="toolbar" Content="Branch" Command="{Binding Repository.CreateBranchCommand}" />
+          <Button Classes="toolbar" Content="Tag" Command="{Binding Repository.CreateTagCommand}" />
+          <Button Classes="toolbar" Content="Stash" Command="{Binding Repository.StashCommand}" />
+          <Button Classes="toolbar" Content="Terminal" Command="{Binding Repository.OpenTerminalCommand}"
+                  ToolTip.Tip="Open a terminal in the repository folder (Ctrl+Shift+C)" />
+        </StackPanel>
+        <TextBlock Grid.Column="1" Text="{Binding Repository.BranchAndRevisionText}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"
+                   IsVisible="{Binding ShowRepositoryContent}" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <ProgressBar Width="90" Height="4" IsIndeterminate="True" VerticalAlignment="Center"
+                       IsVisible="{Binding Repository.IsBusy, FallbackValue=False}" />
+          <Button Classes="flat" Content="Settings" Command="{Binding SettingsCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border DockPanel.Dock="Bottom" Background="{StaticResource Panel}"
+            BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,0" Padding="8,4">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Text="{Binding Repository.BranchAndRevisionText}" FontSize="11" Foreground="#58A6FF"
+                   VerticalAlignment="Center" IsVisible="{Binding ShowRepositoryContent}" />
+        <TextBlock Grid.Column="1" Text="{Binding Repository.StatusMessage}" Classes="muted" FontSize="11"
+                   VerticalAlignment="Center" Margin="16,0" TextTrimming="CharacterEllipsis"
+                   IsVisible="{Binding ShowRepositoryContent}" />
+        <TextBlock Grid.Column="1" Text="{Binding HomeStatusMessage}" Classes="muted" FontSize="11"
+                   VerticalAlignment="Center" Margin="16,0" TextTrimming="CharacterEllipsis"
+                   IsVisible="{Binding WelcomeVisible}" />
+        <TextBlock Grid.Column="2" Text="{Binding Repository.Path}" Classes="muted" FontSize="10"
+                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="480"
+                   IsVisible="{Binding ShowRepositoryContent}" />
+      </Grid>
+    </Border>
+
+    <Grid>
+      <views:WelcomeView IsVisible="{Binding WelcomeVisible}" />
+      <Grid IsVisible="{Binding ShowRepositoryContent}">
+        <views:RepositoryView DataContext="{Binding Repository}" />
+      </Grid>
+    </Grid>
+  </DockPanel>
+</Window>

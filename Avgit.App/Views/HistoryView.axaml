@@ -1,0 +1,172 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avgit.App.ViewModels"
+             xmlns:controls="using:Avgit.App.Controls"
+             xmlns:views="using:Avgit.App.Views"
+             x:Class="Avgit.App.Views.HistoryView"
+             x:DataType="vm:RepositoryViewModel">
+  <UserControl.Styles>
+    <Style Selector="ListBox.hideAuthor TextBlock.author">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="ListBox.hideDate TextBlock.date">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*" Background="{StaticResource AppBackground}">
+    <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
+            BorderThickness="0,0,0,1" Padding="8,5">
+      <Grid ColumnDefinitions="Auto,160,Auto,150,Auto,Auto,Auto,*,Auto">
+        <TextBlock Grid.Column="0" Text="Author" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
+        <TextBox Grid.Column="1" Text="{Binding AuthorFilter, Mode=TwoWay}" PlaceholderText="Filter by author"
+                 Height="26" FontSize="12" />
+        <Button Grid.Column="2" Classes="toolbar" Content="Search" Margin="6,0,10,0"
+                Command="{Binding ApplyLogFilterCommand}" />
+        <ComboBox Grid.Column="3" ItemsSource="{Binding BranchFilterOptions}"
+                  SelectedItem="{Binding SelectedBranchFilter, Mode=TwoWay}" Height="26" FontSize="12" />
+        <TextBlock Grid.Column="4" Text="Context" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="12,0,6,0" />
+        <ComboBox Grid.Column="5" ItemsSource="{Binding ContextOptions}"
+                  SelectedItem="{Binding DiffContext, Mode=TwoWay}" Width="70" Height="26" FontSize="12" />
+        <CheckBox Grid.Column="6" Content="Ignore whitespace" IsChecked="{Binding IgnoreWhitespace, Mode=TwoWay}"
+                  FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" />
+        <Button Grid.Column="8" Classes="toolbar" Content="Clear" Command="{Binding ClearLogFilterCommand}" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="3*,5,2*">
+      <Grid Grid.Column="0" RowDefinitions="Auto,*">
+        <!-- Thin per-pane loading indicator (overlays the top edge). -->
+        <ProgressBar Grid.Row="1" VerticalAlignment="Top" Height="2" MinHeight="2" ZIndex="1"
+                     IsIndeterminate="True" IsVisible="{Binding IsLoadingHistory}" />
+        <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="8,4"
+                BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto">
+            <!-- One TextBlock so a narrow pane trims the text instead of running under the buttons. -->
+            <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"
+                       ToolTip.Tip="{Binding BranchAndRevisionText}">
+              <Run Text="{Binding BranchAndRevisionText}" FontSize="12" FontWeight="SemiBold" />
+              <Run Text="   " FontSize="10" />
+              <Run Text="{Binding LogCountText}" FontSize="10" Foreground="{StaticResource Muted}" />
+            </TextBlock>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+              <Button Classes="flat" Content="Load more" Command="{Binding LoadMoreLogCommand}" />
+              <Button Classes="flat" Content="Refresh" Command="{Binding RefreshCommand}" />
+              <Button Classes="flat" Content="Fetch" Command="{Binding FetchCommand}" />
+              <Button Classes="flat" Content="Pull" Command="{Binding PullCommand}" />
+              <Button Classes="flat" Content="Push" Command="{Binding PushCommand}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <ListBox x:Name="CommitList" Grid.Row="1" Classes="commits" ItemsSource="{Binding LogRows}"
+                 SelectionMode="Multiple" SelectionChanged="OnCommitSelectionChanged"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <ListBox.ContextMenu>
+            <ContextMenu Opening="OnCommitMenuOpening" Closing="OnCommitMenuClosing">
+              <MenuItem Header="Checkout commit" Click="OnCheckoutCommit" />
+              <MenuItem Header="Create branch here..." Click="OnCreateBranchHere" />
+              <MenuItem Header="Create tag here..." Click="OnCreateTagHere" />
+              <Separator />
+              <MenuItem Header="Merge into current branch" Click="OnMergeCommit" />
+              <MenuItem Header="Cherry-pick selected commit(s)" Click="OnCherryPick" />
+              <MenuItem Header="Revert selected commit(s)" Click="OnRevertCommit" />
+              <MenuItem Header="Rebase current branch onto this" Click="OnRebaseOntoCommit" />
+              <MenuItem Header="Interactive rebase from here..." Click="OnInteractiveRebase" />
+              <MenuItem Header="Reset --hard to this commit" Click="OnResetCommit" />
+              <Separator />
+              <MenuItem Header="Set as compare base" Click="OnSetCompareBase" />
+              <MenuItem Header="Compare selected with base" Click="OnCompareWithBase" />
+              <Separator />
+              <MenuItem Header="Copy SHA" Click="OnCopyCommitSha" />
+            </ContextMenu>
+          </ListBox.ContextMenu>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <!-- Author and date columns collapse in narrow panes (see HistoryView.UpdateCommitListWidthClasses). -->
+              <Grid ColumnDefinitions="Auto,*,Auto,Auto" Height="26">
+                <controls:CommitGraphRow Grid.Column="0" Entry="{Binding Graph}" Width="{Binding GraphWidth}"
+                                         ColumnWidth="11" ClipToBounds="True" />
+                <DockPanel Grid.Column="1" VerticalAlignment="Center">
+                  <controls:RefPillsPanel DockPanel.Dock="Left" Pills="{Binding Pills}" LaneColor="{Binding LabelColor}"
+                                          IsVisible="{Binding HasLabels}" Margin="0,0,6,0"
+                                          ToolTip.Tip="{Binding LabelsToolTip}" />
+                  <TextBlock Text="{Binding Message}" FontSize="12" TextTrimming="CharacterEllipsis"
+                             VerticalAlignment="Center" />
+                </DockPanel>
+                <TextBlock Grid.Column="2" Classes="muted author" Text="{Binding Author}" FontSize="11" Width="118"
+                           Margin="8,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="3" Classes="muted date" Text="{Binding TimestampText}" FontSize="11" Width="96"
+                           VerticalAlignment="Center" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+
+      <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" />
+
+      <Grid Grid.Column="2" RowDefinitions="Auto,170,5,*">
+        <!-- Thin per-pane loading indicator (overlays the top edge). -->
+        <ProgressBar Grid.Row="1" VerticalAlignment="Top" Height="2" MinHeight="2" ZIndex="1"
+                     IsIndeterminate="True" IsVisible="{Binding IsLoadingCommit}" />
+        <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="10,8"
+                BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1">
+          <StackPanel Spacing="5">
+            <TextBlock Text="{Binding CommitInfo.Title}" FontSize="14" FontWeight="SemiBold"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="{Binding CommitInfo.Message}" Classes="muted" FontSize="11" TextWrapping="Wrap"
+                       MaxHeight="56" IsVisible="{Binding CommitInfo.HasMoreMessage}" />
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Text="{Binding CommitInfo.ShortSha}" FontFamily="{StaticResource MonoFont}" FontSize="11"
+                         Foreground="#58A6FF" Margin="0,0,12,0" />
+              <TextBlock Grid.Column="1" Classes="muted" FontSize="11">
+                <Run Text="{Binding CommitInfo.Author}" />
+                <Run Text="  " />
+                <Run Text="{Binding CommitInfo.AuthorDateText}" />
+              </TextBlock>
+            </Grid>
+            <TextBlock Text="{Binding CommitInfo.TagsText}" Foreground="#3FB950" FontSize="11" />
+            <TextBlock Text="{Binding CommitInfo.ParentsText}" Classes="muted" FontSize="10" />
+            <WrapPanel Orientation="Horizontal">
+              <Button Classes="flat" Content="Checkout" Command="{Binding CheckoutCommitCommand}" />
+              <Button Classes="flat" Content="Branch here" Command="{Binding CreateBranchAtCommitCommand}" />
+              <Button Classes="flat" Content="Tag here" Command="{Binding CreateTagAtCommitCommand}" />
+              <Button Classes="flat" Content="Merge" Command="{Binding MergeCommitCommand}" />
+              <Button Classes="flat" Content="Rebase onto" Command="{Binding RebaseCommitCommand}" />
+              <Button Classes="flat" Content="Reset --hard" Command="{Binding ResetCommitCommand}" />
+              <Button Classes="flat" Content="Copy SHA" Command="{Binding CopyCommitShaCommand}" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
+                BorderThickness="0,0,0,1">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Text="Changed files" Classes="muted" FontSize="11" Margin="8,4" />
+            <ListBox Grid.Row="1" ItemsSource="{Binding CommitFiles}"
+                     SelectedItem="{Binding SelectedCommitFile, Mode=TwoWay}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="18,*,Auto" Height="22">
+                    <TextBlock Text="{Binding StatusText}" FontFamily="{StaticResource MonoFont}" FontWeight="Bold"
+                               Foreground="{Binding Status, Converter={StaticResource StatusBrush}}" />
+                    <TextBlock Grid.Column="1" Text="{Binding RelativePath}" FontSize="11"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="2" Text="{Binding OldPath}" Classes="muted" FontSize="10"
+                               IsVisible="{Binding HasOldPath}" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+        </Border>
+
+        <GridSplitter Grid.Row="2" Height="5" ResizeDirection="Rows" />
+
+        <views:DiffView Grid.Row="3" DataContext="{Binding CommitDiff}" />
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>
+

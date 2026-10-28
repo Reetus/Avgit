@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Avgit
+GenericName=Git Client
+Comment=Browse history, stage changes and manage Git repositories
+Exec=avgit %F
+Icon=avgit
+Terminal=false
+Categories=Development;RevisionControl;
+Keywords=git;version control;commit;branch;
+StartupWMClass=Avgit
