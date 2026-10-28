@@ -10,6 +10,7 @@ Inspired by Sourcetree. Avgit is an independent project and is not affiliated wi
 - Multiple repositories open at once in closable tabs above the toolbar; `+` opens the home/recent-repositories screen, `Ctrl+T` returns home, `Ctrl+W` closes the current tab and `Ctrl+Tab` cycles repositories.
 - Commit history with a rendered **commit graph** (lanes, merge edges, branch colours).
 - Commit details, changed-file list and per-file diffs.
+- "Push after committing" option in the commit area (remembered; the button reads "Commit & Push"), and a toolbar Remote button that opens an http(s) origin in the browser.
 - Unified diff viewer with line numbers, added/removed highlighting, configurable context and whitespace-ignoring.
 - Worktrees in the sidebar: each worktree with its branch, Open (in a tab) and Remove, "+ New worktree", and Prune for worktrees whose folders are gone. Branches checked out in another worktree are marked; checking one out offers to open its worktree. A linked worktree shows an icon beside the branch in the toolbar.
 - Image diffs: PNG, JPEG, GIF, BMP, WebP and ICO files show as pictures, with Old File and New File side by side, or a single panel for an added or deleted image. Git LFS images show their real content when Git LFS is installed.
