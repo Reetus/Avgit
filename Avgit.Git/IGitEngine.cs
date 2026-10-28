@@ -44,6 +44,13 @@ public interface IGitEngine
 
     Task<string> GetDiffAsync(string path, DiffSpec request, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// A file's content at <paramref name="objectSpec"/> ("rev:path", or ":path" for the
+    /// index), as checked out (Git LFS content rather than its pointer). Output beyond
+    /// <paramref name="maxBytes"/> is reported as <see cref="BinaryProcessResult.TooLarge"/>.
+    /// </summary>
+    Task<BinaryProcessResult> GetFileBytesAsync(string path, string objectSpec, long maxBytes, CancellationToken cancellationToken = default);
+
     Task<ProcessResult> StageAsync(string path, IReadOnlyList<ChangedFile> files, CancellationToken cancellationToken = default);
     Task<ProcessResult> UnstageAsync(string path, IReadOnlyList<ChangedFile> files, CancellationToken cancellationToken = default);
     Task<ProcessResult> DiscardAsync(string path, IReadOnlyList<ChangedFile> files, CancellationToken cancellationToken = default);

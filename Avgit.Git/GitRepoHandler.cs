@@ -61,6 +61,10 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
 
     private Task<ProcessResult> RunCoreAsync(string path, IReadOnlyList<string> arguments, string? standardInput,
         IReadOnlyDictionary<string, string>? extraEnvironment, CancellationToken cancellationToken)
+        => ProcessRunner.RunAsync(ExecutablePath, path, BuildArguments(arguments), standardInput,
+            BuildEnvironment(extraEnvironment), cancellationToken);
+
+    private List<string> BuildArguments(IReadOnlyList<string> arguments)
     {
         var args = new List<string>(arguments.Count + 7)
         {
@@ -70,9 +74,7 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         };
         AddCredentialHelper(args);
         args.AddRange(arguments);
-
-        return ProcessRunner.RunAsync(ExecutablePath, path, args, standardInput,
-            BuildEnvironment(extraEnvironment), cancellationToken);
+        return args;
     }
 
     private void AddCredentialHelper(List<string> args)
@@ -313,6 +315,22 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         }
 
         return ParseNameStatus(path, result.Output);
+    }
+
+    public async Task<BinaryProcessResult> GetFileBytesAsync(string path, string objectSpec, long maxBytes,
+        CancellationToken cancellationToken = default)
+    {
+        // --filters gives the checked-out form, so Git LFS pointers become their real
+        // content. It fails when a required filter is missing; fall back to the raw blob.
+        BinaryProcessResult result = await ProcessRunner.RunBytesAsync(ExecutablePath, path,
+            BuildArguments(["cat-file", "--filters", objectSpec]), maxBytes, BuildEnvironment(null), cancellationToken).ConfigureAwait(false);
+        if (result.Success || result.TooLarge || result.Cancelled)
+        {
+            return result;
+        }
+
+        return await ProcessRunner.RunBytesAsync(ExecutablePath, path,
+            BuildArguments(["cat-file", "blob", objectSpec]), maxBytes, BuildEnvironment(null), cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<string> GetDiffAsync(string path, DiffSpec request, CancellationToken cancellationToken = default)

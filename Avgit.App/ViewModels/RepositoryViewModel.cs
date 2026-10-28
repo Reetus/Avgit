@@ -1335,7 +1335,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             var title = useRange
                 ? $"{shortBase}..{commit.Row.ShortId}  {file.RelativePath}"
                 : $"{commit.Row.ShortId}  {file.RelativePath}";
-            CommitDiff.SetFiles(files, title, canStage: false, canUnstage: false, canDiscard: false);
+            var revision = commit.Row.CommitId;
+            var oldRevision = useRange ? baseSha : (commit.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : null);
+            CommitDiff.SetFiles(files, title, canStage: false, canUnstage: false, canDiscard: false,
+                imageSides: f => DiffImages.SidesFor(f,
+                    oldRevision is null ? null : p => ImageOrigin.Object($"{oldRevision}:{p}"),
+                    p => ImageOrigin.Object($"{revision}:{p}")));
         }
         finally
         {
@@ -1671,7 +1676,10 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             WorkingDiff.SetFiles(files, $"{(staged ? "Staged" : "Working copy")}  {file.RelativePath}",
                 canStage: !staged && !conflicted,
                 canUnstage: staged && !conflicted,
-                canDiscard: !staged && !conflicted);
+                canDiscard: !staged && !conflicted,
+                imageSides: staged
+                    ? f => DiffImages.SidesFor(f, p => ImageOrigin.Object($"HEAD:{p}"), p => ImageOrigin.Object($":{p}"))
+                    : f => DiffImages.SidesFor(f, p => ImageOrigin.Object($":{p}"), p => ImageOrigin.File(FullPathOf(p))));
         }
         finally
         {
@@ -1707,8 +1715,48 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         });
     }
 
+    private string FullPathOf(string relativePath)
+        => System.IO.Path.Combine(Path, relativePath.Replace('/', System.IO.Path.DirectorySeparatorChar));
+
+    private async Task<ImageBytes> ReadImageAsync(ImageOrigin origin, CancellationToken cancellationToken)
+    {
+        if (origin.FilePath is { } file)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var info = new FileInfo(file);
+                    if (!info.Exists)
+                    {
+                        return new ImageBytes(null, "The file no longer exists.");
+                    }
+
+                    return info.Length > DiffImages.MaxBytes
+                        ? new ImageBytes(null, $"Too large to preview ({DiffImages.FormatSize(info.Length)}).")
+                        : new ImageBytes(File.ReadAllBytes(file));
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    return new ImageBytes(null, ex.Message);
+                }
+            }, cancellationToken).ConfigureAwait(true);
+        }
+
+        BinaryProcessResult result = await Handler.GetFileBytesAsync(Path, origin.ObjectSpec!, DiffImages.MaxBytes, cancellationToken)
+            .ConfigureAwait(true);
+        if (result.TooLarge)
+        {
+            return new ImageBytes(null, $"Too large to preview (over {DiffImages.FormatSize(DiffImages.MaxBytes)}).");
+        }
+
+        return result.Success ? new ImageBytes(result.Output) : new ImageBytes(null, "Could not read the image from git.");
+    }
+
     private void WireDiffActions()
     {
+        CommitDiff.ReadImageAction = ReadImageAsync;
+        WorkingDiff.ReadImageAction = ReadImageAsync;
         WorkingDiff.StageFileAction = file => StageFilesAsync([FindRecord(file.FileName, staged: false) ?? MakeRecord(file.FileName, staged: false)]);
         WorkingDiff.UnstageFileAction = file => UnstageFilesAsync([FindRecord(file.FileName, staged: true) ?? MakeRecord(file.FileName, staged: true)]);
         WorkingDiff.DiscardFileAction = file => DiscardFilesAsync([FindRecord(file.FileName, staged: false) ?? MakeRecord(file.FileName, staged: false)], confirm: true);
