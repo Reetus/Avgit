@@ -66,6 +66,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             "A Git client for Windows, macOS and Linux.\n\n" +
             "Commit graph, unified diff viewer, line-level staging, interactive rebase and repository tools."));
         ExitCommand = new RelayCommand(() => ExitAction?.Invoke());
+        CheckForUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
+        RestartToUpdateCommand = new RelayCommand(() => Updates?.ApplyAndRestart());
     }
 
     public ObservableCollection<string> RecentRepositories { get; } = [];
@@ -182,6 +184,80 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public ICommand SettingsCommand { get; }
     public ICommand AboutCommand { get; }
     public ICommand ExitCommand { get; }
+    public ICommand CheckForUpdatesCommand { get; }
+    public ICommand RestartToUpdateCommand { get; }
+
+    /// <summary>Set by the app at startup; null in tests and design-time use.</summary>
+    public UpdateService? Updates { get; set; }
+
+    /// <summary>Version downloaded and waiting for a restart; null when there is none.</summary>
+    public string? UpdateReadyVersion
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value))
+            {
+                OnPropertyChanged(nameof(IsUpdateReady));
+                OnPropertyChanged(nameof(UpdateReadyText));
+            }
+        }
+    }
+
+    public bool IsUpdateReady => UpdateReadyVersion is not null;
+    public string UpdateReadyText => $"Avgit {UpdateReadyVersion} is ready to install.";
+
+    /// <summary>
+    /// Startup check: downloads a newer release quietly when automatic updates are
+    /// on. Failures (offline, rate limits) are ignored; the next start tries again.
+    /// </summary>
+    public async Task CheckForUpdatesInBackgroundAsync()
+    {
+        if (Updates is null || !SettingsService.Settings.CheckForUpdates)
+        {
+            return;
+        }
+
+        try
+        {
+            UpdateReadyVersion = await Updates.DownloadLatestAsync().ConfigureAwait(true);
+        }
+        catch (Exception)
+        {
+            // Best effort only.
+        }
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        if (Updates is null || !Updates.IsInstalled)
+        {
+            await _dialogs.ShowMessageAsync("Check for updates",
+                "Updates are only available when Avgit was installed from a release (Setup.exe on Windows, the AppImage on Linux).\n\n" +
+                $"Releases: {UpdateService.RepositoryUrl}/releases").ConfigureAwait(true);
+            return;
+        }
+
+        try
+        {
+            UpdateReadyVersion = await Updates.DownloadLatestAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            await _dialogs.ShowMessageAsync("Check for updates", $"Could not check for updates: {ex.Message}").ConfigureAwait(true);
+            return;
+        }
+
+        if (UpdateReadyVersion is null)
+        {
+            await _dialogs.ShowMessageAsync("Check for updates", $"Avgit {Updates.CurrentVersion} is up to date.").ConfigureAwait(true);
+        }
+        else if (await _dialogs.ConfirmAsync("Update ready",
+                     $"Avgit {UpdateReadyVersion} has been downloaded. Restart now to install it?").ConfigureAwait(true))
+        {
+            Updates.ApplyAndRestart();
+        }
+    }
 
     private void CycleRepository(int delta)
     {

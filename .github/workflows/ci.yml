@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # The release workflow runs this first, so nothing ships without passing it.
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore Avgit.slnx
+
+      # .editorconfig asks for CRLF, which only a Windows checkout has.
+      - name: Check formatting
+        if: runner.os == 'Windows'
+        run: dotnet format Avgit.slnx --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build Avgit.slnx -c Release --no-restore
+
+      # Performance-tagged tests time large inputs; shared runners are too noisy for them.
+      - name: Test
+        run: >
+          dotnet test Avgit.Tests/Avgit.Tests.csproj -c Release --no-build
+          --filter "Category!=Performance"
+          --logger trx --results-directory TestResults
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.rid }}
+          path: TestResults
+          retention-days: 7
+
+      # NativeAOT can fail on code that builds and tests fine (trimming,
+      # reflection), so make sure the release build still compiles.
+      - name: Install NativeAOT prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Add vswhere to PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Add-Content $env:GITHUB_PATH "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
+
+      - name: Publish NativeAOT
+        run: dotnet publish Avgit.App -c Release -r ${{ matrix.rid }} -p:PublishProfile=NativeAot

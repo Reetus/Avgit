@@ -1,0 +1,173 @@
+name: Release
+
+# Builds Windows and Linux packages with Velopack and publishes them as one
+# GitHub release. Installed copies of Avgit check GitHub Releases on startup
+# and update themselves from it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, e.g. 0.2.0 (a suffix such as 0.2.0-beta.1 makes a pre-release that installed copies ignore)
+        required: true
+        type: string
+      notes:
+        description: Release notes (markdown, optional)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  validate:
+    name: Validate version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: version
+        name: Check version and tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          version="${VERSION#v}"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "::error::'$VERSION' is not a version like 1.2.3 or 1.2.3-beta.1"
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null; then
+            echo "::error::Tag v$version already exists"
+            exit 1
+          fi
+          case "$version" in *-*) prerelease=true ;; *) prerelease=false ;; esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Package (${{ matrix.rid }})
+    needs: [validate, test]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          # The oldest supported runner: a NativeAOT binary needs at least the
+          # glibc it was linked against, so this keeps older distributions working.
+          - os: ubuntu-22.04
+            rid: linux-x64
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+      RID: ${{ matrix.rid }}
+      NOTES: ${{ inputs.notes }}
+      OUT: artifacts/releases/${{ matrix.rid }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install NativeAOT prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      # The previous release lets vpk build a small delta package for updates.
+      - name: Download previous release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$OUT"
+          dotnet vpk download github --repoUrl "${{ github.server_url }}/${{ github.repository }}" \
+            --token "$GH_TOKEN" --channel "$RID" --outputDir "$OUT" \
+            || echo "::notice::No earlier $RID release found; publishing a full package only."
+
+      - name: Write release notes
+        shell: bash
+        run: |
+          if [ -n "$NOTES" ]; then
+            printf '%s\n' "$NOTES" > "$RUNNER_TEMP/release-notes.md"
+          else
+            printf 'Avgit %s\n' "$VERSION" > "$RUNNER_TEMP/release-notes.md"
+          fi
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: >
+          ./branding/windows/build-setup.ps1 -Version $env:VERSION -Runtime $env:RID -Channel $env:RID
+          -Output $env:OUT -ReleaseNotes "$env:RUNNER_TEMP/release-notes.md"
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: >
+          sh branding/linux/build-appimage.sh --version "$VERSION" --rid "$RID" --channel "$RID"
+          --output "$OUT" --release-notes "$RUNNER_TEMP/release-notes.md"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.rid }}
+          path: ${{ env.OUT }}
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub release
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
+      PRE: ${{ needs.validate.outputs.prerelease == 'true' && '--pre' || '' }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: releases
+
+      # The first upload creates a draft release; the second merges into it and
+      # publishes it, so the release appears with both platforms at once.
+      - name: Upload Windows packages
+        run: >
+          dotnet vpk upload github --repoUrl "$REPO_URL" --token "$GH_TOKEN"
+          --channel win-x64 --outputDir releases/release-win-x64
+          --tag "v$VERSION" --releaseName "Avgit $VERSION" --targetCommitish "$GITHUB_SHA" $PRE
+
+      - name: Upload Linux packages and publish
+        run: >
+          dotnet vpk upload github --repoUrl "$REPO_URL" --token "$GH_TOKEN"
+          --channel linux-x64 --outputDir releases/release-linux-x64
+          --tag "v$VERSION" --releaseName "Avgit $VERSION" --targetCommitish "$GITHUB_SHA"
+          --merge --publish $PRE

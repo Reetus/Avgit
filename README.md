@@ -159,20 +159,20 @@ It copies the whole publish folder to `~/.local/lib/avgit/`, because the NativeA
 
 ### Linux AppImage (Velopack)
 
-`branding/linux/build-appimage.sh` publishes the NativeAOT build and packs it with [Velopack](https://velopack.io) into a self-updating `Avgit.AppImage`:
+`branding/linux/build-appimage.sh` publishes the NativeAOT build and packs it with [Velopack](https://velopack.io) into a self-updating `Avgit-linux-x64.AppImage`:
 
 ```bash
 sh branding/linux/build-appimage.sh                    # version from <Version> in Avgit.App.csproj
-sh branding/linux/build-appimage.sh --version 0.2.0    # or --rid linux-arm64, --output DIR
+sh branding/linux/build-appimage.sh --version 0.2.0    # or --rid linux-arm64, --output DIR, --release-notes FILE
 ```
 
-Output goes to `artifacts/releases/<rid>/`: `Avgit.AppImage` plus the Velopack feed (`releases.linux.json`, full and delta `.nupkg` files) to upload for updates. Keep earlier releases in that folder so delta packages can be built. The AppImage carries the same desktop entry and hicolor icon set as the install script; `vpk` is pinned in `dotnet-tools.json` and must match the `Velopack` package version in `Avgit.App.csproj`.
+Output goes to `artifacts/releases/<rid>/`: `Avgit-<rid>.AppImage` plus the Velopack feed (`releases.<rid>.json`, full and delta `.nupkg` files) to upload for updates. Keep earlier releases in that folder so delta packages can be built. The AppImage carries the same desktop entry and hicolor icon set as the install script; `vpk` is pinned in `dotnet-tools.json` and must match the `Velopack` package version in `Avgit.App.csproj`.
 
-An AppImage does not add itself to the app menu. Install it with `sh branding/linux/install.sh artifacts/releases/linux-x64/Avgit.AppImage` (copied to `~/.local/lib/avgit/Avgit.AppImage`, where Velopack can update it in place), or use AppImageLauncher or Gear Lever.
+An AppImage does not add itself to the app menu. Install it with `sh branding/linux/install.sh artifacts/releases/linux-x64/Avgit-linux-x64.AppImage` (copied to `~/.local/lib/avgit/Avgit.AppImage`, where Velopack can update it in place), or use AppImageLauncher or Gear Lever.
 
 ### Windows installer (Velopack)
 
-`branding/windows/build-setup.ps1` publishes the NativeAOT build and packs it with Velopack into `Avgit-win-Setup.exe`:
+`branding/windows/build-setup.ps1` publishes the NativeAOT build and packs it with Velopack into `Avgit-win-x64-Setup.exe`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File branding/windows/build-setup.ps1        # version from <Version> in Avgit.App.csproj
@@ -181,11 +181,38 @@ powershell -ExecutionPolicy Bypass -File branding/windows/build-setup.ps1 -Versi
 
 Output goes to `artifacts/releases/<rid>/`:
 
-- `Avgit-win-Setup.exe`: per-user installer, no admin rights needed. It installs to `%LocalAppData%\Avgit`, adds Start menu and desktop shortcuts, and registers an uninstaller in Apps & features.
-- `Avgit-win-Portable.zip`: runs without installing.
-- The Velopack feed (`releases.win.json`, full and delta `.nupkg` files) to upload for updates.
+- `Avgit-win-x64-Setup.exe`: per-user installer, no admin rights needed. It installs to `%LocalAppData%\Avgit`, adds Start menu and desktop shortcuts, and registers an uninstaller in Apps & features.
+- `Avgit-win-x64-Portable.zip`: runs without installing.
+- The Velopack feed (`releases.win-x64.json`, full and delta `.nupkg` files) to upload for updates.
 
-Other options: `-Runtime win-arm64`, `-Output DIR`, `-Profile SingleFile` (no Visual Studio C++ workload needed), and `-AzureTrustedSignFile` as an alternative to `-SignParams`. Unsigned installers trigger a SmartScreen warning on first run. The NativeAOT profile needs the Visual Studio "Desktop development with C++" workload, and the script puts `vswhere.exe` on `PATH` for the linker lookup.
+Other options: `-Runtime win-arm64`, `-Output DIR`, `-ReleaseNotes FILE`, `-Profile SingleFile` (no Visual Studio C++ workload needed), and `-AzureTrustedSignFile` as an alternative to `-SignParams`. Unsigned installers trigger a SmartScreen warning on first run. The NativeAOT profile needs the Visual Studio "Desktop development with C++" workload, and the script puts `vswhere.exe` on `PATH` for the linker lookup.
+
+### Velopack channels
+
+Each package uses its runtime identifier as its Velopack channel (`win-x64`, `linux-x64`). Windows and Linux packages share one GitHub release, and with the default channels (`win`, `linux`) their `.nupkg` names would collide. An installed copy updates only from the channel it was installed from, so keep these channel names stable.
+
+### Releases and updates
+
+`.github/workflows/release.yml` builds and publishes a release. To run it, open **Actions → Release → Run workflow** and enter a version, such as `0.2.0`, plus optional release notes. The workflow:
+
+1. Checks that the version is valid and that its tag does not exist yet.
+2. Runs the CI workflow.
+3. Packages Windows (`windows-latest`) and Linux (`ubuntu-22.04`, so the binary runs on older glibc versions) in parallel, each with `vpk download github` first so a delta package is built against the previous release.
+4. Publishes one GitHub release `v<version>` containing both platforms through `vpk upload github`.
+
+A version with a suffix, such as `0.2.0-beta.1`, becomes a GitHub pre-release. Installed copies ignore pre-releases.
+
+Installed copies of Avgit (from Setup.exe or the AppImage) check GitHub Releases at startup and download a newer version in the background. Avgit then offers **Restart to update**; otherwise the update installs the next time Avgit starts. **Help → Check for Updates** checks on demand, and Settings → Updates turns the automatic download off. Copies run from a build or publish folder never update.
+
+### Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request, on every push to `main`, and from the release workflow. On Windows and on Linux it:
+
+- builds the solution (warnings are errors);
+- runs the test suite, skipping the timing-sensitive `Category=Performance` tests;
+- runs a NativeAOT publish.
+
+The Windows job also runs `dotnet format --verify-no-changes`.
 
 ## Test
 

@@ -51,6 +51,8 @@
         <MenuItem Header="Open in Terminal" Command="{Binding Repository.OpenTerminalCommand}" InputGesture="Ctrl+Shift+C" />
       </MenuItem>
       <MenuItem Header="_Help">
+        <MenuItem Header="Check for Updates..." Command="{Binding CheckForUpdatesCommand}" />
+        <Separator />
         <MenuItem Header="About Avgit" Command="{Binding AboutCommand}" />
       </MenuItem>
     </Menu>
@@ -131,6 +133,15 @@
           <Button Classes="flat" Content="Settings" Command="{Binding SettingsCommand}" />
         </StackPanel>
       </Grid>
+    </Border>
+
+    <Border DockPanel.Dock="Top" Background="{StaticResource PanelAlt}" IsVisible="{Binding IsUpdateReady}"
+            BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1" Padding="8,4">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <TextBlock Text="{Binding UpdateReadyText}" FontSize="12" VerticalAlignment="Center" />
+        <Button Classes="accent" Content="Restart to update" Command="{Binding RestartToUpdateCommand}" />
+        <TextBlock Text="or it installs the next time Avgit starts." Classes="muted" FontSize="11" VerticalAlignment="Center" />
+      </StackPanel>
     </Border>
 
     <Border DockPanel.Dock="Bottom" Background="{StaticResource Panel}"

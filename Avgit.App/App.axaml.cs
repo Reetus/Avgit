@@ -21,7 +21,7 @@ public partial class App : Application
             RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
 
             var dialogs = new DialogService();
-            var viewModel = new MainWindowViewModel(settings, dialogs);
+            var viewModel = new MainWindowViewModel(settings, dialogs) { Updates = new UpdateService() };
             var window = new MainWindow
             {
                 DataContext = viewModel
@@ -58,6 +58,8 @@ public partial class App : Application
                 {
                     await viewModel.RestoreOpenTabsAsync();
                 }
+
+                await viewModel.CheckForUpdatesInBackgroundAsync();
             };
         }
 

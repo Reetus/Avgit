@@ -3,11 +3,15 @@
 # the release feed (releases.<channel>.json, full/delta .nupkg) for publishing.
 #
 #   branding/linux/build-appimage.sh [--version X.Y.Z] [--rid RID] [--output DIR]
+#                                    [--channel NAME] [--release-notes FILE]
 #
 # --version  defaults to <Version> in Avgit.App/Avgit.App.csproj
 # --rid      defaults to this machine's architecture (linux-x64 or linux-arm64)
 # --output   defaults to artifacts/releases/<rid>; keep earlier releases there
 #            so vpk can build delta packages against them
+# --channel  Velopack channel, defaults to the rid; Windows and Linux packages
+#            share a GitHub release, so each needs its own channel
+# --release-notes  optional markdown file shown with the release
 #
 # The app is published with the NativeAot profile (needs clang and zlib1g-dev),
 # laid out as an AppDir with Avgit's own desktop entry and icon set, then packed
@@ -20,19 +24,23 @@ repo_root=$(cd "$script_dir/../.." && pwd)
 version=
 rid=
 output_dir=
+channel=
+release_notes=
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --version|--rid|--output)
+        --version|--rid|--output|--channel|--release-notes)
             [ $# -ge 2 ] || { echo "$1 needs a value" >&2; exit 2; }
             case "$1" in
                 --version) version=$2 ;;
                 --rid) rid=$2 ;;
                 --output) output_dir=$2 ;;
+                --channel) channel=$2 ;;
+                --release-notes) release_notes=$2 ;;
             esac
             shift ;;
         -h|--help)
-            sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+            sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
             exit 0 ;;
         *) echo "Unknown argument: $1" >&2; exit 2 ;;
     esac
@@ -53,6 +61,7 @@ if [ -z "$version" ]; then
     version=$(dotnet msbuild Avgit.App/Avgit.App.csproj -getProperty:Version)
 fi
 output_dir=${output_dir:-"$repo_root/artifacts/releases/$rid"}
+channel=${channel:-$rid}
 
 echo "Publishing Avgit $version for $rid"
 dotnet publish Avgit.App -c Release -r "$rid" -p:PublishProfile=NativeAot -p:Version="$version"
@@ -89,14 +98,20 @@ exec "$HERE/usr/bin/Avgit" "$@"
 EOF
 chmod 755 "$app_dir/AppRun"
 
-dotnet tool restore
-dotnet vpk pack \
+set -- \
     --packId Avgit \
     --packVersion "$version" \
     --packTitle Avgit \
     --packDir "$app_dir" \
     --mainExe Avgit \
     --runtime "$rid" \
+    --channel "$channel" \
     --outputDir "$output_dir"
+if [ -n "$release_notes" ]; then
+    set -- "$@" --releaseNotes "$release_notes"
+fi
+
+dotnet tool restore
+dotnet vpk pack "$@"
 
 echo "Release written to $output_dir"

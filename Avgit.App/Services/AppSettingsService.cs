@@ -27,6 +27,8 @@ public sealed class AppSettings
     public bool CommitSignOff { get; set; }
     public bool CommitGpgSign { get; set; }
     public bool ShowAllBranches { get; set; } = true;
+    /// <summary>Download new releases from GitHub in the background; they install on restart.</summary>
+    public bool CheckForUpdates { get; set; } = true;
 }
 
 public sealed class CustomActionSetting

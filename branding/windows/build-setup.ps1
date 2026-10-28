@@ -24,6 +24,12 @@ param(
     # Defaults to this machine's architecture (win-x64 or win-arm64).
     [ValidateSet('win-x64', 'win-arm64')]
     [string]$Runtime,
+    # Velopack channel; defaults to the runtime (win-x64). Windows and Linux
+    # packages share one GitHub release, so each needs its own channel or their
+    # file names collide. Installed copies update from the channel they came from.
+    [string]$Channel,
+    # Optional markdown file with release notes.
+    [string]$ReleaseNotes,
     # Defaults to artifacts/releases/<runtime>.
     [string]$Output,
     # NativeAot needs the Visual Studio C++ workload; SingleFile does not.
@@ -46,6 +52,7 @@ try {
         $Version = (dotnet msbuild Avgit.App/Avgit.App.csproj -getProperty:Version).Trim()
         if ($LASTEXITCODE -ne 0 -or -not $Version) { throw 'Could not read <Version> from Avgit.App.csproj.' }
     }
+    if (-not $Channel) { $Channel = $Runtime }
     if (-not $Output) { $Output = Join-Path $repoRoot "artifacts\releases\$Runtime" }
 
     if ($Profile -eq 'NativeAot') {
@@ -79,8 +86,10 @@ try {
         '--mainExe', 'Avgit.exe',
         '--icon', 'Avgit.App\Assets\avgit.ico',
         '--runtime', $Runtime,
+        '--channel', $Channel,
         '--outputDir', $Output
     )
+    if ($ReleaseNotes) { $packArgs += @('--releaseNotes', $ReleaseNotes) }
     if ($SignParams) { $packArgs += @('--signParams', $SignParams) }
     if ($AzureTrustedSignFile) { $packArgs += @('--azureTrustedSignFile', $AzureTrustedSignFile) }
 

@@ -41,6 +41,11 @@ public sealed class SettingsWindow : Window
             Content = "Write a commit-graph when missing (much faster history in large repositories)",
             IsChecked = settings.Settings.MaintainCommitGraph
         };
+        var updatesBox = new CheckBox
+        {
+            Content = "Download new versions automatically (installed on restart)",
+            IsChecked = settings.Settings.CheckForUpdates
+        };
         var terminalBox = new TextBox
         {
             Text = settings.Settings.TerminalShell,
@@ -51,7 +56,7 @@ public sealed class SettingsWindow : Window
 
         var grid = new Grid
         {
-            RowDefinitions = new RowDefinitions("Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto"),
+            RowDefinitions = new RowDefinitions("Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto"),
             ColumnDefinitions = new ColumnDefinitions("140,*"),
             Margin = new Thickness(18),
             RowSpacing = 10,
@@ -67,6 +72,7 @@ public sealed class SettingsWindow : Window
         AddRow(grid, 6, "Auto refresh", autoRefreshBox);
         AddRow(grid, 7, "Untracked files", untrackedBox);
         AddRow(grid, 8, "Performance", commitGraphBox);
+        AddRow(grid, 9, "Updates", updatesBox);
 
         var pathText = new TextBlock
         {
@@ -75,7 +81,7 @@ public sealed class SettingsWindow : Window
             Foreground = new SolidColorBrush(Color.Parse("#A0A0A0")),
             TextWrapping = TextWrapping.Wrap
         };
-        Grid.SetRow(pathText, 9);
+        Grid.SetRow(pathText, 10);
         Grid.SetColumnSpan(pathText, 2);
         grid.Children.Add(pathText);
 
@@ -163,6 +169,7 @@ public sealed class SettingsWindow : Window
             settings.Settings.AutoRefresh = autoRefreshBox.IsChecked == true;
             settings.Settings.ShowFilesInUntrackedFolders = untrackedBox.IsChecked == true;
             settings.Settings.MaintainCommitGraph = commitGraphBox.IsChecked == true;
+            settings.Settings.CheckForUpdates = updatesBox.IsChecked == true;
             settings.Settings.TerminalShell = terminalBox.Text?.Trim() ?? string.Empty;
             settings.Save();
             vm.ReloadGit();
@@ -171,7 +178,7 @@ public sealed class SettingsWindow : Window
         };
         buttons.Children.Add(cancel);
         buttons.Children.Add(save);
-        Grid.SetRow(buttons, 11);
+        Grid.SetRow(buttons, 12);
         Grid.SetColumnSpan(buttons, 2);
         grid.Children.Add(buttons);
 
