@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Avalonia.Media.Imaging;
 using Avgit.Core.Diff;
 using Avgit.Core.Model;
 
@@ -62,6 +63,12 @@ public sealed partial class DiffViewModel : ObservableObject
     public Func<Hunk, Task>? UnstageSelectedLinesAction { get; set; }
     public Func<Hunk, Task>? DiscardSelectedLinesAction { get; set; }
 
+    /// <summary>Reads one side of an image comparison; without it images show as binary files.</summary>
+    public Func<ImageOrigin, CancellationToken, Task<ImageBytes>>? ReadImageAction { get; set; }
+
+    private CancellationTokenSource? _imageLoadCts;
+    private readonly List<DiffImageSide> _imageSides = [];
+
     public ICommand StageFileCommand { get; }
     public ICommand UnstageFileCommand { get; }
     public ICommand DiscardFileCommand { get; }
@@ -72,7 +79,12 @@ public sealed partial class DiffViewModel : ObservableObject
     public ICommand UnstageSelectedLinesCommand { get; }
     public ICommand DiscardSelectedLinesCommand { get; }
 
-    public void SetFiles(IReadOnlyList<FileDiff> files, string title, bool canStage, bool canUnstage, bool canDiscard)
+    /// <summary>
+    /// Shows <paramref name="files"/>. Files for which <paramref name="imageSides"/> returns
+    /// sides are shown as images (loaded in the background) instead of a text diff.
+    /// </summary>
+    public void SetFiles(IReadOnlyList<FileDiff> files, string title, bool canStage, bool canUnstage, bool canDiscard,
+        Func<FileDiff, ImageDiffSides?>? imageSides = null)
     {
         Title = title;
         CanStage = canStage;
@@ -80,6 +92,8 @@ public sealed partial class DiffViewModel : ObservableObject
         CanDiscard = canDiscard;
         Files.Clear();
         DisplayItems.Clear();
+        ReleaseImages();
+        CancellationToken imageToken = (_imageLoadCts = new CancellationTokenSource()).Token;
 
         foreach (FileDiff file in files)
         {
@@ -91,6 +105,19 @@ public sealed partial class DiffViewModel : ObservableObject
                 UnstageCommand = UnstageFileCommand,
                 DiscardCommand = DiscardFileCommand
             });
+
+            if (ReadImageAction is { } readImage && imageSides?.Invoke(file) is { } sides)
+            {
+                var item = new DiffImageItem(file, sides);
+                DisplayItems.Add(item);
+                foreach (DiffImageSide side in item.Sides)
+                {
+                    _imageSides.Add(side);
+                    _ = LoadImageAsync(side, readImage, imageToken);
+                }
+
+                continue;
+            }
 
             if (file.Binary)
             {
@@ -131,9 +158,79 @@ public sealed partial class DiffViewModel : ObservableObject
     {
         Files.Clear();
         DisplayItems.Clear();
+        ReleaseImages();
         Title = string.Empty;
         EmptyMessage = message;
         HasContent = false;
         CanStage = CanUnstage = CanDiscard = false;
+    }
+
+    private static async Task LoadImageAsync(DiffImageSide side,
+        Func<ImageOrigin, CancellationToken, Task<ImageBytes>> readImage, CancellationToken token)
+    {
+        ImageBytes bytes;
+        try
+        {
+            bytes = await readImage(side.Origin, token).ConfigureAwait(true);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            bytes = new ImageBytes(null, ex.Message);
+        }
+
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (bytes.Data is not { } data)
+        {
+            side.SetError(bytes.Error ?? "Could not read the image.");
+            return;
+        }
+
+        Bitmap? image = await Task.Run(() =>
+        {
+            try
+            {
+                using var stream = new MemoryStream(data, writable: false);
+                return new Bitmap(stream);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }, CancellationToken.None).ConfigureAwait(true);
+
+        if (image is null)
+        {
+            side.SetError($"Could not decode the image ({DiffImages.FormatSize(data.Length)}).");
+        }
+        else if (token.IsCancellationRequested)
+        {
+            // The view moved on while decoding; nothing shows this bitmap.
+            image.Dispose();
+        }
+        else
+        {
+            side.SetImage(image, data.Length);
+        }
+    }
+
+    /// <summary>Stops pending image loads and frees the bitmaps of the items just removed.</summary>
+    private void ReleaseImages()
+    {
+        _imageLoadCts?.Cancel();
+        _imageLoadCts = null;
+        foreach (DiffImageSide side in _imageSides)
+        {
+            side.Release();
+        }
+
+        _imageSides.Clear();
     }
 }
