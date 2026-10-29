@@ -27,12 +27,11 @@ public partial class HistoryView : UserControl
             handledEventsToo: true);
         commitList?.SizeChanged += (_, e) => UpdateCommitListWidthClasses(commitList, e.NewSize.Width);
 
-        DetachedFromVisualTree += (_, _) =>
-        {
-            _repository?.ScrollToCommitRequested -= OnScrollToCommit;
-
-            _repository = null;
-        };
+        // Switching to the File Status tab detaches this view without changing its
+        // DataContext, so DataContextChanged alone would not reconnect it on return
+        // and clicks on commits would be ignored.
+        AttachedToVisualTree += (_, _) => SetRepository(DataContext as RepositoryViewModel);
+        DetachedFromVisualTree += (_, _) => SetRepository(null);
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -48,11 +47,17 @@ public partial class HistoryView : UserControl
         list.Classes.Set("hideDate", width < HideDateBelow);
     }
 
-    private void OnDataContextChanged(object? sender, EventArgs e)
-    {
-        _repository?.ScrollToCommitRequested -= OnScrollToCommit;
+    private void OnDataContextChanged(object? sender, EventArgs e) => SetRepository(DataContext as RepositoryViewModel);
 
-        _repository = DataContext as RepositoryViewModel;
+    private void SetRepository(RepositoryViewModel? repository)
+    {
+        if (ReferenceEquals(_repository, repository))
+        {
+            return;
+        }
+
+        _repository?.ScrollToCommitRequested -= OnScrollToCommit;
+        _repository = repository;
         _repository?.ScrollToCommitRequested += OnScrollToCommit;
     }
 
