@@ -833,6 +833,14 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         get => _selectedBranchFilter;
         set
         {
+            // Each refresh rebuilds BranchFilterOptions; the ComboBox then clears its
+            // selection and writes null back. That is not a choice: taking it as one
+            // reloaded the history and moved the selection to the tip.
+            if (value is null)
+            {
+                return;
+            }
+
             if (SetProperty(ref _selectedBranchFilter, value) && IsLoaded)
             {
                 _selectTipAfterLog = value != "(all branches)";
