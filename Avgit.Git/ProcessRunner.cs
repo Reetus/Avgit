@@ -210,7 +210,7 @@ public static class ProcessRunner
         {
             if (!process.Start())
             {
-                return new ExecuteOutcome<T>(-1, default, $"Could not start {psi.FileName}.");
+                return new ExecuteOutcome<T>(-1, default, string.Format(GitStrings.Process_CouldNotStart, psi.FileName));
             }
 
             Interlocked.Increment(ref _startedCount);
@@ -245,7 +245,7 @@ public static class ProcessRunner
         catch (OperationCanceledException)
         {
             TryKill(process);
-            return new ExecuteOutcome<T>(-1, default, $"{Path.GetFileName(psi.FileName)} was cancelled or timed out.",
+            return new ExecuteOutcome<T>(-1, default, string.Format(GitStrings.Process_CancelledOrTimedOut, Path.GetFileName(psi.FileName)),
                 cancellationToken.IsCancellationRequested);
         }
         catch (Exception ex)

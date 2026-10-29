@@ -15,8 +15,8 @@ public sealed class CommitInfoViewModel(CommitRecord details)
     public string[] Parents { get; } = details.ParentIds ?? [];
     public string[] Tags { get; } = details.Tags ?? [];
     public string AuthorDateText => AuthorDate.ToString("yyyy-MM-dd HH:mm:ss");
-    public string ParentsText => Parents.Length == 0 ? "(root commit)" : string.Join(", ", Parents.Select(p => p.Length > 8 ? p[..8] : p));
-    public string TagsText => Tags.Length == 0 ? string.Empty : string.Join("  ", Tags.Select(t => "tag: " + t));
+    public string ParentsText => Parents.Length == 0 ? Strings.CommitInfo_RootCommit : string.Join(", ", Parents.Select(p => p.Length > 8 ? p[..8] : p));
+    public string TagsText => Tags.Length == 0 ? string.Empty : string.Join("  ", Tags.Select(t => string.Format(Strings.CommitInfo_Tag, t)));
     public bool HasMoreMessage => Message.Trim() != Title.Trim() && Message.Contains('\n');
 }
 

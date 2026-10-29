@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="using:Avgit.App.Resources"
              xmlns:vm="using:Avgit.App.ViewModels"
              xmlns:controls="using:Avgit.App.Controls"
              xmlns:views="using:Avgit.App.Views"
@@ -18,19 +19,19 @@
     <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
             BorderThickness="0,0,0,1" Padding="8,5">
       <Grid ColumnDefinitions="Auto,160,Auto,150,Auto,Auto,Auto,*,Auto">
-        <TextBlock Grid.Column="0" Text="Author" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
-        <TextBox Grid.Column="1" Text="{Binding AuthorFilter, Mode=TwoWay}" PlaceholderText="Filter by author"
+        <TextBlock Grid.Column="0" Text="{x:Static res:Strings.History_Author}" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
+        <TextBox Grid.Column="1" Text="{Binding AuthorFilter, Mode=TwoWay}" PlaceholderText="{x:Static res:Strings.History_FilterByAuthor}"
                  Height="26" FontSize="12" />
-        <Button Grid.Column="2" Classes="toolbar" Content="Search" Margin="6,0,10,0"
+        <Button Grid.Column="2" Classes="toolbar" Content="{x:Static res:Strings.History_Search}" Margin="6,0,10,0"
                 Command="{Binding ApplyLogFilterCommand}" />
         <ComboBox Grid.Column="3" ItemsSource="{Binding BranchFilterOptions}"
                   SelectedItem="{Binding SelectedBranchFilter, Mode=TwoWay}" Height="26" FontSize="12" />
-        <TextBlock Grid.Column="4" Text="Context" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="12,0,6,0" />
+        <TextBlock Grid.Column="4" Text="{x:Static res:Strings.History_Context}" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="12,0,6,0" />
         <ComboBox Grid.Column="5" ItemsSource="{Binding ContextOptions}"
                   SelectedItem="{Binding DiffContext, Mode=TwoWay}" Width="70" Height="26" FontSize="12" />
-        <CheckBox Grid.Column="6" Content="Ignore whitespace" IsChecked="{Binding IgnoreWhitespace, Mode=TwoWay}"
+        <CheckBox Grid.Column="6" Content="{x:Static res:Strings.History_IgnoreWhitespace}" IsChecked="{Binding IgnoreWhitespace, Mode=TwoWay}"
                   FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" />
-        <Button Grid.Column="8" Classes="toolbar" Content="Clear" Command="{Binding ClearLogFilterCommand}" />
+        <Button Grid.Column="8" Classes="toolbar" Content="{x:Static res:Strings.History_Clear}" Command="{Binding ClearLogFilterCommand}" />
       </Grid>
     </Border>
 
@@ -50,11 +51,11 @@
               <Run Text="{Binding LogCountText}" FontSize="10" Foreground="{StaticResource Muted}" />
             </TextBlock>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-              <Button Classes="flat" Content="Load more" Command="{Binding LoadMoreLogCommand}" />
-              <Button Classes="flat" Content="Refresh" Command="{Binding RefreshCommand}" />
-              <Button Classes="flat" Content="Fetch" Command="{Binding FetchCommand}" />
-              <Button Classes="flat" Content="Pull" Command="{Binding PullCommand}" />
-              <Button Classes="flat" Content="Push" Command="{Binding PushCommand}" />
+              <Button Classes="flat" Content="{x:Static res:Strings.History_LoadMore}" Command="{Binding LoadMoreLogCommand}" />
+              <Button Classes="flat" Content="{x:Static res:Strings.Common_Refresh}" Command="{Binding RefreshCommand}" />
+              <Button Classes="flat" Content="{x:Static res:Strings.Main_Fetch}" Command="{Binding FetchCommand}" />
+              <Button Classes="flat" Content="{x:Static res:Strings.Main_Pull}" Command="{Binding PullCommand}" />
+              <Button Classes="flat" Content="{x:Static res:Strings.Main_Push}" Command="{Binding PushCommand}" />
             </StackPanel>
           </Grid>
         </Border>
@@ -64,21 +65,21 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
           <ListBox.ContextMenu>
             <ContextMenu Opening="OnCommitMenuOpening" Closing="OnCommitMenuClosing">
-              <MenuItem Header="Checkout commit" Click="OnCheckoutCommit" />
-              <MenuItem Header="Create branch here..." Click="OnCreateBranchHere" />
-              <MenuItem Header="Create tag here..." Click="OnCreateTagHere" />
+              <MenuItem Header="{x:Static res:Strings.History_CheckoutCommit}" Click="OnCheckoutCommit" />
+              <MenuItem Header="{x:Static res:Strings.History_CreateBranchHere}" Click="OnCreateBranchHere" />
+              <MenuItem Header="{x:Static res:Strings.History_CreateTagHere}" Click="OnCreateTagHere" />
               <Separator />
-              <MenuItem Header="Merge into current branch" Click="OnMergeCommit" />
-              <MenuItem Header="Cherry-pick selected commit(s)" Click="OnCherryPick" />
-              <MenuItem Header="Revert selected commit(s)" Click="OnRevertCommit" />
-              <MenuItem Header="Rebase current branch onto this" Click="OnRebaseOntoCommit" />
-              <MenuItem Header="Interactive rebase from here..." Click="OnInteractiveRebase" />
-              <MenuItem Header="Reset --hard to this commit" Click="OnResetCommit" />
+              <MenuItem Header="{x:Static res:Strings.History_MergeIntoCurrentBranch}" Click="OnMergeCommit" />
+              <MenuItem Header="{x:Static res:Strings.History_CherryPickSelected}" Click="OnCherryPick" />
+              <MenuItem Header="{x:Static res:Strings.History_RevertSelected}" Click="OnRevertCommit" />
+              <MenuItem Header="{x:Static res:Strings.History_RebaseOntoThis}" Click="OnRebaseOntoCommit" />
+              <MenuItem Header="{x:Static res:Strings.History_InteractiveRebaseFromHere}" Click="OnInteractiveRebase" />
+              <MenuItem Header="{x:Static res:Strings.History_ResetHardToThis}" Click="OnResetCommit" />
               <Separator />
-              <MenuItem Header="Set as compare base" Click="OnSetCompareBase" />
-              <MenuItem Header="Compare selected with base" Click="OnCompareWithBase" />
+              <MenuItem Header="{x:Static res:Strings.History_SetCompareBase}" Click="OnSetCompareBase" />
+              <MenuItem Header="{x:Static res:Strings.History_CompareWithBase}" Click="OnCompareWithBase" />
               <Separator />
-              <MenuItem Header="Copy SHA" Click="OnCopyCommitSha" />
+              <MenuItem Header="{x:Static res:Strings.History_CopySha}" Click="OnCopyCommitSha" />
             </ContextMenu>
           </ListBox.ContextMenu>
           <ListBox.ItemTemplate>
@@ -130,30 +131,30 @@
               <TextBlock Text="{Binding CommitInfo.TagsText}" Foreground="#3FB950" FontSize="11" />
               <TextBlock Text="{Binding CommitInfo.ParentsText}" Classes="muted" FontSize="10" />
               <WrapPanel Orientation="Horizontal">
-                <Button Classes="flat" Content="Checkout" Command="{Binding CheckoutCommitCommand}" />
-                <Button Classes="flat" Content="Branch here" Command="{Binding CreateBranchAtCommitCommand}" />
-                <Button Classes="flat" Content="Tag here" Command="{Binding CreateTagAtCommitCommand}" />
-                <Button Classes="flat" Content="Merge" Command="{Binding MergeCommitCommand}" />
-                <Button Classes="flat" Content="Rebase onto" Command="{Binding RebaseCommitCommand}" />
-                <Button Classes="flat" Content="Reset --hard" Command="{Binding ResetCommitCommand}" />
-                <Button Classes="flat" Content="Copy SHA" Command="{Binding CopyCommitShaCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_Checkout}" Command="{Binding CheckoutCommitCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_BranchHere}" Command="{Binding CreateBranchAtCommitCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_TagHere}" Command="{Binding CreateTagAtCommitCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_Merge}" Command="{Binding MergeCommitCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_RebaseOnto}" Command="{Binding RebaseCommitCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_ResetHard}" Command="{Binding ResetCommitCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_CopySha}" Command="{Binding CopyCommitShaCommand}" />
               </WrapPanel>
             </StackPanel>
 
             <StackPanel Spacing="5" IsVisible="{Binding IsComparingCommits}">
               <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Text="Comparing commits" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
-                <Button Grid.Column="1" Classes="flat" Content="Swap" Command="{Binding SwapCompareCommand}"
-                        ToolTip.Tip="Swap the base and target of the comparison" />
+                <TextBlock Text="{x:Static res:Strings.History_ComparingCommits}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="flat" Content="{x:Static res:Strings.History_Swap}" Command="{Binding SwapCompareCommand}"
+                        ToolTip.Tip="{x:Static res:Strings.History_SwapToolTip}" />
               </Grid>
               <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="2">
-                <TextBlock Text="From" Classes="muted" FontSize="10" Width="34" VerticalAlignment="Center" />
+                <TextBlock Text="{x:Static res:Strings.History_From}" Classes="muted" FontSize="10" Width="34" VerticalAlignment="Center" />
                 <TextBlock Grid.Column="1" FontSize="11" TextTrimming="CharacterEllipsis">
                   <Run Text="{Binding CompareBaseSha}" FontFamily="{StaticResource MonoFont}" Foreground="#58A6FF" />
                   <Run Text="  " />
                   <Run Text="{Binding CompareBaseSubject}" />
                 </TextBlock>
-                <TextBlock Grid.Row="1" Text="To" Classes="muted" FontSize="10" Width="34" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1" Text="{x:Static res:Strings.History_To}" Classes="muted" FontSize="10" Width="34" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="1" Grid.Column="1" FontSize="11" TextTrimming="CharacterEllipsis">
                   <Run Text="{Binding CompareTargetSha}" FontFamily="{StaticResource MonoFont}" Foreground="#58A6FF" />
                   <Run Text="  " />
@@ -167,7 +168,7 @@
         <Border Grid.Row="1" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
                 BorderThickness="0,0,0,1">
           <Grid RowDefinitions="Auto,*">
-            <TextBlock Text="Changed files" Classes="muted" FontSize="11" Margin="8,4" />
+            <TextBlock Text="{x:Static res:Strings.History_ChangedFiles}" Classes="muted" FontSize="11" Margin="8,4" />
             <ListBox Grid.Row="1" ItemsSource="{Binding CommitFiles}"
                      SelectedItem="{Binding SelectedCommitFile, Mode=TwoWay}">
               <ListBox.ItemTemplate>

@@ -1,0 +1,2793 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Common_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Common_Discard" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="Common_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Welcome_Tagline" xml:space="preserve">
+    <value>A native Avalonia 12 Git client.</value>
+  </data>
+  <data name="Main_Fetch" xml:space="preserve">
+    <value>Fetch</value>
+    <comment>Menu item / toolbar button: git fetch</comment>
+  </data>
+  <data name="Main_Pull" xml:space="preserve">
+    <value>Pull</value>
+    <comment>Menu item / toolbar button: git pull</comment>
+  </data>
+  <data name="Main_Push" xml:space="preserve">
+    <value>Push</value>
+    <comment>Menu item / toolbar button: git push</comment>
+  </data>
+  <data name="Main_Stash" xml:space="preserve">
+    <value>Stash</value>
+    <comment>Toolbar button: stash working changes</comment>
+  </data>
+  <data name="Repo_View_Checkout" xml:space="preserve">
+    <value>Checkout</value>
+    <comment>Context menu item / button: check out the branch or commit</comment>
+  </data>
+  <data name="Repo_View_OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+    <comment>Button: open the repository folder in the file manager</comment>
+  </data>
+  <data name="History_Context" xml:space="preserve">
+    <value>Context</value>
+    <comment>Label before the diff context-lines selector</comment>
+  </data>
+  <data name="History_IgnoreWhitespace" xml:space="preserve">
+    <value>Ignore whitespace</value>
+    <comment>Checkbox: ignore whitespace in diffs</comment>
+  </data>
+  <data name="History_CopySha" xml:space="preserve">
+    <value>Copy SHA</value>
+    <comment>Context menu item / button: copy the commit hash</comment>
+  </data>
+  <data name="Diff_StageSelectedLines" xml:space="preserve">
+    <value>Stage selected lines</value>
+    <comment>Button / context menu item in diff</comment>
+  </data>
+  <data name="Diff_UnstageSelectedLines" xml:space="preserve">
+    <value>Unstage selected lines</value>
+    <comment>Button / context menu item in diff</comment>
+  </data>
+  <data name="Diff_DiscardSelectedLines" xml:space="preserve">
+    <value>Discard selected lines</value>
+    <comment>Button / context menu item in diff</comment>
+  </data>
+  <data name="Repo_View_DeleteBranch" xml:space="preserve">
+    <value>Delete branch</value>
+    <comment>Context menu item / tooltip on branch delete button</comment>
+  </data>
+  <data name="Main_MenuFile" xml:space="preserve">
+    <value>_File</value>
+    <comment>Top-level menu; underscore marks the access key</comment>
+  </data>
+  <data name="Main_OpenRepository" xml:space="preserve">
+    <value>Open Repository...</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_ReopenClosedRepository" xml:space="preserve">
+    <value>Reopen Closed Repository</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_CloneRepository" xml:space="preserve">
+    <value>Clone Repository...</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_CreateRepository" xml:space="preserve">
+    <value>Create Repository...</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_CloseRepository" xml:space="preserve">
+    <value>Close Repository</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_SettingsMenu" xml:space="preserve">
+    <value>Settings...</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_Exit" xml:space="preserve">
+    <value>Exit</value>
+    <comment>File menu item</comment>
+  </data>
+  <data name="Main_MenuRepository" xml:space="preserve">
+    <value>_Repository</value>
+    <comment>Top-level menu; underscore marks the access key</comment>
+  </data>
+  <data name="Main_FetchAllRemotes" xml:space="preserve">
+    <value>Fetch All Remotes</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_PullWithRebase" xml:space="preserve">
+    <value>Pull with Rebase</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_PushToRemote" xml:space="preserve">
+    <value>Push to Remote...</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_ForcePushWithLease" xml:space="preserve">
+    <value>Force Push (with lease)</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_CreateBranch" xml:space="preserve">
+    <value>Create Branch...</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_CreateTag" xml:space="preserve">
+    <value>Create Tag...</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_StashChanges" xml:space="preserve">
+    <value>Stash Changes...</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_AdvancedGit" xml:space="preserve">
+    <value>Advanced Git...</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_OpenInFileExplorer" xml:space="preserve">
+    <value>Open in File Explorer</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_OpenInTerminal" xml:space="preserve">
+    <value>Open in Terminal</value>
+    <comment>Repository menu item</comment>
+  </data>
+  <data name="Main_MenuHelp" xml:space="preserve">
+    <value>_Help</value>
+    <comment>Top-level menu; underscore marks the access key</comment>
+  </data>
+  <data name="Main_CheckForUpdates" xml:space="preserve">
+    <value>Check for Updates...</value>
+    <comment>Help menu item</comment>
+  </data>
+  <data name="Main_AboutAvgit" xml:space="preserve">
+    <value>About Avgit</value>
+    <comment>Help menu item; Avgit is the product name</comment>
+  </data>
+  <data name="Main_CloseOthers" xml:space="preserve">
+    <value>Close Others</value>
+    <comment>Repository tab context menu item</comment>
+  </data>
+  <data name="Main_CloseAll" xml:space="preserve">
+    <value>Close All</value>
+    <comment>Repository tab context menu item</comment>
+  </data>
+  <data name="Main_CopyRepositoryPath" xml:space="preserve">
+    <value>Copy repository path</value>
+    <comment>Repository tab context menu item</comment>
+  </data>
+  <data name="Main_CloseRepositoryToolTip" xml:space="preserve">
+    <value>Close repository</value>
+    <comment>Tooltip on the tab close button</comment>
+  </data>
+  <data name="Main_HomeToolTip" xml:space="preserve">
+    <value>Home / recent repositories</value>
+    <comment>Tooltip on the + button next to the tabs</comment>
+  </data>
+  <data name="Main_Commit" xml:space="preserve">
+    <value>Commit</value>
+    <comment>Toolbar button</comment>
+  </data>
+  <data name="Main_Branch" xml:space="preserve">
+    <value>Branch</value>
+    <comment>Toolbar button: create a branch</comment>
+  </data>
+  <data name="Main_Tag" xml:space="preserve">
+    <value>Tag</value>
+    <comment>Toolbar button: create a tag</comment>
+  </data>
+  <data name="Main_Terminal" xml:space="preserve">
+    <value>Terminal</value>
+    <comment>Toolbar button</comment>
+  </data>
+  <data name="Main_TerminalToolTip" xml:space="preserve">
+    <value>Open a terminal in the repository folder (Ctrl+Shift+C)</value>
+    <comment>Tooltip on the Terminal toolbar button</comment>
+  </data>
+  <data name="Main_Remote" xml:space="preserve">
+    <value>Remote</value>
+    <comment>Toolbar button: open the remote's web page</comment>
+  </data>
+  <data name="Main_RestartToUpdate" xml:space="preserve">
+    <value>Restart to update</value>
+    <comment>Button in the update-ready banner</comment>
+  </data>
+  <data name="Main_UpdateInstallsNextStart" xml:space="preserve">
+    <value>or it installs the next time Avgit starts.</value>
+    <comment>Text after the Restart to update button; Avgit is the product name</comment>
+  </data>
+  <data name="Welcome_OpenRepository" xml:space="preserve">
+    <value>Open repository...</value>
+    <comment>Welcome screen button</comment>
+  </data>
+  <data name="Welcome_CloneRepository" xml:space="preserve">
+    <value>Clone repository...</value>
+    <comment>Welcome screen button</comment>
+  </data>
+  <data name="Welcome_CreateRepository" xml:space="preserve">
+    <value>Create repository...</value>
+    <comment>Welcome screen button</comment>
+  </data>
+  <data name="Welcome_RecentRepositories" xml:space="preserve">
+    <value>Recent repositories</value>
+    <comment>Welcome screen section heading</comment>
+  </data>
+  <data name="Welcome_Remove" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Button: remove a repository from the recent list</comment>
+  </data>
+  <data name="Welcome_FeatureSummary" xml:space="preserve">
+    <value>Git · commit graph · unified diff · staging · branches, tags, stashes</value>
+    <comment>Feature summary footer on the welcome screen</comment>
+  </data>
+  <data name="Repo_View_BranchesHeader" xml:space="preserve">
+    <value>BRANCHES</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_NewBranch" xml:space="preserve">
+    <value>+ New branch</value>
+    <comment>Sidebar button</comment>
+  </data>
+  <data name="Repo_View_OpenWorktree" xml:space="preserve">
+    <value>Open worktree</value>
+    <comment>Branch context menu item</comment>
+  </data>
+  <data name="Repo_View_CreateWorktree" xml:space="preserve">
+    <value>Create worktree...</value>
+    <comment>Branch context menu item</comment>
+  </data>
+  <data name="Repo_View_WorktreesHeader" xml:space="preserve">
+    <value>WORKTREES</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_NewWorktree" xml:space="preserve">
+    <value>+ New worktree</value>
+    <comment>Sidebar button</comment>
+  </data>
+  <data name="Repo_View_NewWorktreeToolTip" xml:space="preserve">
+    <value>Create a new branch in its own folder</value>
+    <comment>Tooltip on + New worktree</comment>
+  </data>
+  <data name="Repo_View_Prune" xml:space="preserve">
+    <value>Prune</value>
+    <comment>Sidebar button: prune missing worktrees</comment>
+  </data>
+  <data name="Repo_View_PruneToolTip" xml:space="preserve">
+    <value>Forget worktrees whose folders are missing</value>
+    <comment>Tooltip on Prune</comment>
+  </data>
+  <data name="Repo_View_NoLinkedWorktrees" xml:space="preserve">
+    <value>No linked worktrees.</value>
+    <comment>Empty-state text</comment>
+  </data>
+  <data name="Repo_View_OpenWorktreeToolTip" xml:space="preserve">
+    <value>Open this worktree in a tab</value>
+    <comment>Tooltip on a worktree's Open button</comment>
+  </data>
+  <data name="Repo_View_RemoveWorktreeToolTip" xml:space="preserve">
+    <value>Remove worktree (keeps the branch)</value>
+    <comment>Tooltip on a worktree's remove button</comment>
+  </data>
+  <data name="Repo_View_RemotesHeader" xml:space="preserve">
+    <value>REMOTES</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_AddRemote" xml:space="preserve">
+    <value>+ Add remote</value>
+    <comment>Sidebar button</comment>
+  </data>
+  <data name="Repo_View_NoRemotes" xml:space="preserve">
+    <value>No remotes configured.</value>
+    <comment>Empty-state text</comment>
+  </data>
+  <data name="Repo_View_Edit" xml:space="preserve">
+    <value>Edit</value>
+    <comment>Button: edit a remote</comment>
+  </data>
+  <data name="Repo_View_EditRemoteToolTip" xml:space="preserve">
+    <value>Rename or change remote URL</value>
+    <comment>Tooltip on a remote's Edit button</comment>
+  </data>
+  <data name="Repo_View_RemoveRemoteToolTip" xml:space="preserve">
+    <value>Remove remote</value>
+    <comment>Tooltip on a remote's remove button</comment>
+  </data>
+  <data name="Repo_View_RemoteBranchesHeader" xml:space="preserve">
+    <value>REMOTE BRANCHES</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_NoRemoteBranches" xml:space="preserve">
+    <value>No remote branches.</value>
+    <comment>Empty-state text</comment>
+  </data>
+  <data name="Repo_View_TagsHeader" xml:space="preserve">
+    <value>TAGS</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_NoTags" xml:space="preserve">
+    <value>No tags.</value>
+    <comment>Empty-state text</comment>
+  </data>
+  <data name="Repo_View_DeleteTagToolTip" xml:space="preserve">
+    <value>Delete tag</value>
+    <comment>Tooltip on a tag's delete button</comment>
+  </data>
+  <data name="Repo_View_StashesHeader" xml:space="preserve">
+    <value>STASHES</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_StashChanges" xml:space="preserve">
+    <value>+ Stash changes</value>
+    <comment>Sidebar button</comment>
+  </data>
+  <data name="Repo_View_NoStashes" xml:space="preserve">
+    <value>No stashes.</value>
+    <comment>Empty-state text</comment>
+  </data>
+  <data name="Repo_View_ApplyStash" xml:space="preserve">
+    <value>Apply</value>
+    <comment>Button: apply a stash</comment>
+  </data>
+  <data name="Repo_View_PopStash" xml:space="preserve">
+    <value>Pop</value>
+    <comment>Button: pop a stash</comment>
+  </data>
+  <data name="Repo_View_DropStashToolTip" xml:space="preserve">
+    <value>Drop stash</value>
+    <comment>Tooltip on a stash's drop button</comment>
+  </data>
+  <data name="Repo_View_RepositoryHeader" xml:space="preserve">
+    <value>REPOSITORY</value>
+    <comment>Sidebar section header (all caps)</comment>
+  </data>
+  <data name="Repo_View_HistoryTab" xml:space="preserve">
+    <value>History</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Repo_View_FileStatusTab" xml:space="preserve">
+    <value>File Status</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="History_Author" xml:space="preserve">
+    <value>Author</value>
+    <comment>Label before the author filter box</comment>
+  </data>
+  <data name="History_FilterByAuthor" xml:space="preserve">
+    <value>Filter by author</value>
+    <comment>Placeholder in the author filter box</comment>
+  </data>
+  <data name="History_Search" xml:space="preserve">
+    <value>Search</value>
+    <comment>Button: apply the log filter</comment>
+  </data>
+  <data name="History_Clear" xml:space="preserve">
+    <value>Clear</value>
+    <comment>Button: clear the log filter</comment>
+  </data>
+  <data name="History_LoadMore" xml:space="preserve">
+    <value>Load more</value>
+    <comment>Button: load more commits</comment>
+  </data>
+  <data name="History_CheckoutCommit" xml:space="preserve">
+    <value>Checkout commit</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_CreateBranchHere" xml:space="preserve">
+    <value>Create branch here...</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_CreateTagHere" xml:space="preserve">
+    <value>Create tag here...</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_MergeIntoCurrentBranch" xml:space="preserve">
+    <value>Merge into current branch</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_CherryPickSelected" xml:space="preserve">
+    <value>Cherry-pick selected commit(s)</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_RevertSelected" xml:space="preserve">
+    <value>Revert selected commit(s)</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_RebaseOntoThis" xml:space="preserve">
+    <value>Rebase current branch onto this</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_InteractiveRebaseFromHere" xml:space="preserve">
+    <value>Interactive rebase from here...</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_ResetHardToThis" xml:space="preserve">
+    <value>Reset --hard to this commit</value>
+    <comment>Commit context menu item; --hard is a git option, do not translate</comment>
+  </data>
+  <data name="History_SetCompareBase" xml:space="preserve">
+    <value>Set as compare base</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_CompareWithBase" xml:space="preserve">
+    <value>Compare selected with base</value>
+    <comment>Commit context menu item</comment>
+  </data>
+  <data name="History_BranchHere" xml:space="preserve">
+    <value>Branch here</value>
+    <comment>Commit details button</comment>
+  </data>
+  <data name="History_TagHere" xml:space="preserve">
+    <value>Tag here</value>
+    <comment>Commit details button</comment>
+  </data>
+  <data name="History_Merge" xml:space="preserve">
+    <value>Merge</value>
+    <comment>Commit details button</comment>
+  </data>
+  <data name="History_RebaseOnto" xml:space="preserve">
+    <value>Rebase onto</value>
+    <comment>Commit details button</comment>
+  </data>
+  <data name="History_ResetHard" xml:space="preserve">
+    <value>Reset --hard</value>
+    <comment>Commit details button; --hard is a git option, do not translate</comment>
+  </data>
+  <data name="History_ComparingCommits" xml:space="preserve">
+    <value>Comparing commits</value>
+    <comment>Heading shown when two commits are compared</comment>
+  </data>
+  <data name="History_Swap" xml:space="preserve">
+    <value>Swap</value>
+    <comment>Button: swap compare base and target</comment>
+  </data>
+  <data name="History_SwapToolTip" xml:space="preserve">
+    <value>Swap the base and target of the comparison</value>
+    <comment>Tooltip on Swap</comment>
+  </data>
+  <data name="History_From" xml:space="preserve">
+    <value>From</value>
+    <comment>Label for the comparison base commit</comment>
+  </data>
+  <data name="History_To" xml:space="preserve">
+    <value>To</value>
+    <comment>Label for the comparison target commit</comment>
+  </data>
+  <data name="History_ChangedFiles" xml:space="preserve">
+    <value>Changed files</value>
+    <comment>Heading over the commit's file list</comment>
+  </data>
+  <data name="WorkingCopy_UnstageSelected" xml:space="preserve">
+    <value>Unstage selected</value>
+    <comment>Button</comment>
+  </data>
+  <data name="WorkingCopy_UnstageAll" xml:space="preserve">
+    <value>Unstage all</value>
+    <comment>Button</comment>
+  </data>
+  <data name="WorkingCopy_StageSelected" xml:space="preserve">
+    <value>Stage selected</value>
+    <comment>Button</comment>
+  </data>
+  <data name="WorkingCopy_StageAll" xml:space="preserve">
+    <value>Stage all</value>
+    <comment>Button</comment>
+  </data>
+  <data name="WorkingCopy_DiscardAll" xml:space="preserve">
+    <value>Discard all</value>
+    <comment>Button</comment>
+  </data>
+  <data name="WorkingCopy_AbortMerge" xml:space="preserve">
+    <value>Abort merge</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_AbortRebase" xml:space="preserve">
+    <value>Abort rebase</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_ContinueRebase" xml:space="preserve">
+    <value>Continue rebase</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_SkipCommit" xml:space="preserve">
+    <value>Skip commit</value>
+    <comment>Conflict banner button (rebase)</comment>
+  </data>
+  <data name="WorkingCopy_ContinueCherryPick" xml:space="preserve">
+    <value>Continue cherry-pick</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_SkipCherryPick" xml:space="preserve">
+    <value>Skip cherry-pick</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_AbortCherryPick" xml:space="preserve">
+    <value>Abort cherry-pick</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_ContinueRevert" xml:space="preserve">
+    <value>Continue revert</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_AbortRevert" xml:space="preserve">
+    <value>Abort revert</value>
+    <comment>Conflict banner button</comment>
+  </data>
+  <data name="WorkingCopy_CommitMessagePlaceholder" xml:space="preserve">
+    <value>Commit message</value>
+    <comment>Placeholder in the commit message box</comment>
+  </data>
+  <data name="WorkingCopy_AmendLastCommit" xml:space="preserve">
+    <value>Amend last commit</value>
+    <comment>Checkbox</comment>
+  </data>
+  <data name="WorkingCopy_SignOff" xml:space="preserve">
+    <value>Sign off</value>
+    <comment>Checkbox: add Signed-off-by trailer</comment>
+  </data>
+  <data name="WorkingCopy_GpgSign" xml:space="preserve">
+    <value>GPG sign</value>
+    <comment>Checkbox</comment>
+  </data>
+  <data name="WorkingCopy_PushAfterCommitting" xml:space="preserve">
+    <value>Push after committing</value>
+    <comment>Checkbox</comment>
+  </data>
+  <data name="WorkingCopy_OpenFile" xml:space="preserve">
+    <value>Open file</value>
+    <comment>Button: open the selected file</comment>
+  </data>
+  <data name="Diff_StageFile" xml:space="preserve">
+    <value>Stage file</value>
+    <comment>Diff file header button</comment>
+  </data>
+  <data name="Diff_UnstageFile" xml:space="preserve">
+    <value>Unstage file</value>
+    <comment>Diff file header button</comment>
+  </data>
+  <data name="Diff_StageHunk" xml:space="preserve">
+    <value>Stage hunk</value>
+    <comment>Diff hunk header button</comment>
+  </data>
+  <data name="Diff_UnstageHunk" xml:space="preserve">
+    <value>Unstage hunk</value>
+    <comment>Diff hunk header button</comment>
+  </data>
+  <data name="Diff_DiscardHunk" xml:space="preserve">
+    <value>Discard hunk</value>
+    <comment>Diff hunk header button</comment>
+  </data>
+  <data name="Diff_Copy" xml:space="preserve">
+    <value>Copy</value>
+    <comment>Diff context menu item: copy selected lines</comment>
+  </data>
+  <data name="Diff_CopyWithMarkers" xml:space="preserve">
+    <value>Copy with +/- markers</value>
+    <comment>Diff context menu item</comment>
+  </data>
+  <data name="Diff_CopyNewVersion" xml:space="preserve">
+    <value>Copy new version</value>
+    <comment>Diff context menu item</comment>
+  </data>
+  <data name="Diff_CopyOldVersion" xml:space="preserve">
+    <value>Copy old version</value>
+    <comment>Diff context menu item</comment>
+  </data>
+  <data name="Diff_CopyFilePath" xml:space="preserve">
+    <value>Copy file path</value>
+    <comment>Diff context menu item</comment>
+  </data>
+  <data name="Rebase_Title" xml:space="preserve">
+    <value>Interactive rebase</value>
+    <comment>Window title</comment>
+  </data>
+  <data name="Rebase_Instructions" xml:space="preserve">
+    <value>Reorder commits and choose an action for each one. The rebase runs from oldest to newest.</value>
+    <comment>Instructions at the top of the interactive rebase window</comment>
+  </data>
+  <data name="Rebase_MessageToolTip" xml:space="preserve">
+    <value>Full commit message (editable for reword)</value>
+    <comment>Tooltip on the message box; reword is a git rebase action</comment>
+  </data>
+  <data name="Rebase_MoveUp" xml:space="preserve">
+    <value>Move up</value>
+    <comment>Tooltip on the up-arrow button</comment>
+  </data>
+  <data name="Rebase_MoveDown" xml:space="preserve">
+    <value>Move down</value>
+    <comment>Tooltip on the down-arrow button</comment>
+  </data>
+  <data name="Rebase_RunRebase" xml:space="preserve">
+    <value>Run rebase</value>
+    <comment>Button: start the rebase</comment>
+  </data>
+  <data name="Main_LinkedWorktreeOfFormat" xml:space="preserve">
+    <value>Linked worktree of {0}</value>
+    <comment>Tooltip on the worktree icon. {0} = path of the main worktree</comment>
+  </data>
+  <data name="Repo_View_MainWorktreeFormat" xml:space="preserve">
+    <value>Main worktree: {0}</value>
+    <comment>{0} = path of the main worktree</comment>
+  </data>
+  <data name="Diff_FileCountFormat" xml:space="preserve">
+    <value>{0} file(s)</value>
+    <comment>{0} = number of files in the diff</comment>
+  </data>
+  <data name="App_UnexpectedError" xml:space="preserve">
+    <value>Unexpected error</value>
+    <comment>Title of the dialog shown for an unhandled error</comment>
+  </data>
+  <data name="Advanced_WindowTitle" xml:space="preserve">
+    <value>Advanced Git - {0}</value>
+    <comment>Window title; {0} = repository name</comment>
+  </data>
+  <data name="Advanced_OperationRunning" xml:space="preserve">
+    <value>{0}...</value>
+    <comment>Status while an operation runs; {0} = operation name (e.g. "Add submodule")</comment>
+  </data>
+  <data name="Advanced_OperationFailedStatus" xml:space="preserve">
+    <value>{0} failed.</value>
+    <comment>Status after an operation failed; {0} = operation name (e.g. "Add submodule")</comment>
+  </data>
+  <data name="Advanced_OperationFailedTitle" xml:space="preserve">
+    <value>{0} failed</value>
+    <comment>Error dialog title; {0} = operation name (e.g. "Add submodule")</comment>
+  </data>
+  <data name="Advanced_OperationCompleted" xml:space="preserve">
+    <value>{0} completed.</value>
+    <comment>Status after an operation succeeded; {0} = operation name (e.g. "Add submodule")</comment>
+  </data>
+  <data name="Advanced_DeinitSubmoduleConfirm" xml:space="preserve">
+    <value>Deinit '{0}'? Uncommitted changes in the submodule working tree will be discarded.</value>
+    <comment>Confirmation; {0} = submodule path</comment>
+  </data>
+  <data name="Advanced_RemoveSubmoduleConfirm" xml:space="preserve">
+    <value>Remove '{0}' from the index and working tree?</value>
+    <comment>Confirmation; {0} = submodule path</comment>
+  </data>
+  <data name="Advanced_SubmoduleCount" xml:space="preserve">
+    <value>{0} submodule(s).</value>
+    <comment>Status; {0} = number of submodules</comment>
+  </data>
+  <data name="Advanced_LockFile" xml:space="preserve">
+    <value>Lock {0}</value>
+    <comment>Operation name; {0} = file path</comment>
+  </data>
+  <data name="Advanced_UnlockFile" xml:space="preserve">
+    <value>Unlock {0}</value>
+    <comment>Operation name; {0} = file path</comment>
+  </data>
+  <data name="Advanced_TrackPattern" xml:space="preserve">
+    <value>Track {0}</value>
+    <comment>Operation name; {0} = LFS file pattern</comment>
+  </data>
+  <data name="Advanced_UntrackPattern" xml:space="preserve">
+    <value>Untrack {0}</value>
+    <comment>Operation name; {0} = LFS file pattern</comment>
+  </data>
+  <data name="Advanced_LfsPatternCount" xml:space="preserve">
+    <value>{0} tracked LFS pattern(s).</value>
+    <comment>Status; {0} = number of patterns</comment>
+  </data>
+  <data name="Advanced_LfsLockCount" xml:space="preserve">
+    <value>{0} LFS lock(s).</value>
+    <comment>Status; {0} = number of locks</comment>
+  </data>
+  <data name="Advanced_FlowStart" xml:space="preserve">
+    <value>Start {0}/{1}</value>
+    <comment>Operation name; {0} = git-flow branch type (feature/release/...), {1} = branch name</comment>
+  </data>
+  <data name="Advanced_FlowFinish" xml:space="preserve">
+    <value>Finish {0}/{1}</value>
+    <comment>Operation name; {0} = git-flow branch type (feature/release/...), {1} = branch name</comment>
+  </data>
+  <data name="Advanced_FlowList" xml:space="preserve">
+    <value>List {0}</value>
+    <comment>Operation name; {0} = git-flow branch type (feature/release/...)</comment>
+  </data>
+  <data name="Advanced_WorktreeItemDetached" xml:space="preserve">
+    <value>{0}  [{1} detached]</value>
+    <comment>Worktree list item for a detached HEAD; {0} = worktree path, {1} = branch/commit</comment>
+  </data>
+  <data name="Advanced_WorktreeCount" xml:space="preserve">
+    <value>{0} worktree(s).</value>
+    <comment>Status; {0} = number of worktrees</comment>
+  </data>
+  <data name="Advanced_RemoveWorktreeConfirm" xml:space="preserve">
+    <value>Remove worktree '{0}'?</value>
+    <comment>Confirmation; {0} = worktree path</comment>
+  </data>
+  <data name="Advanced_FileHistoryTitle" xml:space="preserve">
+    <value>File history - {0}</value>
+    <comment>Dialog title; {0} = file path</comment>
+  </data>
+  <data name="Advanced_BlameTitle" xml:space="preserve">
+    <value>Blame - {0}</value>
+    <comment>Dialog title; {0} = file path</comment>
+  </data>
+  <data name="Advanced_StashTitle" xml:space="preserve">
+    <value>Stash {0}</value>
+    <comment>Dialog title; {0} = stash name (e.g. stash@{0})</comment>
+  </data>
+  <data name="Advanced_DeleteRemoteBranchConfirm" xml:space="preserve">
+    <value>Delete '{0}' from '{1}'?</value>
+    <comment>Confirmation; {0} = branch name, {1} = remote name</comment>
+  </data>
+  <data name="Advanced_EditHookTitle" xml:space="preserve">
+    <value>Edit hook {0}</value>
+    <comment>Dialog title; {0} = hook file name</comment>
+  </data>
+  <data name="Advanced_SavedHook" xml:space="preserve">
+    <value>Saved hook {0}.</value>
+    <comment>Status; {0} = hook file name</comment>
+  </data>
+  <data name="Advanced_NoteForTitle" xml:space="preserve">
+    <value>Note for {0}</value>
+    <comment>Dialog title; {0} = revision</comment>
+  </data>
+  <data name="Advanced_RemoveNoteConfirm" xml:space="preserve">
+    <value>Remove the note on {0}?</value>
+    <comment>Confirmation; {0} = revision</comment>
+  </data>
+  <data name="Advanced_DeleteCustomActionConfirm" xml:space="preserve">
+    <value>Delete '{0}'?</value>
+    <comment>Confirmation; {0} = custom action name</comment>
+  </data>
+  <data name="Advanced_ChooseOperation" xml:space="preserve">
+    <value>Choose an operation.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Advanced_Submodules" xml:space="preserve">
+    <value>Submodules</value>
+    <comment>Tab header and section header</comment>
+  </data>
+  <data name="Advanced_TabLfs" xml:space="preserve">
+    <value>LFS</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_TabFlow" xml:space="preserve">
+    <value>Flow</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_TabSubtree" xml:space="preserve">
+    <value>Subtree</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_TabSvn" xml:space="preserve">
+    <value>SVN</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_Bisect" xml:space="preserve">
+    <value>Bisect</value>
+    <comment>Tab header, section header and dialog title</comment>
+  </data>
+  <data name="Advanced_TabWorktrees" xml:space="preserve">
+    <value>Worktrees</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_TabPatches" xml:space="preserve">
+    <value>Patches</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_Diagnostics" xml:space="preserve">
+    <value>Diagnostics</value>
+    <comment>Tab header and section header</comment>
+  </data>
+  <data name="Advanced_TabExtras" xml:space="preserve">
+    <value>Extras</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_TabCustom" xml:space="preserve">
+    <value>Custom</value>
+    <comment>Tab header</comment>
+  </data>
+  <data name="Advanced_AddEllipsis" xml:space="preserve">
+    <value>Add...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_AddSubmodule" xml:space="preserve">
+    <value>Add submodule</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_RepositoryURL" xml:space="preserve">
+    <value>Repository URL</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_LocalPath" xml:space="preserve">
+    <value>Local path</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_Init" xml:space="preserve">
+    <value>Init</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_InitSubmodules" xml:space="preserve">
+    <value>Init submodules</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Update" xml:space="preserve">
+    <value>Update</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_UpdateSubmodules" xml:space="preserve">
+    <value>Update submodules</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Sync" xml:space="preserve">
+    <value>Sync</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_SyncSubmodules" xml:space="preserve">
+    <value>Sync submodules</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Deinit" xml:space="preserve">
+    <value>Deinit</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_DeinitSubmodule" xml:space="preserve">
+    <value>Deinit submodule</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Remove" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_RemoveSubmodule" xml:space="preserve">
+    <value>Remove submodule</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_GitLFS" xml:space="preserve">
+    <value>Git LFS</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_Locks" xml:space="preserve">
+    <value>Locks</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_RefreshLocks" xml:space="preserve">
+    <value>Refresh locks</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_LockEllipsis" xml:space="preserve">
+    <value>Lock...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_LockWithGitLFS" xml:space="preserve">
+    <value>Lock with Git LFS</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_FilePath" xml:space="preserve">
+    <value>File path</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_UnlockEllipsis" xml:space="preserve">
+    <value>Unlock...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_UnlockWithGitLFS" xml:space="preserve">
+    <value>Unlock with Git LFS</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_RefreshPatterns" xml:space="preserve">
+    <value>Refresh patterns</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_GitLFSInit" xml:space="preserve">
+    <value>Git LFS init</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_TrackEllipsis" xml:space="preserve">
+    <value>Track...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_TrackWithGitLFS" xml:space="preserve">
+    <value>Track with Git LFS</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Pattern" xml:space="preserve">
+    <value>Pattern</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_UntrackEllipsis" xml:space="preserve">
+    <value>Untrack...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_UntrackGitLFS" xml:space="preserve">
+    <value>Untrack Git LFS</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Fetch" xml:space="preserve">
+    <value>Fetch</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_GitLFSFetch" xml:space="preserve">
+    <value>Git LFS fetch</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Pull" xml:space="preserve">
+    <value>Pull</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_GitLFSPull" xml:space="preserve">
+    <value>Git LFS pull</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_GitFlow" xml:space="preserve">
+    <value>Git Flow</value>
+    <comment>Section header and dialog title</comment>
+  </data>
+  <data name="Advanced_FlowRequirement" xml:space="preserve">
+    <value>Requires git-flow (AVH edition).</value>
+    <comment>Hint text</comment>
+  </data>
+  <data name="Advanced_GitFlowInit" xml:space="preserve">
+    <value>Git Flow init</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_StartEllipsis" xml:space="preserve">
+    <value>Start...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_FlowBranchTypeWithKinds" xml:space="preserve">
+    <value>Branch type (feature/release/hotfix/support)</value>
+    <comment>Prompt label; feature/release/hotfix/support are git-flow keywords the user types, keep them untranslated</comment>
+  </data>
+  <data name="Advanced_Name" xml:space="preserve">
+    <value>Name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_FinishEllipsis" xml:space="preserve">
+    <value>Finish...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_TagMessage" xml:space="preserve">
+    <value>Tag message</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_ListEllipsis" xml:space="preserve">
+    <value>List...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_BranchType" xml:space="preserve">
+    <value>Branch type</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_GitSubtree" xml:space="preserve">
+    <value>Git Subtree</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_SubtreeExamples" xml:space="preserve">
+    <value>Examples: prefix=libs/foo, remote URL, ref=main.</value>
+    <comment>Hint text; prefix=, ref= are field names</comment>
+  </data>
+  <data name="Advanced_SubtreeAdd" xml:space="preserve">
+    <value>Subtree add</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Prefix" xml:space="preserve">
+    <value>Prefix</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_Reference" xml:space="preserve">
+    <value>Reference</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_SquashHistoryPrompt" xml:space="preserve">
+    <value>Squash history?</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_SquashHistory" xml:space="preserve">
+    <value>Squash history</value>
+    <comment>Check box</comment>
+  </data>
+  <data name="Advanced_PullEllipsis" xml:space="preserve">
+    <value>Pull...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_SubtreePull" xml:space="preserve">
+    <value>Subtree pull</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_RemoteOrURL" xml:space="preserve">
+    <value>Remote or URL</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_PushEllipsis" xml:space="preserve">
+    <value>Push...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_SubtreePush" xml:space="preserve">
+    <value>Subtree push</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_GitSVNBridge" xml:space="preserve">
+    <value>Git-SVN bridge</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_SvnRequirement" xml:space="preserve">
+    <value>Requires a git-svn initialized repository.</value>
+    <comment>Hint text</comment>
+  </data>
+  <data name="Advanced_Rebase" xml:space="preserve">
+    <value>Rebase</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_Dcommit" xml:space="preserve">
+    <value>Dcommit</value>
+    <comment>Button; git svn dcommit</comment>
+  </data>
+  <data name="Advanced_Info" xml:space="preserve">
+    <value>Info</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_BadRevision" xml:space="preserve">
+    <value>Bad revision</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_GoodRevisionOptional" xml:space="preserve">
+    <value>Good revision (optional)</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_StartBisect" xml:space="preserve">
+    <value>Start bisect</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Good" xml:space="preserve">
+    <value>Good</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_BisectGood" xml:space="preserve">
+    <value>Bisect good</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Bad" xml:space="preserve">
+    <value>Bad</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_BisectBad" xml:space="preserve">
+    <value>Bisect bad</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Reset" xml:space="preserve">
+    <value>Reset</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_BisectReset" xml:space="preserve">
+    <value>Bisect reset</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Log" xml:space="preserve">
+    <value>Log</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_BisectLog" xml:space="preserve">
+    <value>Bisect log</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Advanced_LinkedWorktrees" xml:space="preserve">
+    <value>Linked worktrees</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_AddWorktree" xml:space="preserve">
+    <value>Add worktree</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Path" xml:space="preserve">
+    <value>Path</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_NewBranchOptional" xml:space="preserve">
+    <value>New branch (optional)</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_StartPointOptional" xml:space="preserve">
+    <value>Start point (optional)</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_RemoveEllipsis" xml:space="preserve">
+    <value>Remove...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_RemoveWorktree" xml:space="preserve">
+    <value>Remove worktree</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_PatchesAndArchives" xml:space="preserve">
+    <value>Patches and archives</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_CreatePatchForSelectedCommitEllipsis" xml:space="preserve">
+    <value>Create patch for selected commit...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_Patch" xml:space="preserve">
+    <value>Patch</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Advanced_SelectACommitFirst" xml:space="preserve">
+    <value>Select a commit first.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_SavePatch" xml:space="preserve">
+    <value>Save patch</value>
+    <comment>File picker title</comment>
+  </data>
+  <data name="Advanced_CreatePatch" xml:space="preserve">
+    <value>Create patch</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_ApplyPatchEllipsis" xml:space="preserve">
+    <value>Apply patch...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_ApplyPatch" xml:space="preserve">
+    <value>Apply patch</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_ExportArchiveEllipsis" xml:space="preserve">
+    <value>Export archive...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_Archive" xml:space="preserve">
+    <value>Archive</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Advanced_ExportArchive" xml:space="preserve">
+    <value>Export archive</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_PushTagEllipsis" xml:space="preserve">
+    <value>Push tag...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_PushTag" xml:space="preserve">
+    <value>Push tag</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_TagName" xml:space="preserve">
+    <value>Tag name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_Remote" xml:space="preserve">
+    <value>Remote</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_RebaseKeepingMergesEllipsis" xml:space="preserve">
+    <value>Rebase keeping merges...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_RebasePreservingMerges" xml:space="preserve">
+    <value>Rebase preserving merges</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Onto" xml:space="preserve">
+    <value>Onto</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_RebaseRootKeepingMerges" xml:space="preserve">
+    <value>Rebase root keeping merges</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_RebaseFromRoot" xml:space="preserve">
+    <value>Rebase from root</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_RebaseFromRootConfirm" xml:space="preserve">
+    <value>Rewrite the entire history from the root commit? This cannot be undone.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_Reflog" xml:space="preserve">
+    <value>Reflog</value>
+    <comment>Button and dialog title</comment>
+  </data>
+  <data name="Advanced_FileHistoryEllipsis" xml:space="preserve">
+    <value>File history...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_FileHistory" xml:space="preserve">
+    <value>File history</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_RepositoryRelativeFile" xml:space="preserve">
+    <value>Repository-relative file</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_BlameEllipsis" xml:space="preserve">
+    <value>Blame...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_Blame" xml:space="preserve">
+    <value>Blame</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_SearchLogEllipsis" xml:space="preserve">
+    <value>Search log...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_SearchLog" xml:space="preserve">
+    <value>Search log</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_MessageText" xml:space="preserve">
+    <value>Message text</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_SearchResults" xml:space="preserve">
+    <value>Search results</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Advanced_SearchWorkingTreeEllipsis" xml:space="preserve">
+    <value>Search working tree...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_SearchWorkingTree" xml:space="preserve">
+    <value>Search working tree</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Text" xml:space="preserve">
+    <value>Text</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_WorkingTreeMatches" xml:space="preserve">
+    <value>Working tree matches</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Advanced_PreviewStashEllipsis" xml:space="preserve">
+    <value>Preview stash...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_StashPreview" xml:space="preserve">
+    <value>Stash preview</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Stash" xml:space="preserve">
+    <value>Stash</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_RenameBranchEllipsis" xml:space="preserve">
+    <value>Rename branch...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_RenameBranch" xml:space="preserve">
+    <value>Rename branch</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_CurrentBranchName" xml:space="preserve">
+    <value>Current branch name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_NewBranchName" xml:space="preserve">
+    <value>New branch name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_DeleteRemoteBranchEllipsis" xml:space="preserve">
+    <value>Delete remote branch...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_DeleteRemoteBranch" xml:space="preserve">
+    <value>Delete remote branch</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Branch" xml:space="preserve">
+    <value>Branch</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_ExternalDiffEllipsis" xml:space="preserve">
+    <value>External diff...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_ExternalDiff" xml:space="preserve">
+    <value>External diff</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_SelectAFileFirst" xml:space="preserve">
+    <value>Select a file first.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_ConfigureExternalDiffFirst" xml:space="preserve">
+    <value>Configure External diff in Settings first.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_ExternalMergeEllipsis" xml:space="preserve">
+    <value>External merge...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_ExternalMerge" xml:space="preserve">
+    <value>External merge</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_SelectAConflictedFileFirst" xml:space="preserve">
+    <value>Select a conflicted file first.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_ConfigureExternalMergeFirst" xml:space="preserve">
+    <value>Configure External merge in Settings first.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_ExternalMergeMissingStages" xml:space="preserve">
+    <value>This conflict does not have base, local and remote stages (for example add/add or delete/modify). Use the built-in diff instead.</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_OpenHooksFolder" xml:space="preserve">
+    <value>Open hooks folder</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_HooksFolderNotFound" xml:space="preserve">
+    <value>Hooks folder not found.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Advanced_EditHookEllipsis" xml:space="preserve">
+    <value>Edit hook...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_EditHook" xml:space="preserve">
+    <value>Edit hook</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_HookFileName" xml:space="preserve">
+    <value>Hook file name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_HookNameWithoutPath" xml:space="preserve">
+    <value>Enter a hook file name without a path.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Advanced_OpenTerminal" xml:space="preserve">
+    <value>Open terminal</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_GitNotes" xml:space="preserve">
+    <value>Git notes</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_ShowNoteEllipsis" xml:space="preserve">
+    <value>Show note...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_ShowNote" xml:space="preserve">
+    <value>Show note</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Revision" xml:space="preserve">
+    <value>Revision</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_AddNoteEllipsis" xml:space="preserve">
+    <value>Add note...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_AddNote" xml:space="preserve">
+    <value>Add note</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_NoteText" xml:space="preserve">
+    <value>Note text</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_RemoveNoteEllipsis" xml:space="preserve">
+    <value>Remove note...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_RemoveNote" xml:space="preserve">
+    <value>Remove note</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_SparseCheckout" xml:space="preserve">
+    <value>Sparse checkout</value>
+    <comment>Section header and dialog title</comment>
+  </data>
+  <data name="Advanced_Enable" xml:space="preserve">
+    <value>Enable</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_EnableSparseCheckoutConfirm" xml:space="preserve">
+    <value>Enable cone-mode sparse checkout in this repository?</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_EnableSparseCheckout" xml:space="preserve">
+    <value>Enable sparse checkout</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_SetPatternsEllipsis" xml:space="preserve">
+    <value>Set patterns...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_SparsePatternsPrompt" xml:space="preserve">
+    <value>Folders/files separated by commas or new lines</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_SetSparsePatterns" xml:space="preserve">
+    <value>Set sparse patterns</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Disable" xml:space="preserve">
+    <value>Disable</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_DisableSparseCheckoutConfirm" xml:space="preserve">
+    <value>Disable sparse checkout and restore the full working tree?</value>
+    <comment>Dialog message</comment>
+  </data>
+  <data name="Advanced_DisableSparseCheckout" xml:space="preserve">
+    <value>Disable sparse checkout</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_SavedCustomActions" xml:space="preserve">
+    <value>Saved custom actions</value>
+    <comment>Section header</comment>
+  </data>
+  <data name="Advanced_CustomActionsHint" xml:space="preserve">
+    <value>Commands run in the repository. Placeholders: {repo}, {sha}, {file}.</value>
+    <comment>Hint text; not a format string - {repo}, {sha}, {file} are literal placeholder tokens the user types and must stay untranslated</comment>
+  </data>
+  <data name="Advanced_RunSelected" xml:space="preserve">
+    <value>Run selected</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_CustomAction" xml:space="preserve">
+    <value>Custom action</value>
+    <comment>Dialog title / operation name</comment>
+  </data>
+  <data name="Advanced_Command" xml:space="preserve">
+    <value>Command</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Advanced_Delete" xml:space="preserve">
+    <value>Delete</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Advanced_DeleteCustomAction" xml:space="preserve">
+    <value>Delete custom action</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Advanced_RunCommandEllipsis" xml:space="preserve">
+    <value>Run command...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Settings_OverwriteSshKeyConfirm" xml:space="preserve">
+    <value>'{0}' already exists. Replace it? The existing private key cannot be recovered.</value>
+    <comment>Confirmation; {0} = key file path</comment>
+  </data>
+  <data name="Settings_SshCommandPlaceholder" xml:space="preserve">
+    <value>e.g. ssh -i C:\keys\id_ed25519</value>
+    <comment>Text box placeholder; the command after 'e.g.' is an example and must stay untranslated</comment>
+  </data>
+  <data name="Settings_GenerateKeyEllipsis" xml:space="preserve">
+    <value>Generate key...</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Settings_CredentialHelperPlaceholder" xml:space="preserve">
+    <value>e.g. manager-core or store</value>
+    <comment>Text box placeholder; manager-core and store are credential helper names, keep untranslated</comment>
+  </data>
+  <data name="Settings_ExternalDiffPlaceholder" xml:space="preserve">
+    <value>command with {repo}, {file}, {sha}</value>
+    <comment>Text box placeholder; not a format string - {repo}, {file}, {sha} are literal tokens, keep untranslated</comment>
+  </data>
+  <data name="Settings_ExternalMergePlaceholder" xml:space="preserve">
+    <value>command with {repo}, {file}, {base}, {local}, {remote}</value>
+    <comment>Text box placeholder; not a format string - {repo}, {file}, {base}, {local}, {remote} are literal tokens, keep untranslated</comment>
+  </data>
+  <data name="Settings_AutoRefreshOnFileChanges" xml:space="preserve">
+    <value>Auto-refresh on file changes</value>
+    <comment>Check box</comment>
+  </data>
+  <data name="Settings_ShowFilesInUntrackedFolders" xml:space="preserve">
+    <value>Show files inside untracked folders (off: one entry per folder, faster)</value>
+    <comment>Check box</comment>
+  </data>
+  <data name="Settings_MaintainCommitGraph" xml:space="preserve">
+    <value>Write a commit-graph when missing (much faster history in large repositories)</value>
+    <comment>Check box</comment>
+  </data>
+  <data name="Settings_DownloadUpdatesAutomatically" xml:space="preserve">
+    <value>Download new versions automatically (installed on restart)</value>
+    <comment>Check box</comment>
+  </data>
+  <data name="Settings_TerminalPlaceholderWindows" xml:space="preserve">
+    <value>default: PowerShell (pwsh if installed); e.g. cmd.exe</value>
+    <comment>Text box placeholder (Windows); PowerShell, pwsh, cmd.exe are program names</comment>
+  </data>
+  <data name="Settings_TerminalPlaceholderUnix" xml:space="preserve">
+    <value>default: login shell ($SHELL); e.g. /bin/zsh</value>
+    <comment>Text box placeholder (Linux/macOS); $SHELL and /bin/zsh must stay untranslated</comment>
+  </data>
+  <data name="Settings_GitExecutable" xml:space="preserve">
+    <value>Git executable</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_SSHCommand" xml:space="preserve">
+    <value>SSH command</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_CredentialHelper" xml:space="preserve">
+    <value>Credential helper</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_ExternalDiff" xml:space="preserve">
+    <value>External diff</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_ExternalMerge" xml:space="preserve">
+    <value>External merge</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_TerminalShell" xml:space="preserve">
+    <value>Terminal shell</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_AutoRefresh" xml:space="preserve">
+    <value>Auto refresh</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_UntrackedFiles" xml:space="preserve">
+    <value>Untracked files</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_Performance" xml:space="preserve">
+    <value>Performance</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_Updates" xml:space="preserve">
+    <value>Updates</value>
+    <comment>Row label</comment>
+  </data>
+  <data name="Settings_CreateSSHKey" xml:space="preserve">
+    <value>Create SSH key</value>
+    <comment>File picker title</comment>
+  </data>
+  <data name="Settings_OverwriteSSHKey" xml:space="preserve">
+    <value>Overwrite SSH key</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Settings_SSHKey" xml:space="preserve">
+    <value>SSH key</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Settings_Save" xml:space="preserve">
+    <value>Save</value>
+    <comment>Button</comment>
+  </data>
+  <data name="Dialog_RunRebase" xml:space="preserve">
+    <value>Run rebase</value>
+    <comment>Button that confirms the edited rebase todo list</comment>
+  </data>
+  <data name="Terminal_NoEmulatorFound" xml:space="preserve">
+    <value>No terminal emulator was found. Install one (for example gnome-terminal or xterm) or set the TERMINAL environment variable.</value>
+    <comment>Error; gnome-terminal, xterm and TERMINAL are program/variable names, do not translate</comment>
+  </data>
+  <data name="Terminal_CouldNotStart" xml:space="preserve">
+    <value>Could not start {0}: {1}</value>
+    <comment>Error; {0} = terminal executable, {1} = system error message</comment>
+  </data>
+  <data name="Main_OpenRepositoryToGetStarted" xml:space="preserve">
+    <value>Open a repository to get started.</value>
+    <comment>Status message on the home screen</comment>
+  </data>
+  <data name="Main_RepositoryPathCopied" xml:space="preserve">
+    <value>Repository path copied.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Main_AboutText" xml:space="preserve">
+    <value>Avgit {0}
+
+A Git client for Windows, macOS and Linux.
+
+Commit graph, unified diff viewer, line-level staging, interactive rebase and repository tools.</value>
+    <comment>About dialog text; {0} = application version. Avgit is the product name</comment>
+  </data>
+  <data name="Main_WindowTitle" xml:space="preserve">
+    <value>{0} - Avgit</value>
+    <comment>Main window title; {0} = repository name. Avgit is the product name</comment>
+  </data>
+  <data name="Main_UpdateReadyToInstall" xml:space="preserve">
+    <value>Avgit {0} is ready to install.</value>
+    <comment>Update banner; {0} = version</comment>
+  </data>
+  <data name="Main_CheckForUpdatesTitle" xml:space="preserve">
+    <value>Check for updates</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_UpdatesUnavailable" xml:space="preserve">
+    <value>Updates are only available when Avgit was installed from a release (Setup.exe on Windows, the AppImage on Linux).
+
+Releases: {0}/releases</value>
+    <comment>Message; {0} = project URL (keep "/releases" after it)</comment>
+  </data>
+  <data name="Main_CouldNotCheckForUpdates" xml:space="preserve">
+    <value>Could not check for updates: {0}</value>
+    <comment>Error; {0} = error message</comment>
+  </data>
+  <data name="Main_UpToDate" xml:space="preserve">
+    <value>Avgit {0} is up to date.</value>
+    <comment>Message; {0} = current version</comment>
+  </data>
+  <data name="Main_UpdateReadyTitle" xml:space="preserve">
+    <value>Update ready</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_UpdateDownloadedRestart" xml:space="preserve">
+    <value>Avgit {0} has been downloaded. Restart now to install it?</value>
+    <comment>Confirmation; {0} = version</comment>
+  </data>
+  <data name="Main_SelectRecentOrOpen" xml:space="preserve">
+    <value>Select a recent repository or open another.</value>
+    <comment>Status message on the home screen</comment>
+  </data>
+  <data name="Main_NoRecentlyClosed" xml:space="preserve">
+    <value>No recently closed repository.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Main_OpenRepositoryPickerTitle" xml:space="preserve">
+    <value>Open repository</value>
+    <comment>Folder picker title</comment>
+  </data>
+  <data name="Main_NotARepositoryTitle" xml:space="preserve">
+    <value>Not a repository</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_NotARepositoryMessage" xml:space="preserve">
+    <value>'{0}' does not contain a .git directory.</value>
+    <comment>Error; {0} = folder path. .git is a folder name</comment>
+  </data>
+  <data name="Main_OpeningRepository" xml:space="preserve">
+    <value>Opening {0}...</value>
+    <comment>Status message; {0} = repository path</comment>
+  </data>
+  <data name="Main_CouldNotOpenRepository" xml:space="preserve">
+    <value>Could not open repository</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_CloneRepositoryTitle" xml:space="preserve">
+    <value>Clone repository</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_CloneRepositoryUrlLabel" xml:space="preserve">
+    <value>Repository URL</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Main_CloneOptionsLabel" xml:space="preserve">
+    <value>Additional git clone options (optional, e.g. --depth 1 --branch dev)</value>
+    <comment>Prompt label; the options are git command-line arguments, do not translate them</comment>
+  </data>
+  <data name="Main_ClonePartialCheckBox" xml:space="preserve">
+    <value>Partial clone (blobless)</value>
+    <comment>Check box</comment>
+  </data>
+  <data name="Main_CloneParentPickerTitle" xml:space="preserve">
+    <value>Choose a folder for the clone</value>
+    <comment>Folder picker title</comment>
+  </data>
+  <data name="Main_CloneFolderNameLabel" xml:space="preserve">
+    <value>Folder name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Main_CloneFailedTitle" xml:space="preserve">
+    <value>Clone failed</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_CloneDestinationNotEmpty" xml:space="preserve">
+    <value>The destination folder is not empty.</value>
+    <comment>Error</comment>
+  </data>
+  <data name="Main_Cloning" xml:space="preserve">
+    <value>Cloning...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Main_CloneFailedStatus" xml:space="preserve">
+    <value>Clone failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Main_InitPickerTitle" xml:space="preserve">
+    <value>Create repository in folder</value>
+    <comment>Folder picker title</comment>
+  </data>
+  <data name="Main_InitTitle" xml:space="preserve">
+    <value>Create repository</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_InitConfirm" xml:space="preserve">
+    <value>Create a new Git repository in '{0}'?</value>
+    <comment>Confirmation; {0} = folder path</comment>
+  </data>
+  <data name="Main_CreatingRepository" xml:space="preserve">
+    <value>Creating repository...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Main_InitFailedTitle" xml:space="preserve">
+    <value>Create repository failed</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Main_InitFailedStatus" xml:space="preserve">
+    <value>Create repository failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="DiffVm_SelectFile" xml:space="preserve">
+    <value>Select a file to view its diff.</value>
+    <comment>Placeholder in an empty diff view</comment>
+  </data>
+  <data name="DiffVm_BinaryFile" xml:space="preserve">
+    <value>Binary file; no text diff is available.</value>
+    <comment>Note shown in place of a diff</comment>
+  </data>
+  <data name="DiffVm_NoChanges" xml:space="preserve">
+    <value>No changes to display.</value>
+    <comment>Placeholder in an empty diff view</comment>
+  </data>
+  <data name="DiffVm_DiscardLinesTitle" xml:space="preserve">
+    <value>Discard lines</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="DiffVm_DiscardLineConfirm" xml:space="preserve">
+    <value>Discard the selected changed line? This cannot be undone.</value>
+    <comment>Confirmation for exactly one line</comment>
+  </data>
+  <data name="DiffVm_DiscardLinesConfirm" xml:space="preserve">
+    <value>Discard the {0:N0} selected changed lines? This cannot be undone.</value>
+    <comment>Confirmation; {0} = number of lines (more than one)</comment>
+  </data>
+  <data name="DiffVm_CouldNotReadImage" xml:space="preserve">
+    <value>Could not read the image.</value>
+    <comment>Error shown under an image panel</comment>
+  </data>
+  <data name="DiffVm_CouldNotDecodeImage" xml:space="preserve">
+    <value>Could not decode the image ({0}).</value>
+    <comment>Error shown under an image panel; {0} = file size such as "12 KB"</comment>
+  </data>
+  <data name="DiffVm_SizeBytes" xml:space="preserve">
+    <value>{0:N0} B</value>
+    <comment>File size; {0} = number of bytes</comment>
+  </data>
+  <data name="DiffVm_SizeKilobytes" xml:space="preserve">
+    <value>{0:N1} KB</value>
+    <comment>File size; {0} = kilobytes</comment>
+  </data>
+  <data name="DiffVm_SizeMegabytes" xml:space="preserve">
+    <value>{0:N1} MB</value>
+    <comment>File size; {0} = megabytes</comment>
+  </data>
+  <data name="DiffVm_ImageLoading" xml:space="preserve">
+    <value>Loading…</value>
+    <comment>Caption under an image while it loads</comment>
+  </data>
+  <data name="DiffVm_ImageInfo" xml:space="preserve">
+    <value>{0:N0} × {1:N0} px · {2}</value>
+    <comment>Image caption; {0} = width, {1} = height in pixels, {2} = file size</comment>
+  </data>
+  <data name="DiffVm_OldFile" xml:space="preserve">
+    <value>Old File</value>
+    <comment>Label above the old version of an image</comment>
+  </data>
+  <data name="DiffVm_NewFile" xml:space="preserve">
+    <value>New File</value>
+    <comment>Label above the new version of an image</comment>
+  </data>
+  <data name="DiffVm_File" xml:space="preserve">
+    <value>File</value>
+    <comment>Label above an unchanged image</comment>
+  </data>
+  <data name="DiffVm_MergeParents" xml:space="preserve">
+    <value>merge {0}</value>
+    <comment>History row badge for a merge commit; {0} = number of parents</comment>
+  </data>
+  <data name="DiffVm_TagToolTip" xml:space="preserve">
+    <value>tag: {0}</value>
+    <comment>Ref tooltip line; {0} = tag name</comment>
+  </data>
+  <data name="DiffVm_BranchInOtherWorktree" xml:space="preserve">
+    <value>{0} (in another worktree)</value>
+    <comment>Ref tooltip line; {0} = branch name</comment>
+  </data>
+  <data name="Worktree_Bare" xml:space="preserve">
+    <value>bare</value>
+    <comment>Worktree list: shown instead of a branch for a bare repository</comment>
+  </data>
+  <data name="Worktree_DetachedAt" xml:space="preserve">
+    <value>detached at {0}</value>
+    <comment>Worktree list: detached HEAD; {0} = short commit id</comment>
+  </data>
+  <data name="Worktree_Detached" xml:space="preserve">
+    <value>detached</value>
+    <comment>Worktree list: detached HEAD with no known commit</comment>
+  </data>
+  <data name="Worktree_BadgeMain" xml:space="preserve">
+    <value>main</value>
+    <comment>Worktree badge: the main worktree</comment>
+  </data>
+  <data name="Worktree_BadgeLocked" xml:space="preserve">
+    <value>locked</value>
+    <comment>Worktree badge</comment>
+  </data>
+  <data name="Worktree_BadgeMissing" xml:space="preserve">
+    <value>missing</value>
+    <comment>Worktree badge: the folder no longer exists</comment>
+  </data>
+  <data name="Worktree_ToolTipCurrent" xml:space="preserve">
+    <value>This tab's worktree.</value>
+    <comment>Tooltip line</comment>
+  </data>
+  <data name="Worktree_ToolTipMain" xml:space="preserve">
+    <value>Main worktree.</value>
+    <comment>Tooltip line</comment>
+  </data>
+  <data name="Worktree_ToolTipLocked" xml:space="preserve">
+    <value>Locked: git will not remove or prune it.</value>
+    <comment>Tooltip line</comment>
+  </data>
+  <data name="Worktree_ToolTipMissing" xml:space="preserve">
+    <value>The folder is missing. Prune to forget it.</value>
+    <comment>Tooltip line</comment>
+  </data>
+  <data name="CommitInfo_RootCommit" xml:space="preserve">
+    <value>(root commit)</value>
+    <comment>Shown as the parent list of a commit with no parents</comment>
+  </data>
+  <data name="CommitInfo_Tag" xml:space="preserve">
+    <value>tag: {0}</value>
+    <comment>Tag label in commit details; {0} = tag name</comment>
+  </data>
+  <data name="Repo_AllBranchesFilter" xml:space="preserve">
+    <value>(all branches)</value>
+    <comment>History branch filter option that shows all branches</comment>
+  </data>
+  <data name="Repo_RepoTypeLinkedWorktree" xml:space="preserve">
+    <value>Git Â· linked worktree</value>
+    <comment>Repository type label for a linked worktree tab</comment>
+  </data>
+  <data name="Repo_OpFetch" xml:space="preserve">
+    <value>Fetch</value>
+    <comment>Operation name; shown in status/dialog titles such as "Fetch failed"</comment>
+  </data>
+  <data name="Repo_OpPull" xml:space="preserve">
+    <value>Pull</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpPullWithRebase" xml:space="preserve">
+    <value>Pull with rebase</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_StatusSelectCommitToCompare" xml:space="preserve">
+    <value>Select a commit to compare.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCompareBase" xml:space="preserve">
+    <value>Compare base: {0}</value>
+    <comment>Status message; {0} = short commit SHA</comment>
+  </data>
+  <data name="Repo_StatusCommitShaCopied" xml:space="preserve">
+    <value>Commit SHA copied.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_OpAbortMerge" xml:space="preserve">
+    <value>Abort merge</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpAbortRebase" xml:space="preserve">
+    <value>Abort rebase</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpContinueRebase" xml:space="preserve">
+    <value>Continue rebase</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpSkipCommit" xml:space="preserve">
+    <value>Skip commit</value>
+    <comment>Operation name (skip the current rebase commit); shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpContinueCherryPick" xml:space="preserve">
+    <value>Continue cherry-pick</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpAbortCherryPick" xml:space="preserve">
+    <value>Abort cherry-pick</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpSkipCherryPick" xml:space="preserve">
+    <value>Skip cherry-pick</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpContinueRevert" xml:space="preserve">
+    <value>Continue revert</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpAbortRevert" xml:space="preserve">
+    <value>Abort revert</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_StatusNoCommitToAmend" xml:space="preserve">
+    <value>There is no commit to amend yet.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_AmendLastCommitTitle" xml:space="preserve">
+    <value>Amend last commit</value>
+    <comment>Confirmation dialog title</comment>
+  </data>
+  <data name="Repo_AmendReplaceMessageConfirm" xml:space="preserve">
+    <value>Replace the current commit message with the last commit's message?</value>
+    <comment>Confirmation dialog message</comment>
+  </data>
+  <data name="Repo_CommitAndPushButton" xml:space="preserve">
+    <value>Commit &amp; Push</value>
+    <comment>Commit button text when push-after-commit is on</comment>
+  </data>
+  <data name="Repo_CommitButton" xml:space="preserve">
+    <value>Commit</value>
+    <comment>Commit button text</comment>
+  </data>
+  <data name="Repo_OpenRemoteWebUrlToolTip" xml:space="preserve">
+    <value>Open {0} in the browser</value>
+    <comment>Tooltip; {0} = remote web URL</comment>
+  </data>
+  <data name="Repo_StatusCouldNotOpen" xml:space="preserve">
+    <value>Could not open {0}: {1}</value>
+    <comment>Status message; {0} = URL or path, {1} = error message</comment>
+  </data>
+  <data name="Repo_StatusReady" xml:space="preserve">
+    <value>Ready</value>
+    <comment>Initial status message</comment>
+  </data>
+  <data name="Repo_LogCountCached" xml:space="preserve">
+    <value>{0} commits (cached, refreshing)</value>
+    <comment>History count; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_LogCount" xml:space="preserve">
+    <value>{0} commits</value>
+    <comment>History count; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_ConflictRebase" xml:space="preserve">
+    <value>A rebase is in progress. Resolve conflicts, then continue, skip or abort.</value>
+    <comment>Conflict banner text</comment>
+  </data>
+  <data name="Repo_ConflictCherryPick" xml:space="preserve">
+    <value>A cherry-pick is in progress. Resolve conflicts, then continue, skip or abort.</value>
+    <comment>Conflict banner text</comment>
+  </data>
+  <data name="Repo_ConflictRevert" xml:space="preserve">
+    <value>A revert is in progress. Resolve conflicts, then continue or abort.</value>
+    <comment>Conflict banner text</comment>
+  </data>
+  <data name="Repo_ConflictMerge" xml:space="preserve">
+    <value>A merge is in progress. Resolve conflicts, stage the files, then commit or abort.</value>
+    <comment>Conflict banner text</comment>
+  </data>
+  <data name="Repo_StagedHeader" xml:space="preserve">
+    <value>Staged ({0})</value>
+    <comment>File list header; {0} = number of staged files</comment>
+  </data>
+  <data name="Repo_UnstagedHeader" xml:space="preserve">
+    <value>Unstaged ({0})</value>
+    <comment>File list header; {0} = number of unstaged files</comment>
+  </data>
+  <data name="Repo_StatusLoading" xml:space="preserve">
+    <value>Loading {0}...</value>
+    <comment>Status message; {0} = repository name</comment>
+  </data>
+  <data name="Repo_CouldNotLoadRepositoryTitle" xml:space="preserve">
+    <value>Could not load repository</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusRefreshing" xml:space="preserve">
+    <value>Refreshing...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_ErrorReadRefs" xml:space="preserve">
+    <value>Could not read repository references</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_ErrorReadHistory" xml:space="preserve">
+    <value>Could not read history</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_StatusNoMoreHistory" xml:space="preserve">
+    <value>No more history to load.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_ErrorReadCommit" xml:space="preserve">
+    <value>Could not read the commit</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_DiffSelectCommitFile" xml:space="preserve">
+    <value>Select a file in the commit to view its diff.</value>
+    <comment>Diff pane placeholder</comment>
+  </data>
+  <data name="Repo_ErrorLoadCommitDiff" xml:space="preserve">
+    <value>Could not load the commit diff</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_ErrorCompareCommits" xml:space="preserve">
+    <value>Could not compare commits</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_DiffCouldNotCompareCommits" xml:space="preserve">
+    <value>Could not compare commits.</value>
+    <comment>Diff pane placeholder</comment>
+  </data>
+  <data name="Repo_DiffNoChangesInRange" xml:space="preserve">
+    <value>No changed files in this range.</value>
+    <comment>Diff pane placeholder when comparing two commits</comment>
+  </data>
+  <data name="Repo_StatusSetCompareBaseFirst" xml:space="preserve">
+    <value>Set a compare base commit first.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_ErrorReadWorkingCopy" xml:space="preserve">
+    <value>Could not read the working copy</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_SummaryClean" xml:space="preserve">
+    <value>Working copy clean on {0}</value>
+    <comment>Working copy summary; {0} = current branch</comment>
+  </data>
+  <data name="Repo_SummaryModified" xml:space="preserve">
+    <value>{0} modified</value>
+    <comment>Summary part; {0} = number of files</comment>
+  </data>
+  <data name="Repo_SummaryAdded" xml:space="preserve">
+    <value>{0} added</value>
+    <comment>Summary part; {0} = number of files</comment>
+  </data>
+  <data name="Repo_SummaryRemoved" xml:space="preserve">
+    <value>{0} removed</value>
+    <comment>Summary part; {0} = number of files</comment>
+  </data>
+  <data name="Repo_SummaryRenamed" xml:space="preserve">
+    <value>{0} renamed</value>
+    <comment>Summary part; {0} = number of files</comment>
+  </data>
+  <data name="Repo_SummaryConflicted" xml:space="preserve">
+    <value>{0} conflicted</value>
+    <comment>Summary part; {0} = number of files</comment>
+  </data>
+  <data name="Repo_SummaryUntracked" xml:space="preserve">
+    <value>{0} untracked</value>
+    <comment>Summary part; {0} = number of files</comment>
+  </data>
+  <data name="Repo_SummaryCountsOnBranch" xml:space="preserve">
+    <value>{0} on {1}</value>
+    <comment>Working copy summary; {0} = comma-separated counts such as "2 modified, 1 added", {1} = current branch</comment>
+  </data>
+  <data name="Repo_SummaryChangesOnBranch" xml:space="preserve">
+    <value>Changes on {0}</value>
+    <comment>Working copy summary; {0} = current branch</comment>
+  </data>
+  <data name="Repo_DiffSelectFile" xml:space="preserve">
+    <value>Select a file to view its diff.</value>
+    <comment>Diff pane placeholder</comment>
+  </data>
+  <data name="Repo_DiffUntrackedFolder" xml:space="preserve">
+    <value>Untracked folder with {0} file(s). Stage it to add everything inside, or turn on "Show files inside untracked folders" in Settings.</value>
+    <comment>Diff pane text; {0} = formatted file count, e.g. "1,234" or "10,000+"</comment>
+  </data>
+  <data name="Repo_ErrorLoadDiff" xml:space="preserve">
+    <value>Could not load the diff</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_DiffTitleStaged" xml:space="preserve">
+    <value>Staged  {0}</value>
+    <comment>Diff pane title (two spaces); {0} = file path</comment>
+  </data>
+  <data name="Repo_DiffTitleWorkingCopy" xml:space="preserve">
+    <value>Working copy  {0}</value>
+    <comment>Diff pane title (two spaces); {0} = file path</comment>
+  </data>
+  <data name="Repo_ImageFileNoLongerExists" xml:space="preserve">
+    <value>The file no longer exists.</value>
+    <comment>Image preview error</comment>
+  </data>
+  <data name="Repo_ImageTooLargeToPreview" xml:space="preserve">
+    <value>Too large to preview ({0}).</value>
+    <comment>Image preview error; {0} = formatted file size</comment>
+  </data>
+  <data name="Repo_ImageTooLargeToPreviewOver" xml:space="preserve">
+    <value>Too large to preview (over {0}).</value>
+    <comment>Image preview error; {0} = formatted maximum size</comment>
+  </data>
+  <data name="Repo_ImageCouldNotRead" xml:space="preserve">
+    <value>Could not read the image from git.</value>
+    <comment>Image preview error</comment>
+  </data>
+  <data name="Repo_StageFailedTitle" xml:space="preserve">
+    <value>Stage failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusStagedFiles" xml:space="preserve">
+    <value>Staged {0} file(s).</value>
+    <comment>Status message; {0} = number of files</comment>
+  </data>
+  <data name="Repo_UnstageFailedTitle" xml:space="preserve">
+    <value>Unstage failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusUnstagedFiles" xml:space="preserve">
+    <value>Unstaged {0} file(s).</value>
+    <comment>Status message; {0} = number of files</comment>
+  </data>
+  <data name="Repo_DiscardFilesConfirm" xml:space="preserve">
+    <value>Discard changes in {0} file(s)? This cannot be undone.</value>
+    <comment>Confirmation message; {0} = number of files</comment>
+  </data>
+  <data name="Repo_DiscardItemsWithFoldersConfirm" xml:space="preserve">
+    <value>Discard changes in {0} item(s), including {1} untracked folder(s) and everything inside them? This cannot be undone.</value>
+    <comment>Confirmation message; {0} = number of items, {1} = number of untracked folders</comment>
+  </data>
+  <data name="Repo_StatusConflictedCannotDiscard" xml:space="preserve">
+    <value>Conflicted files must be resolved or the merge/rebase aborted.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_DiscardChangesTitle" xml:space="preserve">
+    <value>Discard changes</value>
+    <comment>Confirmation dialog title</comment>
+  </data>
+  <data name="Repo_DiscardFailedTitle" xml:space="preserve">
+    <value>Discard failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusDiscardedFiles" xml:space="preserve">
+    <value>Discarded changes in {0} file(s).</value>
+    <comment>Status message; {0} = number of files</comment>
+  </data>
+  <data name="Repo_StatusDiscardedFilesSkippedConflicts" xml:space="preserve">
+    <value>Discarded changes in {0} file(s). Skipped {1} conflicted file(s).</value>
+    <comment>Status message; {0} = number of files discarded, {1} = number of conflicted files skipped</comment>
+  </data>
+  <data name="Repo_DiscardHunkTitle" xml:space="preserve">
+    <value>Discard hunk</value>
+    <comment>Confirmation dialog title</comment>
+  </data>
+  <data name="Repo_DiscardHunkConfirm" xml:space="preserve">
+    <value>Discard the selected hunk? This cannot be undone.</value>
+    <comment>Confirmation message</comment>
+  </data>
+  <data name="Repo_StatusSelectChangedLinesFirst" xml:space="preserve">
+    <value>Select added or removed lines first.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusNoStageableChanges" xml:space="preserve">
+    <value>No stageable changes in the selection.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_PatchFailedTitle" xml:space="preserve">
+    <value>Patch failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusPatchFailed" xml:space="preserve">
+    <value>Patch failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusHunkDiscarded" xml:space="preserve">
+    <value>Hunk discarded.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusHunkStaged" xml:space="preserve">
+    <value>Hunk staged.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusHunkUnstaged" xml:space="preserve">
+    <value>Hunk unstaged.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCannotDiscardNewFileLines" xml:space="preserve">
+    <value>Selected lines of a new file cannot be discarded; discard the whole file instead.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusSelectAddedLinesFirst" xml:space="preserve">
+    <value>Select added lines first.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusSelectedLinesStaged" xml:space="preserve">
+    <value>Selected lines staged.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusSelectedLinesUnstaged" xml:space="preserve">
+    <value>Selected lines unstaged.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusResolveConflictsBeforeCommit" xml:space="preserve">
+    <value>Resolve and stage all conflicts before committing.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusEnterMessageAndStage" xml:space="preserve">
+    <value>Enter a commit message and stage at least one file.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusEnterCommitMessage" xml:space="preserve">
+    <value>Enter a commit message.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCommitting" xml:space="preserve">
+    <value>Committing...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_CommitFailedTitle" xml:space="preserve">
+    <value>Commit failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusCommitFailed" xml:space="preserve">
+    <value>Commit failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCommitCreated" xml:space="preserve">
+    <value>Commit created.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCommitCreatedNoRemotes" xml:space="preserve">
+    <value>Commit created. Not pushed: no remotes are configured.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_PushRecoveryPullRebase" xml:space="preserve">
+    <value>Pull with rebase, then push</value>
+    <comment>Choice offered when a push is rejected</comment>
+  </data>
+  <data name="Repo_PushRecoveryPullMerge" xml:space="preserve">
+    <value>Pull with merge, then push</value>
+    <comment>Choice offered when a push is rejected</comment>
+  </data>
+  <data name="Repo_PushRecoveryForceWithLease" xml:space="preserve">
+    <value>Force push with lease (replace the remote branch)</value>
+    <comment>Choice offered when a push is rejected</comment>
+  </data>
+  <data name="Repo_PushRecoveryFetchOnly" xml:space="preserve">
+    <value>Fetch only</value>
+    <comment>Choice offered when a push is rejected</comment>
+  </data>
+  <data name="Repo_PushRecoveryFetchToReview" xml:space="preserve">
+    <value>Fetch to review their commits</value>
+    <comment>Choice offered when a push is rejected</comment>
+  </data>
+  <data name="Repo_OpPush" xml:space="preserve">
+    <value>Push</value>
+    <comment>Operation name and dialog title; shown in titles such as "Push failed"</comment>
+  </data>
+  <data name="Repo_NoRemotesConfigured" xml:space="preserve">
+    <value>No remotes are configured.</value>
+    <comment>Message dialog text</comment>
+  </data>
+  <data name="Repo_PushToRemoteTitle" xml:space="preserve">
+    <value>Push to remote</value>
+    <comment>Prompt dialog title</comment>
+  </data>
+  <data name="Repo_RemoteLabel" xml:space="preserve">
+    <value>Remote</value>
+    <comment>Prompt label for a remote name</comment>
+  </data>
+  <data name="Repo_BranchLabel" xml:space="preserve">
+    <value>Branch</value>
+    <comment>Prompt label for a branch name</comment>
+  </data>
+  <data name="Repo_FetchAllRemotesTitle" xml:space="preserve">
+    <value>Fetch all remotes</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusFetchedRemotes" xml:space="preserve">
+    <value>Fetched {0} remote(s).</value>
+    <comment>Status message; {0} = number of remotes</comment>
+  </data>
+  <data name="Repo_OpForcePush" xml:space="preserve">
+    <value>Force push</value>
+    <comment>Operation name and dialog title; shown in titles such as "Force push failed"</comment>
+  </data>
+  <data name="Repo_RemoteBranchLabel" xml:space="preserve">
+    <value>Remote branch</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_StatusOperationCompleted" xml:space="preserve">
+    <value>{0} completed.</value>
+    <comment>Status message; {0} = operation name such as "Push" or "Fetch"</comment>
+  </data>
+  <data name="Repo_OperationFailedTitle" xml:space="preserve">
+    <value>{0} failed</value>
+    <comment>Error dialog title; {0} = operation name such as "Push" or "Fetch"</comment>
+  </data>
+  <data name="Repo_StatusOperationFailed" xml:space="preserve">
+    <value>{0} failed.</value>
+    <comment>Status message; {0} = operation name such as "Push" or "Fetch"</comment>
+  </data>
+  <data name="Repo_StatusPushRejectedBehind" xml:space="preserve">
+    <value>{0} rejected: the remote branch has commits that are not in yours.</value>
+    <comment>Status message; {0} = operation name ("Push" or "Force push")</comment>
+  </data>
+  <data name="Repo_StatusPullingWithRebase" xml:space="preserve">
+    <value>Pulling with rebase...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusPulling" xml:space="preserve">
+    <value>Pulling...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_PullFailedTitle" xml:space="preserve">
+    <value>Pull failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_PushPullFailedMessage" xml:space="preserve">
+    <value>The pull did not complete, so nothing was pushed. If there are conflicts, resolve them (or abort) and push again.
+
+{0}</value>
+    <comment>Error dialog message; {0} = git output</comment>
+  </data>
+  <data name="Repo_StatusPullFailedNothingPushed" xml:space="preserve">
+    <value>Pull failed; nothing was pushed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusForcePushWithLease" xml:space="preserve">
+    <value>Force push with lease...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_FetchFailedTitle" xml:space="preserve">
+    <value>Fetch failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusFetchedReviewThenPush" xml:space="preserve">
+    <value>Fetched. Review the incoming commits in the history, then push again.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusFetchFailed" xml:space="preserve">
+    <value>Fetch failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_PushRejectedReasonFallback" xml:space="preserve">
+    <value>rejected</value>
+    <comment>Used as the rejection reason in Repo_PushRemoteRejectedMessage when git gives none</comment>
+  </data>
+  <data name="Repo_PushRejectedByServerTitle" xml:space="preserve">
+    <value>{0} rejected by the server</value>
+    <comment>Dialog title; {0} = operation name ("Push" or "Force push")</comment>
+  </data>
+  <data name="Repo_PushRemoteRejectedMessage" xml:space="preserve">
+    <value>The remote refused the update ({0}). This usually means the branch is protected or a server-side check failed; pushing again will not help until that is resolved.</value>
+    <comment>Dialog message; {0} = rejection reason reported by git</comment>
+  </data>
+  <data name="Repo_PushRemoteRejectedMessageWithServer" xml:space="preserve">
+    <value>The remote refused the update ({0}). This usually means the branch is protected or a server-side check failed; pushing again will not help until that is resolved.
+
+The server said:
+{1}</value>
+    <comment>Dialog message; {0} = rejection reason reported by git, {1} = message from the server</comment>
+  </data>
+  <data name="Repo_PushAuthFailedTitle" xml:space="preserve">
+    <value>{0} failed: authentication</value>
+    <comment>Dialog title; {0} = operation name ("Push" or "Force push")</comment>
+  </data>
+  <data name="Repo_PushAuthFailedMessage" xml:space="preserve">
+    <value>The remote did not accept your credentials. Check the credential helper or SSH command in Settings, and that your SSH key or access token is valid.
+
+{0}</value>
+    <comment>Dialog message; {0} = git output</comment>
+  </data>
+  <data name="Repo_StatusPushStoppedAfterAttempts" xml:space="preserve">
+    <value>{0} stopped after several attempts; the remote keeps changing.</value>
+    <comment>Status message; {0} = operation name ("Push" or "Force push")</comment>
+  </data>
+  <data name="Repo_PushTargetFallback" xml:space="preserve">
+    <value>the branch</value>
+    <comment>Used as {0} in push rejection messages when the remote branch name is unknown</comment>
+  </data>
+  <data name="Repo_PushFetchFirstMessage" xml:space="preserve">
+    <value>The remote '{0}' has commits that you have not fetched yet, so your push was rejected.
+
+Pull them into your branch and push again, or fetch them first to review.</value>
+    <comment>Dialog message; {0} = remote branch name</comment>
+  </data>
+  <data name="Repo_PushCommitCountOne" xml:space="preserve">
+    <value>{0} commit</value>
+    <comment>Used as {1} in Repo_PushNonFastForwardMessage; {0} = 1</comment>
+  </data>
+  <data name="Repo_PushCommitCountMany" xml:space="preserve">
+    <value>{0} commits</value>
+    <comment>Used as {1} in Repo_PushNonFastForwardMessage; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_PushCommitsUnknown" xml:space="preserve">
+    <value>commits</value>
+    <comment>Used as {1} in Repo_PushNonFastForwardMessage when the count is unknown</comment>
+  </data>
+  <data name="Repo_PushNonFastForwardMessage" xml:space="preserve">
+    <value>The remote '{0}' has {1} that your branch does not contain (your branch is behind or has diverged), so your push was rejected.
+
+Integrate them and push again, or force push to replace the remote branch with yours, which discards those {1} from the remote. Force with lease still refuses if someone pushes again in the meantime.</value>
+    <comment>Dialog message; {0} = remote branch name, {1} = "3 commits", "1 commit" or "commits"</comment>
+  </data>
+  <data name="Repo_PushNonFastForwardNoPullMessage" xml:space="preserve">
+    <value>The remote '{0}' has {1} that your branch does not contain (your branch is behind or has diverged), so your push was rejected.
+
+Force push to replace the remote branch with yours, which discards those {1} from the remote. Force with lease still refuses if someone pushes again in the meantime.</value>
+    <comment>Dialog message; {0} = remote branch name, {1} = "3 commits", "1 commit" or "commits"</comment>
+  </data>
+  <data name="Repo_PushStaleLeaseMessage" xml:space="preserve">
+    <value>The force push was refused: someone pushed to '{0}' after your last fetch, so overwriting it could discard work you have not seen.
+
+Fetch to review their commits, then integrate them or force push again.</value>
+    <comment>Dialog message; {0} = remote branch name</comment>
+  </data>
+  <data name="Repo_PushRejectedTitle" xml:space="preserve">
+    <value>{0} rejected</value>
+    <comment>Dialog title; {0} = operation name ("Push" or "Force push")</comment>
+  </data>
+  <data name="Repo_CreateBranchTitle" xml:space="preserve">
+    <value>Create branch</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_BranchNameLabel" xml:space="preserve">
+    <value>Branch name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_CheckoutAfterCreating" xml:space="preserve">
+    <value>Checkout after creating</value>
+    <comment>Check box label</comment>
+  </data>
+  <data name="Repo_CreateTagTitle" xml:space="preserve">
+    <value>Create tag</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_TagNameLabel" xml:space="preserve">
+    <value>Tag name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_AnnotatedTag" xml:space="preserve">
+    <value>Annotated tag</value>
+    <comment>Check box label</comment>
+  </data>
+  <data name="Repo_TagMessageTitle" xml:space="preserve">
+    <value>Tag message</value>
+    <comment>Prompt dialog title</comment>
+  </data>
+  <data name="Repo_MessageLabel" xml:space="preserve">
+    <value>Message</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_StashChangesTitle" xml:space="preserve">
+    <value>Stash changes</value>
+    <comment>Prompt dialog title</comment>
+  </data>
+  <data name="Repo_StashMessageLabel" xml:space="preserve">
+    <value>Stash message</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_IncludeUntrackedFiles" xml:space="preserve">
+    <value>Include untracked files</value>
+    <comment>Check box label</comment>
+  </data>
+  <data name="Repo_OpStash" xml:space="preserve">
+    <value>Stash</value>
+    <comment>Operation name; shown in "Stash failed" / "Stash completed."</comment>
+  </data>
+  <data name="Repo_BranchInOtherWorktreeTitle" xml:space="preserve">
+    <value>Branch is in another worktree</value>
+    <comment>Confirmation dialog title</comment>
+  </data>
+  <data name="Repo_BranchInOtherWorktreeConfirm" xml:space="preserve">
+    <value>'{0}' is checked out in the worktree at
+{1}
+
+Open that worktree?</value>
+    <comment>Confirmation message; {0} = branch name, {1} = worktree folder</comment>
+  </data>
+  <data name="Repo_OpCheckout" xml:space="preserve">
+    <value>Checkout</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_CheckoutReferenceConfirm" xml:space="preserve">
+    <value>Check out '{0}'? HEAD may become detached.</value>
+    <comment>Confirmation message; {0} = branch, tag or other reference</comment>
+  </data>
+  <data name="Repo_DeleteBranchTitle" xml:space="preserve">
+    <value>Delete branch</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_DeleteBranchConfirm" xml:space="preserve">
+    <value>Delete branch '{0}'?</value>
+    <comment>Confirmation message; {0} = branch name</comment>
+  </data>
+  <data name="Repo_CreateWorktreeTitle" xml:space="preserve">
+    <value>Create worktree</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_BranchAlreadyCheckedOutAt" xml:space="preserve">
+    <value>'{0}' is already checked out in {1}.</value>
+    <comment>Message; {0} = branch name, {1} = worktree folder</comment>
+  </data>
+  <data name="Repo_BranchAlreadyCheckedOutHere" xml:space="preserve">
+    <value>'{0}' is already checked out in this worktree.</value>
+    <comment>Message; {0} = branch name</comment>
+  </data>
+  <data name="Repo_NewWorktreeTitle" xml:space="preserve">
+    <value>New worktree</value>
+    <comment>Prompt dialog title</comment>
+  </data>
+  <data name="Repo_NewWorktreeBranchLabel" xml:space="preserve">
+    <value>Name of the new branch (starts at HEAD)</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_NewWorktreeFolderLabel" xml:space="preserve">
+    <value>Folder for '{0}'</value>
+    <comment>Prompt label; {0} = branch name</comment>
+  </data>
+  <data name="Repo_WorktreeCreatedTitle" xml:space="preserve">
+    <value>Worktree created</value>
+    <comment>Confirmation dialog title</comment>
+  </data>
+  <data name="Repo_WorktreeCreatedConfirm" xml:space="preserve">
+    <value>Created a worktree for '{0}' at
+{1}
+
+Open it in a new tab?</value>
+    <comment>Confirmation message; {0} = branch name, {1} = worktree folder</comment>
+  </data>
+  <data name="Repo_RemoveWorktreeTitle" xml:space="preserve">
+    <value>Remove worktree</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_RemoveWorktreeConfirm" xml:space="preserve">
+    <value>Remove the worktree at
+{0}
+
+Its folder is deleted. The branch '{1}' is kept.</value>
+    <comment>Confirmation message; {0} = worktree folder, {1} = branch name</comment>
+  </data>
+  <data name="Repo_RemoveWorktreeForceConfirm" xml:space="preserve">
+    <value>The worktree has uncommitted changes or untracked files. Remove it anyway and lose them?</value>
+    <comment>Confirmation message</comment>
+  </data>
+  <data name="Repo_OpPruneWorktrees" xml:space="preserve">
+    <value>Prune worktrees</value>
+    <comment>Operation name; shown in "... failed" / "... completed."</comment>
+  </data>
+  <data name="Repo_DeleteTagTitle" xml:space="preserve">
+    <value>Delete tag</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_DeleteTagConfirm" xml:space="preserve">
+    <value>Delete tag '{0}'?</value>
+    <comment>Confirmation message; {0} = tag name</comment>
+  </data>
+  <data name="Repo_CheckoutCommitTitle" xml:space="preserve">
+    <value>Checkout commit</value>
+    <comment>Confirmation dialog title</comment>
+  </data>
+  <data name="Repo_CheckoutCommitConfirm" xml:space="preserve">
+    <value>Check out {0}? HEAD will be detached.</value>
+    <comment>Confirmation message; {0} = short commit SHA</comment>
+  </data>
+  <data name="Repo_CherryPickTitle" xml:space="preserve">
+    <value>Cherry-pick</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Repo_CherryPickMergeCommitsMessage" xml:space="preserve">
+    <value>Merge commits cannot be cherry-picked. Select only non-merge commits.</value>
+    <comment>Message dialog text</comment>
+  </data>
+  <data name="Repo_CherryPickCommitsConfirm" xml:space="preserve">
+    <value>Cherry-pick {0} commits onto the current branch?</value>
+    <comment>Confirmation message; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_StatusCherryPickingCommits" xml:space="preserve">
+    <value>Cherry-picking {0} commits...</value>
+    <comment>Status message; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_StatusCherryPicking" xml:space="preserve">
+    <value>Cherry-pick...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_CherryPickPartialMessage" xml:space="preserve">
+    <value>{0} of {1} commits were applied before the conflict.
+
+{2}</value>
+    <comment>Error dialog message; {0} = commits applied, {1} = total commits, {2} = git output</comment>
+  </data>
+  <data name="Repo_CherryPickFailedTitle" xml:space="preserve">
+    <value>Cherry-pick failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusCherryPickStopped" xml:space="preserve">
+    <value>Cherry-pick stopped after {0} of {1} commits.</value>
+    <comment>Status message; {0} = commits applied, {1} = total commits</comment>
+  </data>
+  <data name="Repo_StatusCherryPickFailed" xml:space="preserve">
+    <value>Cherry-pick failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCherryPickCompleted" xml:space="preserve">
+    <value>Cherry-pick completed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusCherryPickedCommits" xml:space="preserve">
+    <value>Cherry-picked {0} commits.</value>
+    <comment>Status message; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_RevertTitle" xml:space="preserve">
+    <value>Revert</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Repo_RevertMergeCommitsMessage" xml:space="preserve">
+    <value>Merge commits cannot be reverted without choosing a mainline. Select only non-merge commits.</value>
+    <comment>Message dialog text</comment>
+  </data>
+  <data name="Repo_RevertCommitsConfirm" xml:space="preserve">
+    <value>Revert {0} commits?</value>
+    <comment>Confirmation message; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_StatusRevertingCommits" xml:space="preserve">
+    <value>Reverting {0} commits...</value>
+    <comment>Status message; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_StatusReverting" xml:space="preserve">
+    <value>Revert...</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_RevertPartialMessage" xml:space="preserve">
+    <value>{0} of {1} commits were reverted before the conflict.
+
+{2}</value>
+    <comment>Error dialog message; {0} = commits reverted, {1} = total commits, {2} = git output</comment>
+  </data>
+  <data name="Repo_RevertFailedTitle" xml:space="preserve">
+    <value>Revert failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusRevertStopped" xml:space="preserve">
+    <value>Revert stopped after {0} of {1} commits.</value>
+    <comment>Status message; {0} = commits reverted, {1} = total commits</comment>
+  </data>
+  <data name="Repo_StatusRevertFailed" xml:space="preserve">
+    <value>Revert failed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusRevertCompleted" xml:space="preserve">
+    <value>Revert completed.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusRevertedCommits" xml:space="preserve">
+    <value>Reverted {0} commits.</value>
+    <comment>Status message; {0} = number of commits</comment>
+  </data>
+  <data name="Repo_OpMerge" xml:space="preserve">
+    <value>Merge</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_MergeCommitConfirm" xml:space="preserve">
+    <value>Merge {0} into the current branch?</value>
+    <comment>Confirmation message; {0} = short commit SHA</comment>
+  </data>
+  <data name="Repo_OpRebase" xml:space="preserve">
+    <value>Rebase</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_RebaseOntoCommitConfirm" xml:space="preserve">
+    <value>Rebase the current branch onto {0}?</value>
+    <comment>Confirmation message; {0} = short commit SHA</comment>
+  </data>
+  <data name="Repo_OpReset" xml:space="preserve">
+    <value>Reset</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_HardResetConfirm" xml:space="preserve">
+    <value>Hard reset the current branch to {0}? Uncommitted changes will be lost.</value>
+    <comment>Confirmation message; {0} = short commit SHA</comment>
+  </data>
+  <data name="Repo_OpApplyStash" xml:space="preserve">
+    <value>Apply stash</value>
+    <comment>Operation name; shown in "... failed" / "... completed."</comment>
+  </data>
+  <data name="Repo_OpPopStash" xml:space="preserve">
+    <value>Pop stash</value>
+    <comment>Operation name; shown in "... failed" / "... completed."</comment>
+  </data>
+  <data name="Repo_DropStashTitle" xml:space="preserve">
+    <value>Drop stash</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_DropStashConfirm" xml:space="preserve">
+    <value>Drop '{0}'? This cannot be undone.</value>
+    <comment>Confirmation message; {0} = stash name</comment>
+  </data>
+  <data name="Repo_AddRemoteTitle" xml:space="preserve">
+    <value>Add remote</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_RemoteNameLabel" xml:space="preserve">
+    <value>Remote name</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_RemoteAlreadyExists" xml:space="preserve">
+    <value>A remote named '{0}' already exists.</value>
+    <comment>Message; {0} = remote name</comment>
+  </data>
+  <data name="Repo_RemoteUrlLabel" xml:space="preserve">
+    <value>Remote URL</value>
+    <comment>Prompt label</comment>
+  </data>
+  <data name="Repo_InvalidRemoteUrl" xml:space="preserve">
+    <value>Enter an http(s), ssh, git, file URL, scp-style address (git@host:path) or a local path.</value>
+    <comment>Validation message for a remote URL</comment>
+  </data>
+  <data name="Repo_RemoveRemoteTitle" xml:space="preserve">
+    <value>Remove remote</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_RemoveRemoteConfirm" xml:space="preserve">
+    <value>Remove remote '{0}'? Its remote-tracking refs will also be removed.</value>
+    <comment>Confirmation message; {0} = remote name</comment>
+  </data>
+  <data name="Repo_EditRemoteTitle" xml:space="preserve">
+    <value>Edit remote</value>
+    <comment>Dialog title</comment>
+  </data>
+  <data name="Repo_RenameRemoteFailedTitle" xml:space="preserve">
+    <value>Rename remote failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_UpdateRemoteFailedTitle" xml:space="preserve">
+    <value>Update remote failed</value>
+    <comment>Error dialog title</comment>
+  </data>
+  <data name="Repo_StatusUpdatedRemote" xml:space="preserve">
+    <value>Updated remote '{0}'.</value>
+    <comment>Status message; {0} = remote name</comment>
+  </data>
+  <data name="Repo_OpInteractiveRebase" xml:space="preserve">
+    <value>Interactive rebase</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_InteractiveRebaseInProgressMessage" xml:space="preserve">
+    <value>Finish or abort the current merge/rebase before starting another.</value>
+    <comment>Message dialog text</comment>
+  </data>
+  <data name="Repo_InteractiveRebaseMergeCommitMessage" xml:space="preserve">
+    <value>Interactive rebase over a merge commit is not supported.</value>
+    <comment>Message dialog text</comment>
+  </data>
+  <data name="Repo_InteractiveRebaseNotAncestorMessage" xml:space="preserve">
+    <value>The selected commit is not an ancestor of the current HEAD. Check out its branch first.</value>
+    <comment>Message dialog text</comment>
+  </data>
+  <data name="Repo_InteractiveRebaseFirstSquashMessage" xml:space="preserve">
+    <value>The first non-dropped commit cannot be squash or fixup.</value>
+    <comment>Message dialog text; "squash" and "fixup" are git rebase actions</comment>
+  </data>
+  <data name="Repo_ErrorBuildRebaseTodo" xml:space="preserve">
+    <value>Could not build the rebase todo</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_StatusNoCommitsToRebase" xml:space="preserve">
+    <value>No commits to rebase.</value>
+    <comment>Status message</comment>
+  </data>
+  <data name="Repo_StatusOpenedTerminal" xml:space="preserve">
+    <value>Opened a terminal in the repository folder.</value>
+    <comment>Status message</comment>
+  </data>
+</root>

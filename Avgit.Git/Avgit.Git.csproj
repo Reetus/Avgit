@@ -10,4 +10,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Avgit.Core\Avgit.Core.csproj" />
   </ItemGroup>
+
+  <!-- Messages surfaced to the user; the GitStrings class is generated at build time.
+       Text matched against git's own output (see PushOutcome) stays literal: git runs with LANGUAGE=en. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\GitStrings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)GitStrings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Avgit.Git.Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>GitStrings</StronglyTypedClassName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

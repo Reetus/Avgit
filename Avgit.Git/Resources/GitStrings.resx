@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Discard_Conflicted" xml:space="preserve">
+    <value>Cannot discard '{0}': resolve the conflict or abort the merge/rebase.</value>
+    <comment>{0} = repository-relative path</comment>
+  </data>
+  <data name="Discard_CouldNotDelete" xml:space="preserve">
+    <value>Could not delete '{0}'.</value>
+    <comment>{0} = repository-relative path</comment>
+  </data>
+  <data name="Push_NoRemote" xml:space="preserve">
+    <value>No remote is configured for this repository.</value>
+  </data>
+  <data name="Push_DetachedWithoutTarget" xml:space="preserve">
+    <value>Cannot push a detached HEAD without a destination branch name.</value>
+  </data>
+  <data name="Rebase_MergesNotSupported" xml:space="preserve">
+    <value>Interactive rebase over a range containing merge commits is not supported. Choose a linear range, or restructure the merge manually.</value>
+  </data>
+  <data name="Clone_ParentMissing" xml:space="preserve">
+    <value>Destination parent directory does not exist.</value>
+  </data>
+  <data name="Clone_FolderNameEmpty" xml:space="preserve">
+    <value>Destination folder name is empty.</value>
+  </data>
+  <data name="Commit_UnexpectedOutput" xml:space="preserve">
+    <value>Unexpected output while reading commit {0}.</value>
+    <comment>{0} = revision (SHA or ref)</comment>
+  </data>
+  <data name="Failure_ExitCode" xml:space="preserve">
+    <value>{0} failed (exit {1}).</value>
+    <comment>{0} = git command, e.g. 'git log' (not translated), {1} = exit code</comment>
+  </data>
+  <data name="Failure_Message" xml:space="preserve">
+    <value>{0} failed: {1}</value>
+    <comment>{0} = git command, e.g. 'git log' (not translated), {1} = first line of git's error output</comment>
+  </data>
+  <data name="Process_CouldNotStart" xml:space="preserve">
+    <value>Could not start {0}.</value>
+    <comment>{0} = executable path</comment>
+  </data>
+  <data name="Process_CancelledOrTimedOut" xml:space="preserve">
+    <value>{0} was cancelled or timed out.</value>
+    <comment>{0} = executable file name</comment>
+  </data>
+</root>

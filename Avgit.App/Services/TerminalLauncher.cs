@@ -43,8 +43,7 @@ public static class TerminalLauncher
             FindOnPath, Environment.GetEnvironmentVariable);
         if (psi is null)
         {
-            return "No terminal emulator was found. Install one (for example gnome-terminal or xterm) " +
-                   "or set the TERMINAL environment variable.";
+            return Strings.Terminal_NoEmulatorFound;
         }
 
         try
@@ -54,7 +53,7 @@ public static class TerminalLauncher
         }
         catch (Exception ex)
         {
-            return $"Could not start {psi.FileName}: {ex.Message}";
+            return string.Format(Strings.Terminal_CouldNotStart, psi.FileName, ex.Message);
         }
     }
 

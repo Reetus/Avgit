@@ -39,7 +39,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private bool _signOff;
     private bool _gpgSign;
     private bool _pushAfterCommit;
-    private string _selectedBranchFilter = "(all branches)";
+    private string _selectedBranchFilter = Strings.Repo_AllBranchesFilter;
     private int _diffContext;
     private bool _ignoreWhitespace;
     private bool _selectTipAfterLog;
@@ -104,7 +104,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         };
         IsLinkedWorktree = !string.Equals(GitRepoHandler.GetGitDir(path), GitRepoHandler.GetCommonGitDir(path),
             AppSettingsService.PathComparison);
-        RepoTypeText = IsLinkedWorktree ? "Git · linked worktree" : "Git";
+        RepoTypeText = IsLinkedWorktree ? Strings.Repo_RepoTypeLinkedWorktree : "Git";
         // Tests may wrap the handler; Advanced Git then gets its own instance.
         Advanced = new AdvancedGitService(handler as GitRepoHandler ?? new GitRepoHandler(handler.ExecutablePath), path);
         if (handler is GitRepoHandler git)
@@ -124,13 +124,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         WireDiffActions();
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
-        FetchCommand = new AsyncRelayCommand(() => RunOperationAsync("Fetch", ct => Handler.FetchAsync(Path, null, ct)));
-        PullCommand = new AsyncRelayCommand(() => RunOperationAsync("Pull", ct => Handler.PullAsync(Path, null, ct)));
+        FetchCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpFetch, ct => Handler.FetchAsync(Path, null, ct)));
+        PullCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpPull, ct => Handler.PullAsync(Path, null, ct)));
         PushCommand = new AsyncRelayCommand(PushAsync);
         OpenRemoteCommand = new RelayCommand(OpenRemote);
         PushToRemoteCommand = new AsyncRelayCommand(PushToRemoteAsync);
         ForcePushCommand = new AsyncRelayCommand(ForcePushAsync);
-        PullRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync("Pull with rebase", ct => Handler.PullAsync(Path, true, ct)));
+        PullRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpPullWithRebase, ct => Handler.PullAsync(Path, true, ct)));
         FetchAllCommand = new AsyncRelayCommand(FetchAllAsync);
         CommitCommand = new AsyncRelayCommand(CommitAsync);
         StageAllCommand = new AsyncRelayCommand(() => StageFilesAsync(UnstagedFiles));
@@ -162,7 +162,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         {
             _compareBase = SelectedCommit is { } row ? CommitSide.FromRow(row) : null;
             // Only records the base: the panes keep matching the list's selection.
-            StatusMessage = _compareBase is null ? "Select a commit to compare." : $"Compare base: {_compareBase.ShortSha}";
+            StatusMessage = _compareBase is null ? Strings.Repo_StatusSelectCommitToCompare : string.Format(Strings.Repo_StatusCompareBase, _compareBase.ShortSha);
         });
         CompareWithBaseCommand = new AsyncRelayCommand(CompareWithBaseAsync);
         SwapCompareCommand = new AsyncRelayCommand(SwapCompareAsync);
@@ -179,18 +179,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             if (SelectedCommit is not null)
             {
                 CopyText?.Invoke(SelectedCommit.Row.CommitId);
-                StatusMessage = "Commit SHA copied.";
+                StatusMessage = Strings.Repo_StatusCommitShaCopied;
             }
         });
-        AbortMergeCommand = new AsyncRelayCommand(() => RunOperationAsync("Abort merge", ct => Handler.AbortMergeAsync(Path, ct)));
-        AbortRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync("Abort rebase", ct => Handler.AbortRebaseAsync(Path, ct)));
-        ContinueRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync("Continue rebase", ct => Handler.ContinueRebaseAsync(Path, ct)));
-        SkipRebaseCommitCommand = new AsyncRelayCommand(() => RunOperationAsync("Skip commit", ct => Handler.SkipRebaseCommitAsync(Path, ct)));
-        CherryPickContinueCommand = new AsyncRelayCommand(() => RunOperationAsync("Continue cherry-pick", ct => Handler.CherryPickContinueAsync(Path, ct)));
-        CherryPickAbortCommand = new AsyncRelayCommand(() => RunOperationAsync("Abort cherry-pick", ct => Handler.CherryPickAbortAsync(Path, ct)));
-        CherryPickSkipCommand = new AsyncRelayCommand(() => RunOperationAsync("Skip cherry-pick", ct => Handler.CherryPickSkipAsync(Path, ct)));
-        RevertContinueCommand = new AsyncRelayCommand(() => RunOperationAsync("Continue revert", ct => Handler.RevertContinueAsync(Path, ct)));
-        RevertAbortCommand = new AsyncRelayCommand(() => RunOperationAsync("Abort revert", ct => Handler.RevertAbortAsync(Path, ct)));
+        AbortMergeCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpAbortMerge, ct => Handler.AbortMergeAsync(Path, ct)));
+        AbortRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpAbortRebase, ct => Handler.AbortRebaseAsync(Path, ct)));
+        ContinueRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpContinueRebase, ct => Handler.ContinueRebaseAsync(Path, ct)));
+        SkipRebaseCommitCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpSkipCommit, ct => Handler.SkipRebaseCommitAsync(Path, ct)));
+        CherryPickContinueCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpContinueCherryPick, ct => Handler.CherryPickContinueAsync(Path, ct)));
+        CherryPickAbortCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpAbortCherryPick, ct => Handler.CherryPickAbortAsync(Path, ct)));
+        CherryPickSkipCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpSkipCherryPick, ct => Handler.CherryPickSkipAsync(Path, ct)));
+        RevertContinueCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpContinueRevert, ct => Handler.RevertContinueAsync(Path, ct)));
+        RevertAbortCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpAbortRevert, ct => Handler.RevertAbortAsync(Path, ct)));
         InteractiveRebaseCommand = new AsyncRelayCommand(InteractiveRebaseAsync);
         AddRemoteCommand = new AsyncRelayCommand(AddRemoteAsync);
         DeleteRemoteCommand = new AsyncRelayCommand(p => DeleteRemoteAsync(p as RemoteEntry));
@@ -200,7 +200,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         ClearLogFilterCommand = new AsyncRelayCommand(() =>
         {
             AuthorFilter = string.Empty;
-            _selectedBranchFilter = "(all branches)";
+            _selectedBranchFilter = Strings.Repo_AllBranchesFilter;
             OnPropertyChanged(nameof(SelectedBranchFilter));
             return LoadLogCoreAsync();
         });
@@ -266,7 +266,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ObservableCollection<RemoteEntry> Remotes { get; } = [];
     public ObservableCollection<string> Tags { get; } = [];
     public ObservableCollection<StashEntry> Stashes { get; } = [];
-    public ObservableCollection<string> BranchFilterOptions { get; } = ["(all branches)"];
+    public ObservableCollection<string> BranchFilterOptions { get; } = [Strings.Repo_AllBranchesFilter];
     public IReadOnlyList<int> ContextOptions { get; } = [1, 3, 6, 12, 25, 50, 100];
 
     public DiffViewModel CommitDiff { get; }
@@ -526,7 +526,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             var message = details?.Message;
             if (string.IsNullOrWhiteSpace(message))
             {
-                StatusMessage = "There is no commit to amend yet.";
+                StatusMessage = Strings.Repo_StatusNoCommitToAmend;
                 return;
             }
 
@@ -535,8 +535,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                                 || string.Equals(current, _commitTemplate, StringComparison.Ordinal);
             if (!isPlaceholder && !string.Equals(current, message, StringComparison.Ordinal))
             {
-                if (!await Dialogs.ConfirmAsync("Amend last commit",
-                        "Replace the current commit message with the last commit's message?").ConfigureAwait(true))
+                if (!await Dialogs.ConfirmAsync(Strings.Repo_AmendLastCommitTitle,
+                        Strings.Repo_AmendReplaceMessageConfirm).ConfigureAwait(true))
                 {
                     return;
                 }
@@ -611,7 +611,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
     }
 
-    public string CommitButtonText => PushAfterCommit ? "Commit & Push" : "Commit";
+    public string CommitButtonText => PushAfterCommit ? Strings.Repo_CommitAndPushButton : Strings.Repo_CommitButton;
 
     /// <summary>The web page of origin (or the only remote) when its URL is http(s); otherwise null.</summary>
     [ObservableProperty]
@@ -620,7 +620,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public partial string? RemoteWebUrl { get; private set; }
 
     public bool HasRemoteWebUrl => RemoteWebUrl is not null;
-    public string RemoteWebUrlToolTip => $"Open {RemoteWebUrl} in the browser";
+    public string RemoteWebUrlToolTip => string.Format(Strings.Repo_OpenRemoteWebUrlToolTip, RemoteWebUrl);
 
     /// <summary>
     /// The browser address for a remote URL: http(s) only, without credentials or a
@@ -658,12 +658,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
         {
-            StatusMessage = $"Could not open {url}: {ex.Message}";
+            StatusMessage = string.Format(Strings.Repo_StatusCouldNotOpen, url, ex.Message);
         }
     }
 
     [ObservableProperty]
-    public partial string StatusMessage { get; set; } = "Ready";
+    public partial string StatusMessage { get; set; } = Strings.Repo_StatusReady;
 
     [ObservableProperty]
     public partial string SummaryText { get; set; } = string.Empty;
@@ -701,8 +701,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         ? CurrentBranch
         : $"{CurrentBranch}  @  {CurrentRevisionShort}";
     public string LogCountText => IsShowingCachedHistory
-        ? $"{LogRows.Count} commits (cached, refreshing)"
-        : $"{LogRows.Count} commits";
+        ? string.Format(Strings.Repo_LogCountCached, LogRows.Count)
+        : string.Format(Strings.Repo_LogCount, LogRows.Count);
 
     public bool IsMergeInProgress
     {
@@ -816,13 +816,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     }
 
     public string ConflictText => IsRebaseInProgress
-        ? "A rebase is in progress. Resolve conflicts, then continue, skip or abort."
+        ? Strings.Repo_ConflictRebase
         : IsCherryPickInProgress
-            ? "A cherry-pick is in progress. Resolve conflicts, then continue, skip or abort."
+            ? Strings.Repo_ConflictCherryPick
             : IsRevertInProgress
-                ? "A revert is in progress. Resolve conflicts, then continue or abort."
+                ? Strings.Repo_ConflictRevert
                 : IsMergeInProgress
-                    ? "A merge is in progress. Resolve conflicts, stage the files, then commit or abort."
+                    ? Strings.Repo_ConflictMerge
                     : string.Empty;
 
     [ObservableProperty]
@@ -843,7 +843,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
             if (SetProperty(ref _selectedBranchFilter, value) && IsLoaded)
             {
-                _selectTipAfterLog = value != "(all branches)";
+                _selectTipAfterLog = value != Strings.Repo_AllBranchesFilter;
                 _ = LoadLogCoreAsync();
             }
         }
@@ -884,8 +884,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public bool HasUnresolvedConflicts => StagedFiles.Concat(UnstagedFiles)
         .Any(f => f.Status == PathState.Conflicted);
 
-    public string StagedHeader => $"Staged ({StagedFiles.Count})";
-    public string UnstagedHeader => $"Unstaged ({UnstagedFiles.Count})";
+    public string StagedHeader => string.Format(Strings.Repo_StagedHeader, StagedFiles.Count);
+    public string UnstagedHeader => string.Format(Strings.Repo_UnstagedHeader, UnstagedFiles.Count);
 
     public ICommand RefreshCommand { get; }
     public ICommand FetchCommand { get; }
@@ -1021,7 +1021,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         try
         {
             IsBusy = true;
-            StatusMessage = $"Loading {Name}...";
+            StatusMessage = string.Format(Strings.Repo_StatusLoading, Name);
             // Last session's history appears immediately; git replaces it when ready.
             ShowCachedHistory();
             Task<string?>? templateTask = string.IsNullOrWhiteSpace(CommitMessage)
@@ -1049,7 +1049,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            await Dialogs.ShowMessageAsync("Could not load repository", ex.ToString()).ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_CouldNotLoadRepositoryTitle, ex.ToString()).ConfigureAwait(true);
         }
         finally
         {
@@ -1086,7 +1086,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         try
         {
             IsBusy = true;
-            StatusMessage = "Refreshing...";
+            StatusMessage = Strings.Repo_StatusRefreshing;
             await ReloadAllCoreAsync().ConfigureAwait(true);
             StatusMessage = _loadErrors.Count > 0 ? string.Join(" | ", _loadErrors) : SummaryText;
         }
@@ -1127,7 +1127,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         RefsSnapshot refs = await Handler.GetRefsSnapshotAsync(Path).ConfigureAwait(true);
         if (refs.Error is not null)
         {
-            RecordError("Could not read repository references", refs.Error);
+            RecordError(Strings.Repo_ErrorReadRefs, refs.Error);
             return;
         }
 
@@ -1192,7 +1192,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         var previousFilter = SelectedBranchFilter;
         BranchFilterOptions.Clear();
-        BranchFilterOptions.Add("(all branches)");
+        BranchFilterOptions.Add(Strings.Repo_AllBranchesFilter);
         foreach (BranchRef branch in Branches)
         {
             BranchFilterOptions.Add(branch.Name);
@@ -1203,7 +1203,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             BranchFilterOptions.Add(branch.Name);
         }
 
-        _selectedBranchFilter = BranchFilterOptions.Contains(previousFilter) ? previousFilter : "(all branches)";
+        _selectedBranchFilter = BranchFilterOptions.Contains(previousFilter) ? previousFilter : Strings.Repo_AllBranchesFilter;
         OnPropertyChanged(nameof(SelectedBranchFilter));
     }
 
@@ -1232,13 +1232,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         SummaryText = _loadErrors.Count > 0 ? string.Join(" | ", _loadErrors) : message;
     }
 
-    private bool IsUnfilteredHistory => SelectedBranchFilter == "(all branches)" && string.IsNullOrWhiteSpace(AuthorFilter);
+    private bool IsUnfilteredHistory => SelectedBranchFilter == Strings.Repo_AllBranchesFilter && string.IsNullOrWhiteSpace(AuthorFilter);
 
     private HistoryFilter BuildLogQuery(int skip, int limit) => new()
     {
         Offset = (uint)skip,
         Count = (uint)limit,
-        StartRef = SelectedBranchFilter == "(all branches)" ? null : SelectedBranchFilter,
+        StartRef = SelectedBranchFilter == Strings.Repo_AllBranchesFilter ? null : SelectedBranchFilter,
         Author = string.IsNullOrWhiteSpace(AuthorFilter) ? null : AuthorFilter,
         Flags = HistoryFlags.Merges | HistoryFlags.Remotes | HistoryFlags.Topological
     };
@@ -1316,7 +1316,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
             if (page.Error is not null)
             {
-                RecordError("Could not read history", page.Error);
+                RecordError(Strings.Repo_ErrorReadHistory, page.Error);
                 return;
             }
 
@@ -1455,12 +1455,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
             if (page.Error is not null)
             {
-                RecordError("Could not read history", page.Error);
+                RecordError(Strings.Repo_ErrorReadHistory, page.Error);
                 return;
             }
             if (page.Rows.Count == 0)
             {
-                StatusMessage = "No more history to load.";
+                StatusMessage = Strings.Repo_StatusNoMoreHistory;
                 return;
             }
 
@@ -1536,7 +1536,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             {
                 if (result.Error is not null)
                 {
-                    RecordError("Could not read the commit", result.Error);
+                    RecordError(Strings.Repo_ErrorReadCommit, result.Error);
                 }
                 // Allow clicking the row again to retry.
                 _requestedCommitSha = null;
@@ -1580,7 +1580,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         CommitRowViewModel? commit = SelectedCommit;
         if (file is null || (pair is null && commit is null))
         {
-            CommitDiff.Clear("Select a file in the commit to view its diff.");
+            CommitDiff.Clear(Strings.Repo_DiffSelectCommitFile);
             return;
         }
 
@@ -1614,7 +1614,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            if (ReportHandlerError("Could not load the commit diff"))
+            if (ReportHandlerError(Strings.Repo_ErrorLoadCommitDiff))
             {
                 return;
             }
@@ -1689,12 +1689,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            if (ReportHandlerError("Could not compare commits"))
+            if (ReportHandlerError(Strings.Repo_ErrorCompareCommits))
             {
                 _requestedComparePair = null;
                 _displayedComparePair = null;
                 CommitFiles.Clear();
-                CommitDiff.Clear("Could not compare commits.");
+                CommitDiff.Clear(Strings.Repo_DiffCouldNotCompareCommits);
                 return;
             }
 
@@ -1716,7 +1716,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             }
             else
             {
-                CommitDiff.Clear("No changed files in this range.");
+                CommitDiff.Clear(Strings.Repo_DiffNoChangesInRange);
             }
         }
         catch (OperationCanceledException)
@@ -1756,7 +1756,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (_compareBase is null || SelectedCommit is null)
         {
-            StatusMessage = "Set a compare base commit first.";
+            StatusMessage = Strings.Repo_StatusSetCompareBaseFirst;
             return;
         }
 
@@ -1803,7 +1803,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (snapshot.Error is not null)
         {
-            RecordError("Could not read the working copy", snapshot.Error);
+            RecordError(Strings.Repo_ErrorReadWorkingCopy, snapshot.Error);
             StagedFiles.Clear();
             UnstagedFiles.Clear();
             OnPropertyChanged(nameof(StagedHeader));
@@ -1824,26 +1824,28 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         IsRevertInProgress = summary.RevertInProgress;
         if (summary.IsClean)
         {
-            SummaryText = $"Working copy clean on {CurrentBranch}";
+            SummaryText = string.Format(Strings.Repo_SummaryClean, CurrentBranch);
         }
         else
         {
             var parts = new List<string>();
-            void Add(int count, string label)
+            void Add(int count, string format)
             {
                 if (count > 0)
                 {
-                    parts.Add($"{count} {label}");
+                    parts.Add(string.Format(format, count));
                 }
             }
 
-            Add(summary.Modified, "modified");
-            Add(summary.Added, "added");
-            Add(summary.Removed, "removed");
-            Add(summary.Renamed, "renamed");
-            Add(summary.Conflicted, "conflicted");
-            Add(summary.Untracked, "untracked");
-            SummaryText = $"{(parts.Count > 0 ? string.Join(", ", parts) : "Changes")} on {CurrentBranch}";
+            Add(summary.Modified, Strings.Repo_SummaryModified);
+            Add(summary.Added, Strings.Repo_SummaryAdded);
+            Add(summary.Removed, Strings.Repo_SummaryRemoved);
+            Add(summary.Renamed, Strings.Repo_SummaryRenamed);
+            Add(summary.Conflicted, Strings.Repo_SummaryConflicted);
+            Add(summary.Untracked, Strings.Repo_SummaryUntracked);
+            SummaryText = parts.Count > 0
+                ? string.Format(Strings.Repo_SummaryCountsOnBranch, string.Join(", ", parts), CurrentBranch)
+                : string.Format(Strings.Repo_SummaryChangesOnBranch, CurrentBranch);
         }
 
         // Keep the selection in the list the user was working in. If the selected
@@ -1960,7 +1962,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         else
         {
             _workingDiffSignature = null;
-            WorkingDiff.Clear("Select a file to view its diff.");
+            WorkingDiff.Clear(Strings.Repo_DiffSelectFile);
         }
     }
 
@@ -1992,8 +1994,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 }
 
                 _workingDiffSignature = null;
-                WorkingDiff.Clear($"Untracked folder with {(count >= 10_000 ? "10,000+" : count.ToString("N0"))} file(s). " +
-                                  "Stage it to add everything inside, or turn on \"Show files inside untracked folders\" in Settings.");
+                WorkingDiff.Clear(string.Format(Strings.Repo_DiffUntrackedFolder, count >= 10_000 ? "10,000+" : count.ToString("N0")));
                 return;
             }
 
@@ -2018,7 +2019,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                     return;
                 }
 
-                if (ReportHandlerError("Could not load the diff"))
+                if (ReportHandlerError(Strings.Repo_ErrorLoadDiff))
                 {
                     return;
                 }
@@ -2046,7 +2047,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
             var conflicted = file.Status == PathState.Conflicted;
             _workingDiffSignature = signature;
-            WorkingDiff.SetFiles(files, $"{(staged ? "Staged" : "Working copy")}  {file.RelativePath}",
+            WorkingDiff.SetFiles(files, string.Format(staged ? Strings.Repo_DiffTitleStaged : Strings.Repo_DiffTitleWorkingCopy, file.RelativePath),
                 canStage: !staged && !conflicted,
                 canUnstage: staged && !conflicted,
                 canDiscard: !staged && !conflicted,
@@ -2102,11 +2103,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                     var info = new FileInfo(file);
                     if (!info.Exists)
                     {
-                        return new ImageBytes(null, "The file no longer exists.");
+                        return new ImageBytes(null, Strings.Repo_ImageFileNoLongerExists);
                     }
 
                     return info.Length > DiffImages.MaxBytes
-                        ? new ImageBytes(null, $"Too large to preview ({DiffImages.FormatSize(info.Length)}).")
+                        ? new ImageBytes(null, string.Format(Strings.Repo_ImageTooLargeToPreview, DiffImages.FormatSize(info.Length)))
                         : new ImageBytes(File.ReadAllBytes(file));
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -2120,10 +2121,10 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             .ConfigureAwait(true);
         if (result.TooLarge)
         {
-            return new ImageBytes(null, $"Too large to preview (over {DiffImages.FormatSize(DiffImages.MaxBytes)}).");
+            return new ImageBytes(null, string.Format(Strings.Repo_ImageTooLargeToPreviewOver, DiffImages.FormatSize(DiffImages.MaxBytes)));
         }
 
-        return result.Success ? new ImageBytes(result.Output) : new ImageBytes(null, "Could not read the image from git.");
+        return result.Success ? new ImageBytes(result.Output) : new ImageBytes(null, Strings.Repo_ImageCouldNotRead);
     }
 
     private void WireDiffActions()
@@ -2208,11 +2209,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             ProcessResult result = await Handler.StageAsync(Path, list).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync("Stage failed", result.Combined).ConfigureAwait(true);
+                await Dialogs.ShowMessageAsync(Strings.Repo_StageFailedTitle, result.Combined).ConfigureAwait(true);
             }
             else
             {
-                StatusMessage = $"Staged {list.Count} file(s).";
+                StatusMessage = string.Format(Strings.Repo_StatusStagedFiles, list.Count);
             }
 
             await LoadStatusCoreAsync().ConfigureAwait(true);
@@ -2237,11 +2238,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             ProcessResult result = await Handler.UnstageAsync(Path, list).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync("Unstage failed", result.Combined).ConfigureAwait(true);
+                await Dialogs.ShowMessageAsync(Strings.Repo_UnstageFailedTitle, result.Combined).ConfigureAwait(true);
             }
             else
             {
-                StatusMessage = $"Unstaged {list.Count} file(s).";
+                StatusMessage = string.Format(Strings.Repo_StatusUnstagedFiles, list.Count);
             }
 
             await LoadStatusCoreAsync().ConfigureAwait(true);
@@ -2257,9 +2258,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         // An untracked folder entry deletes everything inside it; say so.
         var folders = files.Count(IsUntrackedFolder);
         return folders == 0
-            ? $"Discard changes in {files.Count} file(s)? This cannot be undone."
-            : $"Discard changes in {files.Count} item(s), including {folders} untracked folder(s) and " +
-              "everything inside them? This cannot be undone.";
+            ? string.Format(Strings.Repo_DiscardFilesConfirm, files.Count)
+            : string.Format(Strings.Repo_DiscardItemsWithFoldersConfirm, files.Count, folders);
     }
 
     private async Task DiscardFilesAsync(IEnumerable<ChangedFile> files, bool confirm)
@@ -2274,11 +2274,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var list = all.Where(f => f.Status != PathState.Conflicted).ToList();
         if (list.Count == 0)
         {
-            StatusMessage = "Conflicted files must be resolved or the merge/rebase aborted.";
+            StatusMessage = Strings.Repo_StatusConflictedCannotDiscard;
             return;
         }
 
-        if (confirm && !await Dialogs.ConfirmAsync("Discard changes",
+        if (confirm && !await Dialogs.ConfirmAsync(Strings.Repo_DiscardChangesTitle,
                 DescribeDiscard(list)).ConfigureAwait(true))
         {
             return;
@@ -2290,12 +2290,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             ProcessResult result = await Handler.DiscardAsync(Path, list).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync("Discard failed", result.Combined).ConfigureAwait(true);
+                await Dialogs.ShowMessageAsync(Strings.Repo_DiscardFailedTitle, result.Combined).ConfigureAwait(true);
             }
             else
             {
-                StatusMessage = $"Discarded changes in {list.Count} file(s)."
-                                + (conflicts.Count > 0 ? $" Skipped {conflicts.Count} conflicted file(s)." : string.Empty);
+                StatusMessage = conflicts.Count > 0
+                    ? string.Format(Strings.Repo_StatusDiscardedFilesSkippedConflicts, list.Count, conflicts.Count)
+                    : string.Format(Strings.Repo_StatusDiscardedFiles, list.Count);
             }
 
             await LoadStatusCoreAsync().ConfigureAwait(true);
@@ -2345,7 +2346,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
 
         if (discard && !confirmed
-            && !await Dialogs.ConfirmAsync("Discard hunk", "Discard the selected hunk? This cannot be undone.").ConfigureAwait(true))
+            && !await Dialogs.ConfirmAsync(Strings.Repo_DiscardHunkTitle, Strings.Repo_DiscardHunkConfirm).ConfigureAwait(true))
         {
             return;
         }
@@ -2360,7 +2361,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 .ToList();
             if (selection.Count == 0)
             {
-                StatusMessage = "Select added or removed lines first.";
+                StatusMessage = Strings.Repo_StatusSelectChangedLinesFirst;
                 return;
             }
         }
@@ -2374,7 +2375,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var patch = PatchBuilder.CreateSelectionPatch(hunk, selection, isStaging: stage);
         if (patch is null)
         {
-            StatusMessage = "No stageable changes in the selection.";
+            StatusMessage = Strings.Repo_StatusNoStageableChanges;
             return;
         }
 
@@ -2385,12 +2386,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 cached: stage || unstage, reverse: unstage || discard).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync("Patch failed", result.Combined).ConfigureAwait(true);
+                await Dialogs.ShowMessageAsync(Strings.Repo_PatchFailedTitle, result.Combined).ConfigureAwait(true);
             }
 
             StatusMessage = !result.Success
-                ? "Patch failed."
-                : discard ? "Hunk discarded." : stage ? "Hunk staged." : "Hunk unstaged.";
+                ? Strings.Repo_StatusPatchFailed
+                : discard ? Strings.Repo_StatusHunkDiscarded : stage ? Strings.Repo_StatusHunkStaged : Strings.Repo_StatusHunkUnstaged;
             await LoadStatusCoreAsync().ConfigureAwait(true);
         }
         finally
@@ -2409,14 +2410,14 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         {
             // Rewriting an untracked file from the decoded diff text could change its
             // encoding or byte-order mark, so only whole-file discard is offered.
-            StatusMessage = "Selected lines of a new file cannot be discarded; discard the whole file instead.";
+            StatusMessage = Strings.Repo_StatusCannotDiscardNewFileLines;
             return;
         }
 
         var patch = PatchBuilder.CreateNewFileSelectionPatch(hunk, forUnstage: unstage);
         if (patch is null)
         {
-            StatusMessage = "Select added lines first.";
+            StatusMessage = Strings.Repo_StatusSelectAddedLinesFirst;
             return;
         }
 
@@ -2427,10 +2428,10 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 allowFuzzy: false).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync("Patch failed", result.Combined).ConfigureAwait(true);
+                await Dialogs.ShowMessageAsync(Strings.Repo_PatchFailedTitle, result.Combined).ConfigureAwait(true);
             }
 
-            StatusMessage = !result.Success ? "Patch failed." : stage ? "Selected lines staged." : "Selected lines unstaged.";
+            StatusMessage = !result.Success ? Strings.Repo_StatusPatchFailed : stage ? Strings.Repo_StatusSelectedLinesStaged : Strings.Repo_StatusSelectedLinesUnstaged;
             await LoadStatusCoreAsync().ConfigureAwait(true);
         }
         finally
@@ -2444,26 +2445,26 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         if (!CanCommit)
         {
             StatusMessage = HasUnresolvedConflicts
-                ? "Resolve and stage all conflicts before committing."
-                : "Enter a commit message and stage at least one file.";
+                ? Strings.Repo_StatusResolveConflictsBeforeCommit
+                : Strings.Repo_StatusEnterMessageAndStage;
             return;
         }
 
         if (string.IsNullOrWhiteSpace(CommitMessage))
         {
-            StatusMessage = "Enter a commit message.";
+            StatusMessage = Strings.Repo_StatusEnterCommitMessage;
             return;
         }
 
         IsBusy = true;
         try
         {
-            StatusMessage = "Committing...";
+            StatusMessage = Strings.Repo_StatusCommitting;
             ProcessResult result = await Handler.CommitAsync(Path, CommitMessage, Amend, SignOff, GpgSign).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync("Commit failed", result.Combined).ConfigureAwait(true);
-                StatusMessage = "Commit failed.";
+                await Dialogs.ShowMessageAsync(Strings.Repo_CommitFailedTitle, result.Combined).ConfigureAwait(true);
+                StatusMessage = Strings.Repo_StatusCommitFailed;
             }
             else
             {
@@ -2472,13 +2473,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 _amendMessage = null;
                 _messageBeforeAmend = null;
                 Amend = false;
-                StatusMessage = "Commit created.";
+                StatusMessage = Strings.Repo_StatusCommitCreated;
                 await ReloadAllCoreAsync().ConfigureAwait(true);
                 if (PushAfterCommit)
                 {
                     if (Remotes.Count == 0)
                     {
-                        StatusMessage = "Commit created. Not pushed: no remotes are configured.";
+                        StatusMessage = Strings.Repo_StatusCommitCreatedNoRemotes;
                     }
                     else
                     {
@@ -2494,11 +2495,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     }
 
     // Recovery options offered when a push is rejected.
-    internal const string PullRebaseThenPush = "Pull with rebase, then push";
-    internal const string PullMergeThenPush = "Pull with merge, then push";
-    internal const string ForcePushWithLease = "Force push with lease (replace the remote branch)";
-    internal const string FetchOnly = "Fetch only";
-    internal const string FetchToReview = "Fetch to review their commits";
+    internal static string PullRebaseThenPush => Strings.Repo_PushRecoveryPullRebase;
+    internal static string PullMergeThenPush => Strings.Repo_PushRecoveryPullMerge;
+    internal static string ForcePushWithLease => Strings.Repo_PushRecoveryForceWithLease;
+    internal static string FetchOnly => Strings.Repo_PushRecoveryFetchOnly;
+    internal static string FetchToReview => Strings.Repo_PushRecoveryFetchToReview;
 
     /// <summary>What to push: Branch is a local branch; DetachedTarget pushes HEAD to that remote branch.</summary>
     private sealed record PushRequest(string? Remote, string? Branch, string? DetachedTarget, bool SetUpstream, bool Force);
@@ -2508,23 +2509,23 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         IReadOnlyDictionary<string, string> remotes = await Handler.GetRemotesAsync(Path).ConfigureAwait(true);
         if (remotes.Count == 0)
         {
-            await Dialogs.ShowMessageAsync("Push", "No remotes are configured.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpPush, Strings.Repo_NoRemotesConfigured).ConfigureAwait(true);
             return;
         }
 
-        var remote = await Dialogs.PromptAsync("Push to remote", "Remote", remotes.ContainsKey("origin") ? "origin" : remotes.Keys.First()).ConfigureAwait(true);
+        var remote = await Dialogs.PromptAsync(Strings.Repo_PushToRemoteTitle, Strings.Repo_RemoteLabel, remotes.ContainsKey("origin") ? "origin" : remotes.Keys.First()).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(remote))
         {
             return;
         }
 
-        var branch = await Dialogs.PromptAsync("Push to remote", "Branch", CurrentBranch).ConfigureAwait(true);
+        var branch = await Dialogs.PromptAsync(Strings.Repo_PushToRemoteTitle, Strings.Repo_BranchLabel, CurrentBranch).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(branch))
         {
             return;
         }
 
-        await PushWithRecoveryAsync("Push", new PushRequest(remote, branch, null, SetUpstream: true, Force: false),
+        await PushWithRecoveryAsync(Strings.Repo_OpPush, new PushRequest(remote, branch, null, SetUpstream: true, Force: false),
             canPull: string.Equals(branch, CurrentBranch, StringComparison.Ordinal)).ConfigureAwait(true);
     }
 
@@ -2533,7 +2534,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         IReadOnlyDictionary<string, string> remotes = await Handler.GetRemotesAsync(Path).ConfigureAwait(true);
         if (remotes.Count == 0)
         {
-            await Dialogs.ShowMessageAsync("Fetch", "No remotes are configured.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpFetch, Strings.Repo_NoRemotesConfigured).ConfigureAwait(true);
             return;
         }
 
@@ -2552,11 +2553,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
             if (failures.Count > 0)
             {
-                await Dialogs.ShowMessageAsync("Fetch all remotes", string.Join("\n\n", failures)).ConfigureAwait(true);
+                await Dialogs.ShowMessageAsync(Strings.Repo_FetchAllRemotesTitle, string.Join("\n\n", failures)).ConfigureAwait(true);
             }
             else
             {
-                StatusMessage = $"Fetched {remotes.Count} remote(s).";
+                StatusMessage = string.Format(Strings.Repo_StatusFetchedRemotes, remotes.Count);
             }
 
             await ReloadAllCoreAsync().ConfigureAwait(true);
@@ -2572,19 +2573,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var branch = CurrentBranch == RepoSummary.DetachedHeadLabel ? null : CurrentBranch;
         if (branch is null)
         {
-            (string Remote, string Target)? prompt = await PromptDetachedTargetAsync("Force push").ConfigureAwait(true);
+            (string Remote, string Target)? prompt = await PromptDetachedTargetAsync(Strings.Repo_OpForcePush).ConfigureAwait(true);
             if (prompt is null)
             {
                 return;
             }
 
-            await PushWithRecoveryAsync("Force push",
+            await PushWithRecoveryAsync(Strings.Repo_OpForcePush,
                 new PushRequest(prompt.Value.Remote, null, prompt.Value.Target, SetUpstream: false, Force: true),
                 canPull: false).ConfigureAwait(true);
             return;
         }
 
-        await PushWithRecoveryAsync("Force push", new PushRequest(null, branch, null, SetUpstream: true, Force: true),
+        await PushWithRecoveryAsync(Strings.Repo_OpForcePush, new PushRequest(null, branch, null, SetUpstream: true, Force: true),
             canPull: true).ConfigureAwait(true);
     }
 
@@ -2593,18 +2594,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         IReadOnlyDictionary<string, string> remotes = await Handler.GetRemotesAsync(Path).ConfigureAwait(true);
         if (remotes.Count == 0)
         {
-            await Dialogs.ShowMessageAsync(title, "No remotes are configured.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(title, Strings.Repo_NoRemotesConfigured).ConfigureAwait(true);
             return null;
         }
 
-        var remote = await Dialogs.PromptAsync(title, "Remote",
+        var remote = await Dialogs.PromptAsync(title, Strings.Repo_RemoteLabel,
             remotes.ContainsKey("origin") ? "origin" : remotes.Keys.First()).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(remote))
         {
             return null;
         }
 
-        var target = await Dialogs.PromptAsync(title, "Remote branch", string.Empty).ConfigureAwait(true);
+        var target = await Dialogs.PromptAsync(title, Strings.Repo_RemoteBranchLabel, string.Empty).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(target))
         {
             return null;
@@ -2618,19 +2619,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var branch = CurrentBranch == RepoSummary.DetachedHeadLabel ? null : CurrentBranch;
         if (branch is null)
         {
-            (string Remote, string Target)? prompt = await PromptDetachedTargetAsync("Push").ConfigureAwait(true);
+            (string Remote, string Target)? prompt = await PromptDetachedTargetAsync(Strings.Repo_OpPush).ConfigureAwait(true);
             if (prompt is null)
             {
                 return;
             }
 
-            await PushWithRecoveryAsync("Push",
+            await PushWithRecoveryAsync(Strings.Repo_OpPush,
                 new PushRequest(prompt.Value.Remote, null, prompt.Value.Target, SetUpstream: false, Force: false),
                 canPull: false).ConfigureAwait(true);
             return;
         }
 
-        await PushWithRecoveryAsync("Push", new PushRequest(null, branch, null, SetUpstream: false, Force: false),
+        await PushWithRecoveryAsync(Strings.Repo_OpPush, new PushRequest(null, branch, null, SetUpstream: false, Force: false),
             canPull: true).ConfigureAwait(true);
     }
 
@@ -2658,7 +2659,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             {
                 if (result.Success)
                 {
-                    StatusMessage = $"{name} completed.";
+                    StatusMessage = string.Format(Strings.Repo_StatusOperationCompleted, name);
                     await ReloadAllCoreAsync().ConfigureAwait(true);
                     return;
                 }
@@ -2676,20 +2677,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                             var choice = await ChoosePushRecoveryAsync(name, outcome, request, canPull).ConfigureAwait(true);
                             if (choice is null)
                             {
-                                StatusMessage = $"{name} rejected: the remote branch has commits that are not in yours.";
+                                StatusMessage = string.Format(Strings.Repo_StatusPushRejectedBehind, name);
                                 return;
                             }
 
-                            if (choice is PullRebaseThenPush or PullMergeThenPush)
+                            if (choice == PullRebaseThenPush || choice == PullMergeThenPush)
                             {
-                                StatusMessage = choice == PullRebaseThenPush ? "Pulling with rebase..." : "Pulling...";
+                                StatusMessage = choice == PullRebaseThenPush ? Strings.Repo_StatusPullingWithRebase : Strings.Repo_StatusPulling;
                                 ProcessResult pull = await Handler.PullAsync(Path, rebase: choice == PullRebaseThenPush).ConfigureAwait(true);
                                 if (!pull.Success)
                                 {
-                                    await Dialogs.ShowMessageAsync("Pull failed",
-                                        "The pull did not complete, so nothing was pushed. If there are conflicts, resolve them " +
-                                        "(or abort) and push again.\n\n" + pull.Combined).ConfigureAwait(true);
-                                    StatusMessage = "Pull failed; nothing was pushed.";
+                                    await Dialogs.ShowMessageAsync(Strings.Repo_PullFailedTitle,
+                                        string.Format(Strings.Repo_PushPullFailedMessage, pull.Combined)).ConfigureAwait(true);
+                                    StatusMessage = Strings.Repo_StatusPullFailedNothingPushed;
                                     await ReloadAllCoreAsync().ConfigureAwait(true);
                                     return;
                                 }
@@ -2702,7 +2702,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
                             if (choice == ForcePushWithLease)
                             {
-                                StatusMessage = "Force push with lease...";
+                                StatusMessage = Strings.Repo_StatusForcePushWithLease;
                                 request = request with { Force = true };
                                 result = await RunPushAsync(request).ConfigureAwait(true);
                                 continue;
@@ -2712,45 +2712,44 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                             ProcessResult fetch = await Handler.FetchAsync(Path, request.Remote).ConfigureAwait(true);
                             if (!fetch.Success)
                             {
-                                await Dialogs.ShowMessageAsync("Fetch failed", fetch.Combined).ConfigureAwait(true);
+                                await Dialogs.ShowMessageAsync(Strings.Repo_FetchFailedTitle, fetch.Combined).ConfigureAwait(true);
                             }
 
                             StatusMessage = fetch.Success
-                                ? "Fetched. Review the incoming commits in the history, then push again."
-                                : "Fetch failed.";
+                                ? Strings.Repo_StatusFetchedReviewThenPush
+                                : Strings.Repo_StatusFetchFailed;
                             await ReloadAllCoreAsync().ConfigureAwait(true);
                             return;
                         }
 
                     case PushRejection.RemoteRejected:
                         {
-                            var reason = outcome.RejectedRef?.Reason ?? "rejected";
-                            var server = outcome.RemoteMessage is null ? string.Empty : $"\n\nThe server said:\n{outcome.RemoteMessage}";
-                            await Dialogs.ShowMessageAsync($"{name} rejected by the server",
-                                $"The remote refused the update ({reason}). This usually means the branch is protected or a " +
-                                $"server-side check failed; pushing again will not help until that is resolved.{server}")
+                            var reason = outcome.RejectedRef?.Reason ?? Strings.Repo_PushRejectedReasonFallback;
+                            await Dialogs.ShowMessageAsync(string.Format(Strings.Repo_PushRejectedByServerTitle, name),
+                                outcome.RemoteMessage is null
+                                    ? string.Format(Strings.Repo_PushRemoteRejectedMessage, reason)
+                                    : string.Format(Strings.Repo_PushRemoteRejectedMessageWithServer, reason, outcome.RemoteMessage))
                                 .ConfigureAwait(true);
                             break;
                         }
 
                     case PushRejection.Authentication:
-                        await Dialogs.ShowMessageAsync($"{name} failed: authentication",
-                            "The remote did not accept your credentials. Check the credential helper or SSH command in " +
-                            "Settings, and that your SSH key or access token is valid.\n\n" + outcome.RawOutput)
+                        await Dialogs.ShowMessageAsync(string.Format(Strings.Repo_PushAuthFailedTitle, name),
+                            string.Format(Strings.Repo_PushAuthFailedMessage, outcome.RawOutput))
                             .ConfigureAwait(true);
                         break;
 
                     default:
-                        await Dialogs.ShowMessageAsync($"{name} failed", outcome.RawOutput).ConfigureAwait(true);
+                        await Dialogs.ShowMessageAsync(string.Format(Strings.Repo_OperationFailedTitle, name), outcome.RawOutput).ConfigureAwait(true);
                         break;
                 }
 
-                StatusMessage = $"{name} failed.";
+                StatusMessage = string.Format(Strings.Repo_StatusOperationFailed, name);
                 await LoadStatusCoreAsync().ConfigureAwait(true);
                 return;
             }
 
-            StatusMessage = $"{name} stopped after several attempts; the remote keeps changing.";
+            StatusMessage = string.Format(Strings.Repo_StatusPushStoppedAfterAttempts, name);
         }
         finally
         {
@@ -2763,7 +2762,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var destination = outcome.RejectedRef?.Destination;
         var target = destination is not null && destination.StartsWith("refs/heads/", StringComparison.Ordinal)
             ? destination["refs/heads/".Length..]
-            : request.Branch ?? request.DetachedTarget ?? "the branch";
+            : request.Branch ?? request.DetachedTarget ?? Strings.Repo_PushTargetFallback;
 
         string message;
         var options = new List<string>();
@@ -2772,8 +2771,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             case PushRejection.FetchFirst:
                 // The remote's commits have not been fetched, so the user has never
                 // seen them: forcing would discard unseen work. No force option here.
-                message = $"The remote '{target}' has commits that you have not fetched yet, so your push was rejected.\n\n" +
-                          "Pull them into your branch and push again, or fetch them first to review.";
+                message = string.Format(Strings.Repo_PushFetchFirstMessage, target);
                 if (canPull)
                 {
                     options.Add(PullRebaseThenPush);
@@ -2785,12 +2783,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             case PushRejection.NonFastForward:
                 {
                     var count = await CountRemoteOnlyCommitsAsync(request, target).ConfigureAwait(true);
-                    var what = count is { } n ? $"{n} commit{(n == 1 ? string.Empty : "s")}" : "commits";
-                    message = $"The remote '{target}' has {what} that your branch does not contain (your branch is behind or " +
-                              "has diverged), so your push was rejected.\n\n" +
-                              (canPull ? "Integrate them and push again, or force push" : "Force push") +
-                              $" to replace the remote branch with yours, which discards those {what} from the remote. " +
-                              "Force with lease still refuses if someone pushes again in the meantime.";
+                    var what = count is { } n
+                        ? string.Format(n == 1 ? Strings.Repo_PushCommitCountOne : Strings.Repo_PushCommitCountMany, n)
+                        : Strings.Repo_PushCommitsUnknown;
+                    message = string.Format(canPull ? Strings.Repo_PushNonFastForwardMessage : Strings.Repo_PushNonFastForwardNoPullMessage,
+                        target, what);
                     if (canPull)
                     {
                         options.Add(PullRebaseThenPush);
@@ -2801,14 +2798,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 }
 
             default: // StaleLease
-                message = $"The force push was refused: someone pushed to '{target}' after your last fetch, so " +
-                          "overwriting it could discard work you have not seen.\n\n" +
-                          "Fetch to review their commits, then integrate them or force push again.";
+                message = string.Format(Strings.Repo_PushStaleLeaseMessage, target);
                 options.Add(FetchToReview);
                 break;
         }
 
-        return await Dialogs.ChooseAsync($"{name} rejected", message, options).ConfigureAwait(true);
+        return await Dialogs.ChooseAsync(string.Format(Strings.Repo_PushRejectedTitle, name), message, options).ConfigureAwait(true);
     }
 
     /// <summary>Commits on the remote-tracking branch that the pushed branch lacks (null when unknown).</summary>
@@ -2831,22 +2826,22 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             ProcessResult result = await operation(CancellationToken.None).ConfigureAwait(true);
             if (!result.Success)
             {
-                await Dialogs.ShowMessageAsync($"{name} failed", result.Combined).ConfigureAwait(true);
-                StatusMessage = $"{name} failed.";
+                await Dialogs.ShowMessageAsync(string.Format(Strings.Repo_OperationFailedTitle, name), result.Combined).ConfigureAwait(true);
+                StatusMessage = string.Format(Strings.Repo_StatusOperationFailed, name);
                 // A pull/merge/rebase can fail because of conflicts; refresh so the
                 // conflict banner and abort/continue controls become visible.
                 await LoadStatusCoreAsync().ConfigureAwait(true);
             }
             else
             {
-                StatusMessage = $"{name} completed.";
+                StatusMessage = string.Format(Strings.Repo_StatusOperationCompleted, name);
                 await ReloadAllCoreAsync().ConfigureAwait(true);
             }
         }
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            await Dialogs.ShowMessageAsync($"{name} failed", ex.Message).ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(string.Format(Strings.Repo_OperationFailedTitle, name), ex.Message).ConfigureAwait(true);
         }
         finally
         {
@@ -2864,19 +2859,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
     private async Task CreateBranchCoreAsync(string start)
     {
-        (string? Value, bool Flag)? prompt = await Dialogs.PromptWithCheckBoxAsync("Create branch", "Branch name", string.Empty, "Checkout after creating", true).ConfigureAwait(true);
+        (string? Value, bool Flag)? prompt = await Dialogs.PromptWithCheckBoxAsync(Strings.Repo_CreateBranchTitle, Strings.Repo_BranchNameLabel, string.Empty, Strings.Repo_CheckoutAfterCreating, true).ConfigureAwait(true);
         if (prompt is null || string.IsNullOrWhiteSpace(prompt.Value.Value))
         {
             return;
         }
 
         ProcessResult result = await Handler.CreateBranchAsync(Path, prompt.Value.Value, start, prompt.Value.Flag).ConfigureAwait(true);
-        await HandleOperationResultAsync("Create branch", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_CreateBranchTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task CreateTagAsync()
     {
-        (string? Value, bool Flag)? prompt = await Dialogs.PromptWithCheckBoxAsync("Create tag", "Tag name", string.Empty, "Annotated tag", false).ConfigureAwait(true);
+        (string? Value, bool Flag)? prompt = await Dialogs.PromptWithCheckBoxAsync(Strings.Repo_CreateTagTitle, Strings.Repo_TagNameLabel, string.Empty, Strings.Repo_AnnotatedTag, false).ConfigureAwait(true);
         if (prompt is null || string.IsNullOrWhiteSpace(prompt.Value.Value))
         {
             return;
@@ -2885,7 +2880,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         string? message = null;
         if (prompt.Value.Flag)
         {
-            message = await Dialogs.PromptAsync("Tag message", "Message", string.Empty).ConfigureAwait(true);
+            message = await Dialogs.PromptAsync(Strings.Repo_TagMessageTitle, Strings.Repo_MessageLabel, string.Empty).ConfigureAwait(true);
             if (message is null)
             {
                 return;
@@ -2894,19 +2889,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         var revision = SelectedCommit?.Row.CommitId ?? "HEAD";
         ProcessResult result = await Handler.CreateTagAsync(Path, prompt.Value.Value, revision, message).ConfigureAwait(true);
-        await HandleOperationResultAsync("Create tag", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_CreateTagTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task StashAsync()
     {
-        (string? Value, bool Flag)? prompt = await Dialogs.PromptWithCheckBoxAsync("Stash changes", "Stash message", string.Empty, "Include untracked files", true).ConfigureAwait(true);
+        (string? Value, bool Flag)? prompt = await Dialogs.PromptWithCheckBoxAsync(Strings.Repo_StashChangesTitle, Strings.Repo_StashMessageLabel, string.Empty, Strings.Repo_IncludeUntrackedFiles, true).ConfigureAwait(true);
         if (prompt is null)
         {
             return;
         }
 
         ProcessResult result = await Handler.StashSaveAsync(Path, prompt.Value.Value ?? string.Empty, prompt.Value.Flag).ConfigureAwait(true);
-        await HandleOperationResultAsync("Stash", result, reloadAll: false).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpStash, result, reloadAll: false).ConfigureAwait(true);
         await LoadRefsCoreAsync().ConfigureAwait(true);
     }
 
@@ -2920,8 +2915,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         // git refuses to check out a branch that another worktree has; offer that worktree instead.
         if (branch is { IsInOtherWorktree: true, WorktreePath: { } worktree })
         {
-            if (await Dialogs.ConfirmAsync("Branch is in another worktree",
-                    $"'{branch.Name}' is checked out in the worktree at\n{worktree}\n\nOpen that worktree?").ConfigureAwait(true))
+            if (await Dialogs.ConfirmAsync(Strings.Repo_BranchInOtherWorktreeTitle,
+                    string.Format(Strings.Repo_BranchInOtherWorktreeConfirm, branch.Name, worktree)).ConfigureAwait(true))
             {
                 await OpenWorktreePathAsync(worktree).ConfigureAwait(true);
             }
@@ -2930,7 +2925,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
 
         ProcessResult result = await Handler.CheckoutAsync(Path, branch.Name).ConfigureAwait(true);
-        await HandleOperationResultAsync("Checkout", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpCheckout, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task CheckoutReferenceAsync(string? reference)
@@ -2940,13 +2935,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Checkout", $"Check out '{reference}'? HEAD may become detached.").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_OpCheckout, string.Format(Strings.Repo_CheckoutReferenceConfirm, reference)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.CheckoutAsync(Path, reference).ConfigureAwait(true);
-        await HandleOperationResultAsync("Checkout", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpCheckout, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task DeleteBranchAsync(BranchRef? branch)
@@ -2956,13 +2951,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Delete branch", $"Delete branch '{branch.Name}'?").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_DeleteBranchTitle, string.Format(Strings.Repo_DeleteBranchConfirm, branch.Name)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.DeleteBranchAsync(Path, branch.Name, force: false).ConfigureAwait(true);
-        await HandleOperationResultAsync("Delete branch", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_DeleteBranchTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private static bool IsSamePath(string a, string b)
@@ -3009,22 +3004,24 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     {
         if (branch is { IsCheckedOut: true } or { IsInOtherWorktree: true })
         {
-            await Dialogs.ShowMessageAsync("Create worktree",
-                $"'{branch.Name}' is already checked out in {branch.WorktreePath ?? "this worktree"}.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_CreateWorktreeTitle,
+                branch.WorktreePath is { } checkedOutAt
+                    ? string.Format(Strings.Repo_BranchAlreadyCheckedOutAt, branch.Name, checkedOutAt)
+                    : string.Format(Strings.Repo_BranchAlreadyCheckedOutHere, branch.Name)).ConfigureAwait(true);
             return;
         }
 
         var branchName = branch?.Name;
         if (branchName is null)
         {
-            branchName = (await Dialogs.PromptAsync("New worktree", "Name of the new branch (starts at HEAD)").ConfigureAwait(true))?.Trim();
+            branchName = (await Dialogs.PromptAsync(Strings.Repo_NewWorktreeTitle, Strings.Repo_NewWorktreeBranchLabel).ConfigureAwait(true))?.Trim();
             if (string.IsNullOrEmpty(branchName))
             {
                 return;
             }
         }
 
-        var folder = (await Dialogs.PromptAsync("New worktree", $"Folder for '{branchName}'", SuggestWorktreePath(branchName))
+        var folder = (await Dialogs.PromptAsync(Strings.Repo_NewWorktreeTitle, string.Format(Strings.Repo_NewWorktreeFolderLabel, branchName), SuggestWorktreePath(branchName))
             .ConfigureAwait(true))?.Trim();
         if (string.IsNullOrEmpty(folder))
         {
@@ -3033,9 +3030,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         ProcessResult result = await Handler.AddWorktreeAsync(Path, folder, branchName, createBranch: branch is null, startPoint: null)
             .ConfigureAwait(true);
-        await HandleOperationResultAsync("Create worktree", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_CreateWorktreeTitle, result, reloadAll: true).ConfigureAwait(true);
         if (result.Success
-            && await Dialogs.ConfirmAsync("Worktree created", $"Created a worktree for '{branchName}' at\n{folder}\n\nOpen it in a new tab?")
+            && await Dialogs.ConfirmAsync(Strings.Repo_WorktreeCreatedTitle, string.Format(Strings.Repo_WorktreeCreatedConfirm, branchName, folder))
                 .ConfigureAwait(true))
         {
             await OpenWorktreePathAsync(folder).ConfigureAwait(true);
@@ -3055,8 +3052,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Remove worktree",
-                $"Remove the worktree at\n{worktree.Path}\n\nIts folder is deleted. The branch '{worktree.BranchText}' is kept.").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_RemoveWorktreeTitle,
+                string.Format(Strings.Repo_RemoveWorktreeConfirm, worktree.Path, worktree.BranchText)).ConfigureAwait(true))
         {
             return;
         }
@@ -3065,8 +3062,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         // git refuses to delete uncommitted work without --force; ask before discarding it.
         if (!result.Success && result.Error.Contains("modified or untracked files", StringComparison.OrdinalIgnoreCase))
         {
-            if (!await Dialogs.ConfirmAsync("Remove worktree",
-                    "The worktree has uncommitted changes or untracked files. Remove it anyway and lose them?").ConfigureAwait(true))
+            if (!await Dialogs.ConfirmAsync(Strings.Repo_RemoveWorktreeTitle,
+                    Strings.Repo_RemoveWorktreeForceConfirm).ConfigureAwait(true))
             {
                 await LoadRefsCoreAsync().ConfigureAwait(true);
                 return;
@@ -3080,13 +3077,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             WorktreeRemoved?.Invoke(worktree.Path);
         }
 
-        await HandleOperationResultAsync("Remove worktree", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_RemoveWorktreeTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task PruneWorktreesAsync()
     {
         ProcessResult result = await Handler.PruneWorktreesAsync(Path).ConfigureAwait(true);
-        await HandleOperationResultAsync("Prune worktrees", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpPruneWorktrees, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task DeleteTagAsync(string? tag)
@@ -3096,13 +3093,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Delete tag", $"Delete tag '{tag}'?").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_DeleteTagTitle, string.Format(Strings.Repo_DeleteTagConfirm, tag)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.DeleteTagAsync(Path, tag).ConfigureAwait(true);
-        await HandleOperationResultAsync("Delete tag", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_DeleteTagTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task CheckoutCommitAsync()
@@ -3112,13 +3109,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Checkout commit", $"Check out {SelectedCommit.Row.ShortId}? HEAD will be detached.").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_CheckoutCommitTitle, string.Format(Strings.Repo_CheckoutCommitConfirm, SelectedCommit.Row.ShortId)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.CheckoutAsync(Path, SelectedCommit.Row.CommitId).ConfigureAwait(true);
-        await HandleOperationResultAsync("Checkout", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpCheckout, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private IReadOnlyList<CommitRowViewModel> SelectedCommitRange(bool newestFirst)
@@ -3152,19 +3149,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (commits.Any(c => c.Row.ParentIds.Length > 1))
         {
-            await Dialogs.ShowMessageAsync("Cherry-pick",
-                "Merge commits cannot be cherry-picked. Select only non-merge commits.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_CherryPickTitle,
+                Strings.Repo_CherryPickMergeCommitsMessage).ConfigureAwait(true);
             return;
         }
         if (commits.Count > 1
-            && !await Dialogs.ConfirmAsync("Cherry-pick",
-                $"Cherry-pick {commits.Count} commits onto the current branch?").ConfigureAwait(true))
+            && !await Dialogs.ConfirmAsync(Strings.Repo_CherryPickTitle,
+                string.Format(Strings.Repo_CherryPickCommitsConfirm, commits.Count)).ConfigureAwait(true))
         {
             return;
         }
 
         IsBusy = true;
-        StatusMessage = commits.Count > 1 ? $"Cherry-picking {commits.Count} commits..." : "Cherry-pick...";
+        StatusMessage = commits.Count > 1 ? string.Format(Strings.Repo_StatusCherryPickingCommits, commits.Count) : Strings.Repo_StatusCherryPicking;
         try
         {
             for (var index = 0; index < commits.Count; index++)
@@ -3175,18 +3172,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 {
                     var applied = index;
                     var detail = commits.Count > 1
-                        ? $"{applied} of {commits.Count} commits were applied before the conflict.\n\n{result.Combined}"
+                        ? string.Format(Strings.Repo_CherryPickPartialMessage, applied, commits.Count, result.Combined)
                         : result.Combined;
-                    await Dialogs.ShowMessageAsync("Cherry-pick failed", detail).ConfigureAwait(true);
+                    await Dialogs.ShowMessageAsync(Strings.Repo_CherryPickFailedTitle, detail).ConfigureAwait(true);
                     StatusMessage = commits.Count > 1
-                        ? $"Cherry-pick stopped after {applied} of {commits.Count} commits."
-                        : "Cherry-pick failed.";
+                        ? string.Format(Strings.Repo_StatusCherryPickStopped, applied, commits.Count)
+                        : Strings.Repo_StatusCherryPickFailed;
                     await LoadStatusCoreAsync().ConfigureAwait(true);
                     return;
                 }
             }
 
-            StatusMessage = commits.Count == 1 ? "Cherry-pick completed." : $"Cherry-picked {commits.Count} commits.";
+            StatusMessage = commits.Count == 1 ? Strings.Repo_StatusCherryPickCompleted : string.Format(Strings.Repo_StatusCherryPickedCommits, commits.Count);
             await ReloadAllCoreAsync().ConfigureAwait(true);
         }
         finally
@@ -3205,19 +3202,19 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (commits.Any(c => c.Row.ParentIds.Length > 1))
         {
-            await Dialogs.ShowMessageAsync("Revert",
-                "Merge commits cannot be reverted without choosing a mainline. Select only non-merge commits.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_RevertTitle,
+                Strings.Repo_RevertMergeCommitsMessage).ConfigureAwait(true);
             return;
         }
         if (commits.Count > 1
-            && !await Dialogs.ConfirmAsync("Revert",
-                $"Revert {commits.Count} commits?").ConfigureAwait(true))
+            && !await Dialogs.ConfirmAsync(Strings.Repo_RevertTitle,
+                string.Format(Strings.Repo_RevertCommitsConfirm, commits.Count)).ConfigureAwait(true))
         {
             return;
         }
 
         IsBusy = true;
-        StatusMessage = commits.Count > 1 ? $"Reverting {commits.Count} commits..." : "Revert...";
+        StatusMessage = commits.Count > 1 ? string.Format(Strings.Repo_StatusRevertingCommits, commits.Count) : Strings.Repo_StatusReverting;
         try
         {
             for (var index = 0; index < commits.Count; index++)
@@ -3228,18 +3225,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 {
                     var applied = index;
                     var detail = commits.Count > 1
-                        ? $"{applied} of {commits.Count} commits were reverted before the conflict.\n\n{result.Combined}"
+                        ? string.Format(Strings.Repo_RevertPartialMessage, applied, commits.Count, result.Combined)
                         : result.Combined;
-                    await Dialogs.ShowMessageAsync("Revert failed", detail).ConfigureAwait(true);
+                    await Dialogs.ShowMessageAsync(Strings.Repo_RevertFailedTitle, detail).ConfigureAwait(true);
                     StatusMessage = commits.Count > 1
-                        ? $"Revert stopped after {applied} of {commits.Count} commits."
-                        : "Revert failed.";
+                        ? string.Format(Strings.Repo_StatusRevertStopped, applied, commits.Count)
+                        : Strings.Repo_StatusRevertFailed;
                     await LoadStatusCoreAsync().ConfigureAwait(true);
                     return;
                 }
             }
 
-            StatusMessage = commits.Count == 1 ? "Revert completed." : $"Reverted {commits.Count} commits.";
+            StatusMessage = commits.Count == 1 ? Strings.Repo_StatusRevertCompleted : string.Format(Strings.Repo_StatusRevertedCommits, commits.Count);
             await ReloadAllCoreAsync().ConfigureAwait(true);
         }
         finally
@@ -3255,13 +3252,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Merge", $"Merge {SelectedCommit.Row.ShortId} into the current branch?").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_OpMerge, string.Format(Strings.Repo_MergeCommitConfirm, SelectedCommit.Row.ShortId)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.MergeAsync(Path, SelectedCommit.Row.CommitId).ConfigureAwait(true);
-        await HandleOperationResultAsync("Merge", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpMerge, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task RebaseCommitAsync()
@@ -3271,13 +3268,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Rebase", $"Rebase the current branch onto {SelectedCommit.Row.ShortId}?").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_OpRebase, string.Format(Strings.Repo_RebaseOntoCommitConfirm, SelectedCommit.Row.ShortId)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.RebaseAsync(Path, SelectedCommit.Row.CommitId).ConfigureAwait(true);
-        await HandleOperationResultAsync("Rebase", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpRebase, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task ResetCommitAsync()
@@ -3287,13 +3284,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Reset", $"Hard reset the current branch to {SelectedCommit.Row.ShortId}? Uncommitted changes will be lost.").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_OpReset, string.Format(Strings.Repo_HardResetConfirm, SelectedCommit.Row.ShortId)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.ResetAsync(Path, SelectedCommit.Row.CommitId, hard: true).ConfigureAwait(true);
-        await HandleOperationResultAsync("Reset", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpReset, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task ApplyStashAsync(StashEntry? stash)
@@ -3304,7 +3301,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
 
         ProcessResult result = await Handler.StashApplyAsync(Path, stash.Name, pop: false).ConfigureAwait(true);
-        await HandleOperationResultAsync("Apply stash", result, reloadAll: false).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpApplyStash, result, reloadAll: false).ConfigureAwait(true);
         await LoadStatusCoreAsync().ConfigureAwait(true);
     }
 
@@ -3316,7 +3313,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
 
         ProcessResult result = await Handler.StashApplyAsync(Path, stash.Name, pop: true).ConfigureAwait(true);
-        await HandleOperationResultAsync("Pop stash", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpPopStash, result, reloadAll: true).ConfigureAwait(true);
         await LoadStatusCoreAsync().ConfigureAwait(true);
     }
 
@@ -3327,13 +3324,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Drop stash", $"Drop '{stash.Name}'? This cannot be undone.").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_DropStashTitle, string.Format(Strings.Repo_DropStashConfirm, stash.Name)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.StashDropAsync(Path, stash.Name).ConfigureAwait(true);
-        await HandleOperationResultAsync("Drop stash", result, reloadAll: false).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_DropStashTitle, result, reloadAll: false).ConfigureAwait(true);
         await LoadRefsCoreAsync().ConfigureAwait(true);
     }
 
@@ -3341,13 +3338,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     {
         if (!result.Success)
         {
-            await Dialogs.ShowMessageAsync($"{name} failed", result.Combined).ConfigureAwait(true);
-            StatusMessage = $"{name} failed.";
+            await Dialogs.ShowMessageAsync(string.Format(Strings.Repo_OperationFailedTitle, name), result.Combined).ConfigureAwait(true);
+            StatusMessage = string.Format(Strings.Repo_StatusOperationFailed, name);
             await LoadStatusCoreAsync().ConfigureAwait(true);
             return;
         }
 
-        StatusMessage = $"{name} completed.";
+        StatusMessage = string.Format(Strings.Repo_StatusOperationCompleted, name);
         if (reloadAll)
         {
             await ReloadAllCoreAsync().ConfigureAwait(true);
@@ -3362,7 +3359,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     {
         IReadOnlyDictionary<string, string> existing = await Handler.GetRemotesAsync(Path).ConfigureAwait(true);
         var defaultName = existing.ContainsKey("origin") ? string.Empty : "origin";
-        var name = await Dialogs.PromptAsync("Add remote", "Remote name", defaultName).ConfigureAwait(true);
+        var name = await Dialogs.PromptAsync(Strings.Repo_AddRemoteTitle, Strings.Repo_RemoteNameLabel, defaultName).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(name))
         {
             return;
@@ -3370,11 +3367,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (existing.ContainsKey(name))
         {
-            await Dialogs.ShowMessageAsync("Add remote", $"A remote named '{name}' already exists.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_AddRemoteTitle, string.Format(Strings.Repo_RemoteAlreadyExists, name)).ConfigureAwait(true);
             return;
         }
 
-        var url = await Dialogs.PromptAsync("Add remote", "Remote URL", string.Empty).ConfigureAwait(true);
+        var url = await Dialogs.PromptAsync(Strings.Repo_AddRemoteTitle, Strings.Repo_RemoteUrlLabel, string.Empty).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(url))
         {
             return;
@@ -3382,13 +3379,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (!LooksLikeRemoteUrl(url))
         {
-            await Dialogs.ShowMessageAsync("Add remote",
-                "Enter an http(s), ssh, git, file URL, scp-style address (git@host:path) or a local path.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_AddRemoteTitle,
+                Strings.Repo_InvalidRemoteUrl).ConfigureAwait(true);
             return;
         }
 
         ProcessResult result = await Handler.AddRemoteAsync(Path, name, url).ConfigureAwait(true);
-        await HandleOperationResultAsync("Add remote", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_AddRemoteTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task DeleteRemoteAsync(RemoteEntry? remote)
@@ -3398,14 +3395,14 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Remove remote",
-                $"Remove remote '{remote.Name}'? Its remote-tracking refs will also be removed.").ConfigureAwait(true))
+        if (!await Dialogs.ConfirmAsync(Strings.Repo_RemoveRemoteTitle,
+                string.Format(Strings.Repo_RemoveRemoteConfirm, remote.Name)).ConfigureAwait(true))
         {
             return;
         }
 
         ProcessResult result = await Handler.DeleteRemoteAsync(Path, remote.Name).ConfigureAwait(true);
-        await HandleOperationResultAsync("Remove remote", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_RemoveRemoteTitle, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task EditRemoteAsync(RemoteEntry? remote)
@@ -3415,7 +3412,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        var name = await Dialogs.PromptAsync("Edit remote", "Remote name", remote.Name).ConfigureAwait(true);
+        var name = await Dialogs.PromptAsync(Strings.Repo_EditRemoteTitle, Strings.Repo_RemoteNameLabel, remote.Name).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(name))
         {
             return;
@@ -3424,11 +3421,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         name = name.Trim();
         if (name != remote.Name && Remotes.Any(r => string.Equals(r.Name, name, StringComparison.OrdinalIgnoreCase)))
         {
-            await Dialogs.ShowMessageAsync("Edit remote", $"A remote named '{name}' already exists.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_EditRemoteTitle, string.Format(Strings.Repo_RemoteAlreadyExists, name)).ConfigureAwait(true);
             return;
         }
 
-        var url = await Dialogs.PromptAsync("Edit remote", "Remote URL", remote.Url).ConfigureAwait(true);
+        var url = await Dialogs.PromptAsync(Strings.Repo_EditRemoteTitle, Strings.Repo_RemoteUrlLabel, remote.Url).ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(url))
         {
             return;
@@ -3437,8 +3434,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         url = url.Trim();
         if (!LooksLikeRemoteUrl(url))
         {
-            await Dialogs.ShowMessageAsync("Edit remote",
-                "Enter an http(s), ssh, git, file URL, scp-style address (git@host:path) or a local path.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_EditRemoteTitle,
+                Strings.Repo_InvalidRemoteUrl).ConfigureAwait(true);
             return;
         }
 
@@ -3451,7 +3448,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 ProcessResult rename = await Handler.RenameRemoteAsync(Path, currentName, name).ConfigureAwait(true);
                 if (!rename.Success)
                 {
-                    await Dialogs.ShowMessageAsync("Rename remote failed", rename.Combined).ConfigureAwait(true);
+                    await Dialogs.ShowMessageAsync(Strings.Repo_RenameRemoteFailedTitle, rename.Combined).ConfigureAwait(true);
                     return;
                 }
                 currentName = name;
@@ -3465,12 +3462,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                     // The rename already succeeded; refresh so the sidebar does
                     // not keep showing a remote name that no longer exists.
                     await ReloadAllCoreAsync().ConfigureAwait(true);
-                    await Dialogs.ShowMessageAsync("Update remote failed", setUrl.Combined).ConfigureAwait(true);
+                    await Dialogs.ShowMessageAsync(Strings.Repo_UpdateRemoteFailedTitle, setUrl.Combined).ConfigureAwait(true);
                     return;
                 }
             }
 
-            StatusMessage = $"Updated remote '{name}'.";
+            StatusMessage = string.Format(Strings.Repo_StatusUpdatedRemote, name);
             await ReloadAllCoreAsync().ConfigureAwait(true);
         }
         finally
@@ -3509,14 +3506,14 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         if (IsMergeInProgress || IsRebaseInProgress)
         {
-            await Dialogs.ShowMessageAsync("Interactive rebase",
-                "Finish or abort the current merge/rebase before starting another.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpInteractiveRebase,
+                Strings.Repo_InteractiveRebaseInProgressMessage).ConfigureAwait(true);
             return;
         }
         if (commit.Row.ParentIds.Length > 1)
         {
-            await Dialogs.ShowMessageAsync("Interactive rebase",
-                "Interactive rebase over a merge commit is not supported.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpInteractiveRebase,
+                Strings.Repo_InteractiveRebaseMergeCommitMessage).ConfigureAwait(true);
             return;
         }
         var fromRoot = commit.Row.ParentIds.Length == 0;
@@ -3529,12 +3526,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             {
                 if (ancestor.ExitCode == 1)
                 {
-                    await Dialogs.ShowMessageAsync("Interactive rebase",
-                        "The selected commit is not an ancestor of the current HEAD. Check out its branch first.").ConfigureAwait(true);
+                    await Dialogs.ShowMessageAsync(Strings.Repo_OpInteractiveRebase,
+                        Strings.Repo_InteractiveRebaseNotAncestorMessage).ConfigureAwait(true);
                 }
                 else
                 {
-                    await Dialogs.ShowMessageAsync("Interactive rebase", ancestor.Combined).ConfigureAwait(true);
+                    await Dialogs.ShowMessageAsync(Strings.Repo_OpInteractiveRebase, ancestor.Combined).ConfigureAwait(true);
                 }
                 return;
             }
@@ -3549,18 +3546,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
         catch (InvalidOperationException ex)
         {
-            await Dialogs.ShowMessageAsync("Interactive rebase", ex.Message).ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpInteractiveRebase, ex.Message).ConfigureAwait(true);
             return;
         }
 
-        if (ReportHandlerError("Could not build the rebase todo"))
+        if (ReportHandlerError(Strings.Repo_ErrorBuildRebaseTodo))
         {
             return;
         }
 
         if (string.IsNullOrWhiteSpace(todo))
         {
-            StatusMessage = "No commits to rebase.";
+            StatusMessage = Strings.Repo_StatusNoCommitsToRebase;
             return;
         }
 
@@ -3576,7 +3573,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             .Where(item => item.Sha.Length > 0)
             .ToList();
 
-        IReadOnlyList<RebasePlanItem>? plan = await Dialogs.EditRebasePlanAsync("Interactive rebase", items).ConfigureAwait(true);
+        IReadOnlyList<RebasePlanItem>? plan = await Dialogs.EditRebasePlanAsync(Strings.Repo_OpInteractiveRebase, items).ConfigureAwait(true);
         if (plan is null || plan.Count == 0)
         {
             return;
@@ -3585,8 +3582,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         RebasePlanItem? firstAction = plan.FirstOrDefault(item => item.Action != "drop");
         if (firstAction is { Action: "squash" or "fixup" })
         {
-            await Dialogs.ShowMessageAsync("Interactive rebase",
-                "The first non-dropped commit cannot be squash or fixup.").ConfigureAwait(true);
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpInteractiveRebase,
+                Strings.Repo_InteractiveRebaseFirstSquashMessage).ConfigureAwait(true);
             return;
         }
 
@@ -3597,7 +3594,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         ProcessResult result = await Handler.InteractiveRebaseAsync(Path, baseRevision, editedTodo, rewordMessages, fromRoot)
             .ConfigureAwait(true);
-        await HandleOperationResultAsync("Interactive rebase", result, reloadAll: true).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpInteractiveRebase, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private const int WatcherQuietPeriodMs = 600;
@@ -3858,7 +3855,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private void OpenTerminal()
     {
         var error = TerminalLauncher.Launch(Path, Settings.Settings.TerminalShell);
-        StatusMessage = error ?? "Opened a terminal in the repository folder.";
+        StatusMessage = error ?? Strings.Repo_StatusOpenedTerminal;
     }
 
     private void OpenInExplorer()

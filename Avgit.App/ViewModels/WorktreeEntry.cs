@@ -27,12 +27,12 @@ public sealed class WorktreeEntry(WorktreeInfo info, bool isCurrent, bool isMain
         {
             if (Info.IsBare)
             {
-                return "bare";
+                return Strings.Worktree_Bare;
             }
 
             if (Info.IsDetached || Info.BranchName.Length == 0)
             {
-                return Info.Head.Length >= 7 ? $"detached at {Info.Head[..7]}" : "detached";
+                return Info.Head.Length >= 7 ? string.Format(Strings.Worktree_DetachedAt, Info.Head[..7]) : Strings.Worktree_Detached;
             }
 
             return Info.BranchName;
@@ -42,9 +42,9 @@ public sealed class WorktreeEntry(WorktreeInfo info, bool isCurrent, bool isMain
     /// <summary>Short labels after the branch: main, locked, missing.</summary>
     public string Badges => string.Join(" · ", new[]
     {
-        IsMain ? "main" : null,
-        IsLocked ? "locked" : null,
-        IsPrunable ? "missing" : null
+        IsMain ? Strings.Worktree_BadgeMain : null,
+        IsLocked ? Strings.Worktree_BadgeLocked : null,
+        IsPrunable ? Strings.Worktree_BadgeMissing : null
     }.Where(b => b is not null));
 
     public bool HasBadges => IsMain || IsLocked || IsPrunable;
@@ -56,22 +56,22 @@ public sealed class WorktreeEntry(WorktreeInfo info, bool isCurrent, bool isMain
             var lines = new List<string> { Path };
             if (IsCurrent)
             {
-                lines.Add("This tab's worktree.");
+                lines.Add(Strings.Worktree_ToolTipCurrent);
             }
 
             if (IsMain)
             {
-                lines.Add("Main worktree.");
+                lines.Add(Strings.Worktree_ToolTipMain);
             }
 
             if (IsLocked)
             {
-                lines.Add("Locked: git will not remove or prune it.");
+                lines.Add(Strings.Worktree_ToolTipLocked);
             }
 
             if (IsPrunable)
             {
-                lines.Add("The folder is missing. Prune to forget it.");
+                lines.Add(Strings.Worktree_ToolTipMissing);
             }
 
             return string.Join("\n", lines);

@@ -34,7 +34,7 @@ public sealed class AdvancedGitWindow : Window
     {
         _repository = repository;
         _dialogs = new DialogService { Owner = this };
-        Title = $"Advanced Git - {repository.Name}";
+        Title = string.Format(Strings.Advanced_WindowTitle, repository.Name);
         Width = 860;
         Height = 640;
         MinWidth = 700;
@@ -43,7 +43,7 @@ public sealed class AdvancedGitWindow : Window
         Background = new SolidColorBrush(Color.Parse("#1E1E1E"));
         _status = new TextBlock
         {
-            Text = "Choose an operation.",
+            Text = Strings.Advanced_ChooseOperation,
             FontSize = 11,
             Foreground = new SolidColorBrush(Color.Parse("#A0A0A0")),
             TextWrapping = TextWrapping.Wrap,
@@ -78,17 +78,17 @@ public sealed class AdvancedGitWindow : Window
         {
             Margin = new Thickness(10, 8, 10, 0)
         };
-        tabs.Items.Add(Tab("Submodules", BuildSubmodules()));
-        tabs.Items.Add(Tab("LFS", BuildLfs()));
-        tabs.Items.Add(Tab("Flow", BuildFlow()));
-        tabs.Items.Add(Tab("Subtree", BuildSubtree()));
-        tabs.Items.Add(Tab("SVN", BuildSvn()));
-        tabs.Items.Add(Tab("Bisect", BuildBisect()));
-        tabs.Items.Add(Tab("Worktrees", BuildWorktrees()));
-        tabs.Items.Add(Tab("Patches", BuildPatches()));
-        tabs.Items.Add(Tab("Diagnostics", BuildDiagnostics()));
-        tabs.Items.Add(Tab("Extras", BuildExtras()));
-        tabs.Items.Add(Tab("Custom", BuildCustom()));
+        tabs.Items.Add(Tab(Strings.Advanced_Submodules, BuildSubmodules()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabLfs, BuildLfs()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabFlow, BuildFlow()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabSubtree, BuildSubtree()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabSvn, BuildSvn()));
+        tabs.Items.Add(Tab(Strings.Advanced_Bisect, BuildBisect()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabWorktrees, BuildWorktrees()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabPatches, BuildPatches()));
+        tabs.Items.Add(Tab(Strings.Advanced_Diagnostics, BuildDiagnostics()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabExtras, BuildExtras()));
+        tabs.Items.Add(Tab(Strings.Advanced_TabCustom, BuildCustom()));
         return tabs;
     }
 
@@ -143,71 +143,71 @@ public sealed class AdvancedGitWindow : Window
 
     private async Task RunAsync(string label, Func<Task<ProcessResult>> action)
     {
-        _status.Text = label + "...";
+        _status.Text = string.Format(Strings.Advanced_OperationRunning, label);
         try
         {
             ProcessResult result = await action();
             _lastOutput = result.Combined;
             if (!result.Success)
             {
-                _status.Text = label + " failed.";
-                await _dialogs.ShowMessageAsync(label + " failed", result.Combined);
+                _status.Text = string.Format(Strings.Advanced_OperationFailedStatus, label);
+                await _dialogs.ShowMessageAsync(string.Format(Strings.Advanced_OperationFailedTitle, label), result.Combined);
             }
             else
             {
-                _status.Text = string.IsNullOrWhiteSpace(result.Output) ? label + " completed." : result.Output.Trim();
+                _status.Text = string.IsNullOrWhiteSpace(result.Output) ? string.Format(Strings.Advanced_OperationCompleted, label) : result.Output.Trim();
             }
         }
         catch (Exception ex)
         {
             _status.Text = ex.Message;
-            await _dialogs.ShowMessageAsync(label + " failed", ex.Message);
+            await _dialogs.ShowMessageAsync(string.Format(Strings.Advanced_OperationFailedTitle, label), ex.Message);
         }
     }
 
     private async Task RunSimpleAsync(string label, Func<Task> action)
     {
-        _status.Text = label + "...";
+        _status.Text = string.Format(Strings.Advanced_OperationRunning, label);
         try
         {
             await action();
-            _status.Text = label + " completed.";
+            _status.Text = string.Format(Strings.Advanced_OperationCompleted, label);
         }
         catch (Exception ex)
         {
             _status.Text = ex.Message;
-            await _dialogs.ShowMessageAsync(label + " failed", ex.Message);
+            await _dialogs.ShowMessageAsync(string.Format(Strings.Advanced_OperationFailedTitle, label), ex.Message);
         }
     }
 
     private Control BuildSubmodules()
     {
-        Button add = Button("Add...", async () =>
+        Button add = Button(Strings.Advanced_AddEllipsis, async () =>
         {
-            var url = await _dialogs.PromptAsync("Add submodule", "Repository URL");
+            var url = await _dialogs.PromptAsync(Strings.Advanced_AddSubmodule, Strings.Advanced_RepositoryURL);
             if (string.IsNullOrWhiteSpace(url))
             {
                 return;
             }
 
-            var path = await _dialogs.PromptAsync("Add submodule", "Local path");
+            var path = await _dialogs.PromptAsync(Strings.Advanced_AddSubmodule, Strings.Advanced_LocalPath);
             if (string.IsNullOrWhiteSpace(path))
             {
                 return;
             }
 
-            await RunAsync("Add submodule", () => _repository.Advanced.SubmoduleAddAsync(url, path));
+            await RunAsync(Strings.Advanced_AddSubmodule, () => _repository.Advanced.SubmoduleAddAsync(url, path));
             await RefreshSubmodulesAsync();
         });
         return Page(
-            new TextBlock { Text = "Submodules", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_Submodules, FontWeight = FontWeight.SemiBold },
             _submodules,
             Row(
-                Button("Refresh", RefreshSubmodulesAsync),
-                Button("Init", () => RunAsync("Init submodules", _repository.Advanced.SubmoduleInitAsync)),
-                Button("Update", async () => { await RunAsync("Update submodules", _repository.Advanced.SubmoduleUpdateAsync); await RefreshSubmodulesAsync(); }),
-                Button("Sync", () => RunAsync("Sync submodules", _repository.Advanced.SubmoduleSyncAsync)),
-                Button("Deinit", async () =>
+                Button(Strings.Common_Refresh, RefreshSubmodulesAsync),
+                Button(Strings.Advanced_Init, () => RunAsync(Strings.Advanced_InitSubmodules, _repository.Advanced.SubmoduleInitAsync)),
+                Button(Strings.Advanced_Update, async () => { await RunAsync(Strings.Advanced_UpdateSubmodules, _repository.Advanced.SubmoduleUpdateAsync); await RefreshSubmodulesAsync(); }),
+                Button(Strings.Advanced_Sync, () => RunAsync(Strings.Advanced_SyncSubmodules, _repository.Advanced.SubmoduleSyncAsync)),
+                Button(Strings.Advanced_Deinit, async () =>
                 {
                     var selected = _submodules.SelectedIndex;
                     if (selected < 0 || selected >= _submoduleItems.Count)
@@ -216,17 +216,17 @@ public sealed class AdvancedGitWindow : Window
                     }
 
                     SubmoduleInfo item = _submoduleItems[selected];
-                    if (!await _dialogs.ConfirmAsync("Deinit submodule",
-                            $"Deinit '{item.Path}'? Uncommitted changes in the submodule working tree will be discarded."))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_DeinitSubmodule,
+                            string.Format(Strings.Advanced_DeinitSubmoduleConfirm, item.Path)))
                     {
                         return;
                     }
 
-                    await RunAsync("Deinit submodule",
+                    await RunAsync(Strings.Advanced_DeinitSubmodule,
                         () => _repository.Advanced.SubmoduleDeinitAsync(item.Path));
                     await RefreshSubmodulesAsync();
                 }),
-                Button("Remove", async () =>
+                Button(Strings.Advanced_Remove, async () =>
                 {
                     var selected = _submodules.SelectedIndex;
                     if (selected < 0 || selected >= _submoduleItems.Count)
@@ -235,13 +235,13 @@ public sealed class AdvancedGitWindow : Window
                     }
 
                     SubmoduleInfo item = _submoduleItems[selected];
-                    if (!await _dialogs.ConfirmAsync("Remove submodule",
-                            $"Remove '{item.Path}' from the index and working tree?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_RemoveSubmodule,
+                            string.Format(Strings.Advanced_RemoveSubmoduleConfirm, item.Path)))
                     {
                         return;
                     }
 
-                    await RunAsync("Remove submodule",
+                    await RunAsync(Strings.Advanced_RemoveSubmodule,
                         () => _repository.Advanced.SubmoduleRemoveAsync(item.Path));
                     await RefreshSubmodulesAsync();
                 }),
@@ -262,7 +262,7 @@ public sealed class AdvancedGitWindow : Window
             _submodules.ItemsSource = list
                 .Select(item => $"{item.State} {item.Sha[..Math.Min(8, item.Sha.Length)]}  {item.Path}  {item.Description}")
                 .ToList();
-            _status.Text = $"{list.Count} submodule(s).";
+            _status.Text = string.Format(Strings.Advanced_SubmoduleCount, list.Count);
         }
         catch (Exception ex)
         {
@@ -273,61 +273,61 @@ public sealed class AdvancedGitWindow : Window
     private Control BuildLfs()
     {
         return Page(
-            new TextBlock { Text = "Git LFS", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_GitLFS, FontWeight = FontWeight.SemiBold },
             _lfsPatterns,
-            new TextBlock { Text = "Locks", FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 6, 0, 0) },
+            new TextBlock { Text = Strings.Advanced_Locks, FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 6, 0, 0) },
             _lfsLocks,
             Row(
-                Button("Refresh locks", RefreshLfsLocksAsync),
-                Button("Lock...", async () =>
+                Button(Strings.Advanced_RefreshLocks, RefreshLfsLocksAsync),
+                Button(Strings.Advanced_LockEllipsis, async () =>
                 {
-                    var file = await _dialogs.PromptAsync("Lock with Git LFS", "File path");
+                    var file = await _dialogs.PromptAsync(Strings.Advanced_LockWithGitLFS, Strings.Advanced_FilePath);
                     if (string.IsNullOrWhiteSpace(file))
                     {
                         return;
                     }
 
-                    await RunAsync("Lock " + file, () => _repository.Advanced.LfsLockAsync(file));
+                    await RunAsync(string.Format(Strings.Advanced_LockFile, file), () => _repository.Advanced.LfsLockAsync(file));
                     await RefreshLfsLocksAsync();
                 }),
-                Button("Unlock...", async () =>
+                Button(Strings.Advanced_UnlockEllipsis, async () =>
                 {
-                    var file = await _dialogs.PromptAsync("Unlock with Git LFS", "File path");
+                    var file = await _dialogs.PromptAsync(Strings.Advanced_UnlockWithGitLFS, Strings.Advanced_FilePath);
                     if (string.IsNullOrWhiteSpace(file))
                     {
                         return;
                     }
 
-                    await RunAsync("Unlock " + file, () => _repository.Advanced.LfsUnlockAsync(file));
+                    await RunAsync(string.Format(Strings.Advanced_UnlockFile, file), () => _repository.Advanced.LfsUnlockAsync(file));
                     await RefreshLfsLocksAsync();
                 })),
             Row(
-                Button("Refresh patterns", RefreshLfsAsync),
-                Button("Init", () => RunAsync("Git LFS init", _repository.Advanced.LfsInstallAsync)),
-                Button("Track...", async () =>
+                Button(Strings.Advanced_RefreshPatterns, RefreshLfsAsync),
+                Button(Strings.Advanced_Init, () => RunAsync(Strings.Advanced_GitLFSInit, _repository.Advanced.LfsInstallAsync)),
+                Button(Strings.Advanced_TrackEllipsis, async () =>
                 {
-                    var pattern = await _dialogs.PromptAsync("Track with Git LFS", "Pattern", "*.bin");
+                    var pattern = await _dialogs.PromptAsync(Strings.Advanced_TrackWithGitLFS, Strings.Advanced_Pattern, "*.bin");
                     if (string.IsNullOrWhiteSpace(pattern))
                     {
                         return;
                     }
 
-                    await RunAsync("Track " + pattern, () => _repository.Advanced.LfsTrackAsync(pattern));
+                    await RunAsync(string.Format(Strings.Advanced_TrackPattern, pattern), () => _repository.Advanced.LfsTrackAsync(pattern));
                     await RefreshLfsAsync();
                 }),
-                Button("Untrack...", async () =>
+                Button(Strings.Advanced_UntrackEllipsis, async () =>
                 {
-                    var pattern = await _dialogs.PromptAsync("Untrack Git LFS", "Pattern");
+                    var pattern = await _dialogs.PromptAsync(Strings.Advanced_UntrackGitLFS, Strings.Advanced_Pattern);
                     if (string.IsNullOrWhiteSpace(pattern))
                     {
                         return;
                     }
 
-                    await RunAsync("Untrack " + pattern, () => _repository.Advanced.LfsUntrackAsync(pattern));
+                    await RunAsync(string.Format(Strings.Advanced_UntrackPattern, pattern), () => _repository.Advanced.LfsUntrackAsync(pattern));
                     await RefreshLfsAsync();
                 }),
-                Button("Fetch", () => RunAsync("Git LFS fetch", _repository.Advanced.LfsFetchAsync)),
-                Button("Pull", () => RunAsync("Git LFS pull", _repository.Advanced.LfsPullAsync))));
+                Button(Strings.Advanced_Fetch, () => RunAsync(Strings.Advanced_GitLFSFetch, _repository.Advanced.LfsFetchAsync)),
+                Button(Strings.Advanced_Pull, () => RunAsync(Strings.Advanced_GitLFSPull, _repository.Advanced.LfsPullAsync))));
     }
 
     private async Task RefreshLfsAsync()
@@ -341,7 +341,7 @@ public sealed class AdvancedGitWindow : Window
                 return;
             }
             _lfsPatterns.ItemsSource = patterns;
-            _status.Text = $"{patterns.Count} tracked LFS pattern(s).";
+            _status.Text = string.Format(Strings.Advanced_LfsPatternCount, patterns.Count);
         }
         catch (Exception ex)
         {
@@ -360,7 +360,7 @@ public sealed class AdvancedGitWindow : Window
                 return;
             }
             _lfsLocks.ItemsSource = locks;
-            _status.Text = $"{locks.Count} LFS lock(s).";
+            _status.Text = string.Format(Strings.Advanced_LfsLockCount, locks.Count);
         }
         catch (Exception ex)
         {
@@ -371,36 +371,36 @@ public sealed class AdvancedGitWindow : Window
     private Control BuildFlow()
     {
         return Page(
-            new TextBlock { Text = "Git Flow", FontWeight = FontWeight.SemiBold },
-            new TextBlock { Text = "Requires git-flow (AVH edition).", Classes = { "muted" }, FontSize = 11 },
+            new TextBlock { Text = Strings.Advanced_GitFlow, FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_FlowRequirement, Classes = { "muted" }, FontSize = 11 },
             Row(
-                Button("Init", () => RunAsync("Git Flow init", _repository.Advanced.FlowInitAsync)),
-                Button("Start...", async () =>
+                Button(Strings.Advanced_Init, () => RunAsync(Strings.Advanced_GitFlowInit, _repository.Advanced.FlowInitAsync)),
+                Button(Strings.Advanced_StartEllipsis, async () =>
                 {
-                    var kind = await _dialogs.PromptAsync("Git Flow", "Branch type (feature/release/hotfix/support)", "feature");
+                    var kind = await _dialogs.PromptAsync(Strings.Advanced_GitFlow, Strings.Advanced_FlowBranchTypeWithKinds, "feature");
                     if (string.IsNullOrWhiteSpace(kind))
                     {
                         return;
                     }
 
-                    var name = await _dialogs.PromptAsync("Git Flow", "Name");
+                    var name = await _dialogs.PromptAsync(Strings.Advanced_GitFlow, Strings.Advanced_Name);
                     if (string.IsNullOrWhiteSpace(name))
                     {
                         return;
                     }
 
-                    await RunAsync($"Start {kind}/{name}", () => _repository.Advanced.FlowStartAsync(kind, name));
+                    await RunAsync(string.Format(Strings.Advanced_FlowStart, kind, name), () => _repository.Advanced.FlowStartAsync(kind, name));
                 }),
-                Button("Finish...", async () =>
+                Button(Strings.Advanced_FinishEllipsis, async () =>
                 {
-                    var kind = await _dialogs.PromptAsync("Git Flow", "Branch type (feature/release/hotfix/support)", "feature");
+                    var kind = await _dialogs.PromptAsync(Strings.Advanced_GitFlow, Strings.Advanced_FlowBranchTypeWithKinds, "feature");
                     if (string.IsNullOrWhiteSpace(kind))
                     {
                         return;
                     }
 
                     kind = kind.Trim().ToLowerInvariant();
-                    var name = await _dialogs.PromptAsync("Git Flow", "Name");
+                    var name = await _dialogs.PromptAsync(Strings.Advanced_GitFlow, Strings.Advanced_Name);
                     if (string.IsNullOrWhiteSpace(name))
                     {
                         return;
@@ -409,188 +409,188 @@ public sealed class AdvancedGitWindow : Window
                     string? tagMessage = null;
                     if (kind is "release" or "hotfix")
                     {
-                        tagMessage = await _dialogs.PromptAsync("Git Flow", "Tag message", $"Finish {kind} {name}");
+                        tagMessage = await _dialogs.PromptAsync(Strings.Advanced_GitFlow, Strings.Advanced_TagMessage, $"Finish {kind} {name}");
                         if (tagMessage is null)
                         {
                             return;
                         }
                     }
-                    await RunAsync($"Finish {kind}/{name}", () => _repository.Advanced.FlowFinishAsync(kind, name, tagMessage));
+                    await RunAsync(string.Format(Strings.Advanced_FlowFinish, kind, name), () => _repository.Advanced.FlowFinishAsync(kind, name, tagMessage));
                 }),
-                Button("List...", async () =>
+                Button(Strings.Advanced_ListEllipsis, async () =>
                 {
-                    var kind = await _dialogs.PromptAsync("Git Flow", "Branch type", "feature");
+                    var kind = await _dialogs.PromptAsync(Strings.Advanced_GitFlow, Strings.Advanced_BranchType, "feature");
                     if (string.IsNullOrWhiteSpace(kind))
                     {
                         return;
                     }
 
-                    await RunAsync($"List {kind}", () => _repository.Advanced.FlowListAsync(kind));
+                    await RunAsync(string.Format(Strings.Advanced_FlowList, kind), () => _repository.Advanced.FlowListAsync(kind));
                 })));
     }
 
     private Control BuildSubtree()
     {
         return Page(
-            new TextBlock { Text = "Git Subtree", FontWeight = FontWeight.SemiBold },
-            new TextBlock { Text = "Examples: prefix=libs/foo, remote URL, ref=main.", Classes = { "muted" }, FontSize = 11 },
+            new TextBlock { Text = Strings.Advanced_GitSubtree, FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_SubtreeExamples, Classes = { "muted" }, FontSize = 11 },
             Row(
-                Button("Add...", async () =>
+                Button(Strings.Advanced_AddEllipsis, async () =>
                 {
-                    var prefix = await _dialogs.PromptAsync("Subtree add", "Prefix");
+                    var prefix = await _dialogs.PromptAsync(Strings.Advanced_SubtreeAdd, Strings.Advanced_Prefix);
                     if (string.IsNullOrWhiteSpace(prefix))
                     {
                         return;
                     }
 
-                    var url = await _dialogs.PromptAsync("Subtree add", "Repository URL");
+                    var url = await _dialogs.PromptAsync(Strings.Advanced_SubtreeAdd, Strings.Advanced_RepositoryURL);
                     if (string.IsNullOrWhiteSpace(url))
                     {
                         return;
                     }
 
-                    var reference = await _dialogs.PromptAsync("Subtree add", "Reference", "main");
+                    var reference = await _dialogs.PromptAsync(Strings.Advanced_SubtreeAdd, Strings.Advanced_Reference, "main");
                     if (string.IsNullOrWhiteSpace(reference))
                     {
                         return;
                     }
 
-                    (string? Value, bool Flag)? squash = await _dialogs.PromptWithCheckBoxAsync("Subtree add", "Squash history?", "", "Squash history", true);
+                    (string? Value, bool Flag)? squash = await _dialogs.PromptWithCheckBoxAsync(Strings.Advanced_SubtreeAdd, Strings.Advanced_SquashHistoryPrompt, "", Strings.Advanced_SquashHistory, true);
                     if (squash is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Subtree add", () => _repository.Advanced.SubtreeAddAsync(prefix, url, reference, squash.Value.Flag));
+                    await RunAsync(Strings.Advanced_SubtreeAdd, () => _repository.Advanced.SubtreeAddAsync(prefix, url, reference, squash.Value.Flag));
                 }),
-                Button("Pull...", async () =>
+                Button(Strings.Advanced_PullEllipsis, async () =>
                 {
-                    var prefix = await _dialogs.PromptAsync("Subtree pull", "Prefix");
+                    var prefix = await _dialogs.PromptAsync(Strings.Advanced_SubtreePull, Strings.Advanced_Prefix);
                     if (string.IsNullOrWhiteSpace(prefix))
                     {
                         return;
                     }
 
-                    var remote = await _dialogs.PromptAsync("Subtree pull", "Remote or URL", "origin");
+                    var remote = await _dialogs.PromptAsync(Strings.Advanced_SubtreePull, Strings.Advanced_RemoteOrURL, "origin");
                     if (string.IsNullOrWhiteSpace(remote))
                     {
                         return;
                     }
 
-                    var reference = await _dialogs.PromptAsync("Subtree pull", "Reference", "main");
+                    var reference = await _dialogs.PromptAsync(Strings.Advanced_SubtreePull, Strings.Advanced_Reference, "main");
                     if (string.IsNullOrWhiteSpace(reference))
                     {
                         return;
                     }
 
-                    (string? Value, bool Flag)? squash = await _dialogs.PromptWithCheckBoxAsync("Subtree pull", "Squash history?", "", "Squash history", true);
+                    (string? Value, bool Flag)? squash = await _dialogs.PromptWithCheckBoxAsync(Strings.Advanced_SubtreePull, Strings.Advanced_SquashHistoryPrompt, "", Strings.Advanced_SquashHistory, true);
                     if (squash is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Subtree pull", () => _repository.Advanced.SubtreePullAsync(prefix, remote, reference, squash.Value.Flag));
+                    await RunAsync(Strings.Advanced_SubtreePull, () => _repository.Advanced.SubtreePullAsync(prefix, remote, reference, squash.Value.Flag));
                 }),
-                Button("Push...", async () =>
+                Button(Strings.Advanced_PushEllipsis, async () =>
                 {
-                    var prefix = await _dialogs.PromptAsync("Subtree push", "Prefix");
+                    var prefix = await _dialogs.PromptAsync(Strings.Advanced_SubtreePush, Strings.Advanced_Prefix);
                     if (string.IsNullOrWhiteSpace(prefix))
                     {
                         return;
                     }
 
-                    var remote = await _dialogs.PromptAsync("Subtree push", "Remote or URL", "origin");
+                    var remote = await _dialogs.PromptAsync(Strings.Advanced_SubtreePush, Strings.Advanced_RemoteOrURL, "origin");
                     if (string.IsNullOrWhiteSpace(remote))
                     {
                         return;
                     }
 
-                    var reference = await _dialogs.PromptAsync("Subtree push", "Reference", "main");
+                    var reference = await _dialogs.PromptAsync(Strings.Advanced_SubtreePush, Strings.Advanced_Reference, "main");
                     if (string.IsNullOrWhiteSpace(reference))
                     {
                         return;
                     }
 
-                    await RunAsync("Subtree push", () => _repository.Advanced.SubtreePushAsync(prefix, remote, reference));
+                    await RunAsync(Strings.Advanced_SubtreePush, () => _repository.Advanced.SubtreePushAsync(prefix, remote, reference));
                 })));
     }
 
     private Control BuildSvn()
     {
         return Page(
-            new TextBlock { Text = "Git-SVN bridge", FontWeight = FontWeight.SemiBold },
-            new TextBlock { Text = "Requires a git-svn initialized repository.", Classes = { "muted" }, FontSize = 11 },
+            new TextBlock { Text = Strings.Advanced_GitSVNBridge, FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_SvnRequirement, Classes = { "muted" }, FontSize = 11 },
             Row(
-                Button("Fetch", () => RunAsync("git svn fetch", _repository.Advanced.SvnFetchAsync)),
-                Button("Rebase", () => RunAsync("git svn rebase", _repository.Advanced.SvnRebaseAsync)),
-                Button("Dcommit", () => RunAsync("git svn dcommit", _repository.Advanced.SvnDcommitAsync)),
-                Button("Info", () => RunAsync("git svn info", _repository.Advanced.SvnInfoAsync))));
+                Button(Strings.Advanced_Fetch, () => RunAsync("git svn fetch", _repository.Advanced.SvnFetchAsync)),
+                Button(Strings.Advanced_Rebase, () => RunAsync("git svn rebase", _repository.Advanced.SvnRebaseAsync)),
+                Button(Strings.Advanced_Dcommit, () => RunAsync("git svn dcommit", _repository.Advanced.SvnDcommitAsync)),
+                Button(Strings.Advanced_Info, () => RunAsync("git svn info", _repository.Advanced.SvnInfoAsync))));
     }
 
     private Control BuildBisect()
     {
         return Page(
-            new TextBlock { Text = "Bisect", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_Bisect, FontWeight = FontWeight.SemiBold },
             Row(
-                Button("Start...", async () =>
+                Button(Strings.Advanced_StartEllipsis, async () =>
                 {
-                    var bad = await _dialogs.PromptAsync("Bisect", "Bad revision", "HEAD");
+                    var bad = await _dialogs.PromptAsync(Strings.Advanced_Bisect, Strings.Advanced_BadRevision, "HEAD");
                     if (bad is null)
                     {
                         return;
                     }
 
-                    var good = await _dialogs.PromptAsync("Bisect", "Good revision (optional)", "");
+                    var good = await _dialogs.PromptAsync(Strings.Advanced_Bisect, Strings.Advanced_GoodRevisionOptional, "");
                     if (good is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Start bisect", () => _repository.Advanced.BisectStartAsync(bad, string.IsNullOrWhiteSpace(good) ? null : good));
+                    await RunAsync(Strings.Advanced_StartBisect, () => _repository.Advanced.BisectStartAsync(bad, string.IsNullOrWhiteSpace(good) ? null : good));
                 }),
-                Button("Good", () => RunAsync("Bisect good", () => _repository.Advanced.BisectGoodAsync(_repository.SelectedCommit?.Row.CommitId))),
-                Button("Bad", () => RunAsync("Bisect bad", () => _repository.Advanced.BisectBadAsync(_repository.SelectedCommit?.Row.CommitId))),
-                Button("Reset", () => RunAsync("Bisect reset", _repository.Advanced.BisectResetAsync)),
-                Button("Log", async () =>
+                Button(Strings.Advanced_Good, () => RunAsync(Strings.Advanced_BisectGood, () => _repository.Advanced.BisectGoodAsync(_repository.SelectedCommit?.Row.CommitId))),
+                Button(Strings.Advanced_Bad, () => RunAsync(Strings.Advanced_BisectBad, () => _repository.Advanced.BisectBadAsync(_repository.SelectedCommit?.Row.CommitId))),
+                Button(Strings.Advanced_Reset, () => RunAsync(Strings.Advanced_BisectReset, _repository.Advanced.BisectResetAsync)),
+                Button(Strings.Advanced_Log, async () =>
                 {
                     ProcessResult result = await _repository.Advanced.BisectLogAsync();
-                    await _dialogs.ShowTextAsync("Bisect log", result.Combined);
+                    await _dialogs.ShowTextAsync(Strings.Advanced_BisectLog, result.Combined);
                 })));
     }
 
     private Control BuildWorktrees()
     {
         return Page(
-            new TextBlock { Text = "Linked worktrees", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_LinkedWorktrees, FontWeight = FontWeight.SemiBold },
             _worktrees,
             Row(
-                Button("Refresh", RefreshWorktreesAsync),
-                Button("Add...", async () =>
+                Button(Strings.Common_Refresh, RefreshWorktreesAsync),
+                Button(Strings.Advanced_AddEllipsis, async () =>
                 {
-                    var path = await _dialogs.PromptAsync("Add worktree", "Path");
+                    var path = await _dialogs.PromptAsync(Strings.Advanced_AddWorktree, Strings.Advanced_Path);
                     if (string.IsNullOrWhiteSpace(path))
                     {
                         return;
                     }
                     // An empty answer means "none"; Cancel (null) aborts.
-                    var branch = await _dialogs.PromptAsync("Add worktree", "New branch (optional)", "");
+                    var branch = await _dialogs.PromptAsync(Strings.Advanced_AddWorktree, Strings.Advanced_NewBranchOptional, "");
                     if (branch is null)
                     {
                         return;
                     }
 
-                    var start = await _dialogs.PromptAsync("Add worktree", "Start point (optional)", "");
+                    var start = await _dialogs.PromptAsync(Strings.Advanced_AddWorktree, Strings.Advanced_StartPointOptional, "");
                     if (start is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Add worktree", () => _repository.Advanced.WorktreeAddAsync(path,
+                    await RunAsync(Strings.Advanced_AddWorktree, () => _repository.Advanced.WorktreeAddAsync(path,
                         string.IsNullOrWhiteSpace(branch) ? null : branch,
                         string.IsNullOrWhiteSpace(start) ? null : start));
                     await RefreshWorktreesAsync();
                 }),
-                Button("Remove...", async () =>
+                Button(Strings.Advanced_RemoveEllipsis, async () =>
                 {
                     var selected = _worktrees.SelectedIndex;
                     if (selected < 0 || selected >= _worktreeItems.Count)
@@ -599,15 +599,15 @@ public sealed class AdvancedGitWindow : Window
                     }
 
                     WorktreeInfo item = _worktreeItems[selected];
-                    if (!await _dialogs.ConfirmAsync("Remove worktree", $"Remove worktree '{item.Path}'?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_RemoveWorktree, string.Format(Strings.Advanced_RemoveWorktreeConfirm, item.Path)))
                     {
                         return;
                     }
 
-                    await RunAsync("Remove worktree", () => _repository.Advanced.WorktreeRemoveAsync(item.Path, true));
+                    await RunAsync(Strings.Advanced_RemoveWorktree, () => _repository.Advanced.WorktreeRemoveAsync(item.Path, true));
                     await RefreshWorktreesAsync();
                 }),
-                Button("Open folder", () =>
+                Button(Strings.Advanced_OpenFolder, () =>
                 {
                     var selected = _worktrees.SelectedIndex;
                     if (selected < 0 || selected >= _worktreeItems.Count)
@@ -638,9 +638,9 @@ public sealed class AdvancedGitWindow : Window
                 return;
             }
             _worktrees.ItemsSource = _worktreeItems
-                .Select(item => $"{item.Path}  [{item.Branch}{(item.IsDetached ? " detached" : "")}]")
+                .Select(item => item.IsDetached ? string.Format(Strings.Advanced_WorktreeItemDetached, item.Path, item.Branch) : $"{item.Path}  [{item.Branch}]")
                 .ToList();
-            _status.Text = $"{_worktreeItems.Count} worktree(s).";
+            _status.Text = string.Format(Strings.Advanced_WorktreeCount, _worktreeItems.Count);
         }
         catch (Exception ex)
         {
@@ -651,101 +651,101 @@ public sealed class AdvancedGitWindow : Window
     private Control BuildPatches()
     {
         return Page(
-            new TextBlock { Text = "Patches and archives", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_PatchesAndArchives, FontWeight = FontWeight.SemiBold },
             Row(
-                Button("Create patch for selected commit...", async () =>
+                Button(Strings.Advanced_CreatePatchForSelectedCommitEllipsis, async () =>
                 {
                     var sha = _repository.SelectedCommit?.Row.CommitId;
-                    if (sha is null) { await _dialogs.ShowMessageAsync("Patch", "Select a commit first."); return; }
-                    var file = await _dialogs.PickSaveFileAsync("Save patch", "commit.patch");
+                    if (sha is null) { await _dialogs.ShowMessageAsync(Strings.Advanced_Patch, Strings.Advanced_SelectACommitFirst); return; }
+                    var file = await _dialogs.PickSaveFileAsync(Strings.Advanced_SavePatch, "commit.patch");
                     if (file is null)
                     {
                         return;
                     }
 
-                    await RunSimpleAsync("Create patch", async () =>
+                    await RunSimpleAsync(Strings.Advanced_CreatePatch, async () =>
                         await File.WriteAllTextAsync(file, await _repository.Advanced.CreatePatchAsync(sha)));
                 }),
-                Button("Apply patch...", async () =>
+                Button(Strings.Advanced_ApplyPatchEllipsis, async () =>
                 {
-                    var file = await _dialogs.PickFileAsync("Apply patch");
+                    var file = await _dialogs.PickFileAsync(Strings.Advanced_ApplyPatch);
                     if (file is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Apply patch", () => _repository.Advanced.ApplyPatchAsync(file));
+                    await RunAsync(Strings.Advanced_ApplyPatch, () => _repository.Advanced.ApplyPatchAsync(file));
                 }),
-                Button("Export archive...", async () =>
+                Button(Strings.Advanced_ExportArchiveEllipsis, async () =>
                 {
                     var sha = _repository.SelectedCommit?.Row.CommitId;
-                    if (sha is null) { await _dialogs.ShowMessageAsync("Archive", "Select a commit first."); return; }
-                    var file = await _dialogs.PickSaveFileAsync("Export archive", "repo.zip");
+                    if (sha is null) { await _dialogs.ShowMessageAsync(Strings.Advanced_Archive, Strings.Advanced_SelectACommitFirst); return; }
+                    var file = await _dialogs.PickSaveFileAsync(Strings.Advanced_ExportArchive, "repo.zip");
                     if (file is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Export archive", () => _repository.Advanced.CreateArchiveAsync(sha, file));
+                    await RunAsync(Strings.Advanced_ExportArchive, () => _repository.Advanced.CreateArchiveAsync(sha, file));
                 }),
-                Button("Push tag...", async () =>
+                Button(Strings.Advanced_PushTagEllipsis, async () =>
                 {
-                    var tag = await _dialogs.PromptAsync("Push tag", "Tag name");
+                    var tag = await _dialogs.PromptAsync(Strings.Advanced_PushTag, Strings.Advanced_TagName);
                     if (string.IsNullOrWhiteSpace(tag))
                     {
                         return;
                     }
 
-                    var remote = await _dialogs.PromptAsync("Push tag", "Remote", "origin");
+                    var remote = await _dialogs.PromptAsync(Strings.Advanced_PushTag, Strings.Advanced_Remote, "origin");
                     if (remote is null)
                     {
                         return;
                     }
 
-                    await RunAsync("Push tag", () => _repository.Advanced.TagPushAsync(tag,
+                    await RunAsync(Strings.Advanced_PushTag, () => _repository.Advanced.TagPushAsync(tag,
                         string.IsNullOrWhiteSpace(remote) ? null : remote));
                 }),
-                Button("Rebase keeping merges...", async () =>
+                Button(Strings.Advanced_RebaseKeepingMergesEllipsis, async () =>
                 {
-                    var onto = await _dialogs.PromptAsync("Rebase preserving merges", "Onto", "HEAD~1");
+                    var onto = await _dialogs.PromptAsync(Strings.Advanced_RebasePreservingMerges, Strings.Advanced_Onto, "HEAD~1");
                     if (string.IsNullOrWhiteSpace(onto))
                     {
                         return;
                     }
 
-                    await RunAsync("Rebase preserving merges", () => _repository.Advanced.RebasePreservingMergesAsync(onto));
+                    await RunAsync(Strings.Advanced_RebasePreservingMerges, () => _repository.Advanced.RebasePreservingMergesAsync(onto));
                 }),
-                Button("Rebase root keeping merges", async () =>
+                Button(Strings.Advanced_RebaseRootKeepingMerges, async () =>
                 {
-                    if (!await _dialogs.ConfirmAsync("Rebase from root",
-                            "Rewrite the entire history from the root commit? This cannot be undone."))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_RebaseFromRoot,
+                            Strings.Advanced_RebaseFromRootConfirm))
                     {
                         return;
                     }
 
-                    await RunAsync("Rebase from root", _repository.Advanced.RebaseRootPreservingMergesAsync);
+                    await RunAsync(Strings.Advanced_RebaseFromRoot, _repository.Advanced.RebaseRootPreservingMergesAsync);
                 })));
     }
 
     private Control BuildDiagnostics()
     {
         return Page(
-            new TextBlock { Text = "Diagnostics", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_Diagnostics, FontWeight = FontWeight.SemiBold },
             Row(
-                Button("Reflog", async () =>
+                Button(Strings.Advanced_Reflog, async () =>
                 {
                     IReadOnlyList<ReflogEntry> entries = await _repository.Advanced.GetReflogAsync();
                     if (!string.IsNullOrEmpty(_repository.Advanced.LastError))
                     {
-                        await _dialogs.ShowMessageAsync("Reflog", _repository.Advanced.LastError);
+                        await _dialogs.ShowMessageAsync(Strings.Advanced_Reflog, _repository.Advanced.LastError);
                         return;
                     }
                     var text = string.Join("\n", entries.Select(e => $"{e.ShortSha}  {e.Selector}  {e.Date}  {e.Subject}"));
-                    await _dialogs.ShowTextAsync("Reflog", text);
+                    await _dialogs.ShowTextAsync(Strings.Advanced_Reflog, text);
                 }),
-                Button("File history...", async () =>
+                Button(Strings.Advanced_FileHistoryEllipsis, async () =>
                 {
-                    var file = await _dialogs.PromptAsync("File history", "Repository-relative file", _repository.SelectedCommitFile?.RelativePath ?? "");
+                    var file = await _dialogs.PromptAsync(Strings.Advanced_FileHistory, Strings.Advanced_RepositoryRelativeFile, _repository.SelectedCommitFile?.RelativePath ?? "");
                     if (string.IsNullOrWhiteSpace(file))
                     {
                         return;
@@ -759,11 +759,11 @@ public sealed class AdvancedGitWindow : Window
                         Flags = HistoryFlags.Merges
                     });
                     var text = string.Join("\n", rows.Select(r => $"{r.ShortId}  {r.Timestamp:yyyy-MM-dd}  {r.AuthorDisplay,-24}  {r.Title}"));
-                    await _dialogs.ShowTextAsync("File history - " + file, text);
+                    await _dialogs.ShowTextAsync(string.Format(Strings.Advanced_FileHistoryTitle, file), text);
                 }),
-                Button("Blame...", async () =>
+                Button(Strings.Advanced_BlameEllipsis, async () =>
                 {
-                    var file = await _dialogs.PromptAsync("Blame", "Repository-relative file", _repository.SelectedCommitFile?.RelativePath ?? "");
+                    var file = await _dialogs.PromptAsync(Strings.Advanced_Blame, Strings.Advanced_RepositoryRelativeFile, _repository.SelectedCommitFile?.RelativePath ?? "");
                     if (string.IsNullOrWhiteSpace(file))
                     {
                         return;
@@ -772,115 +772,115 @@ public sealed class AdvancedGitWindow : Window
                     IReadOnlyList<BlameLine> lines = await _repository.Advanced.GetBlameAsync(file);
                     if (!string.IsNullOrEmpty(_repository.Advanced.LastError))
                     {
-                        await _dialogs.ShowMessageAsync("Blame", _repository.Advanced.LastError);
+                        await _dialogs.ShowMessageAsync(Strings.Advanced_Blame, _repository.Advanced.LastError);
                         return;
                     }
                     var text = string.Join("\n", lines.Select(l => $"{l.LineNumber,6} {l.Sha[..Math.Min(8, l.Sha.Length)]} {l.Author,-22} {l.Date}  {l.Text}"));
-                    await _dialogs.ShowTextAsync("Blame - " + file, text);
+                    await _dialogs.ShowTextAsync(string.Format(Strings.Advanced_BlameTitle, file), text);
                 }),
-                Button("Search log...", async () =>
+                Button(Strings.Advanced_SearchLogEllipsis, async () =>
                 {
-                    var text = await _dialogs.PromptAsync("Search log", "Message text");
+                    var text = await _dialogs.PromptAsync(Strings.Advanced_SearchLog, Strings.Advanced_MessageText);
                     if (string.IsNullOrWhiteSpace(text))
                     {
                         return;
                     }
 
                     ProcessResult result = await _repository.Advanced.SearchLogAsync(text);
-                    await _dialogs.ShowTextAsync("Search results", result.Combined);
+                    await _dialogs.ShowTextAsync(Strings.Advanced_SearchResults, result.Combined);
                 }),
-                Button("Search working tree...", async () =>
+                Button(Strings.Advanced_SearchWorkingTreeEllipsis, async () =>
                 {
-                    var text = await _dialogs.PromptAsync("Search working tree", "Text");
+                    var text = await _dialogs.PromptAsync(Strings.Advanced_SearchWorkingTree, Strings.Advanced_Text);
                     if (string.IsNullOrWhiteSpace(text))
                     {
                         return;
                     }
 
                     ProcessResult result = await _repository.Advanced.GrepAsync(text);
-                    await _dialogs.ShowTextAsync("Working tree matches", result.Combined);
+                    await _dialogs.ShowTextAsync(Strings.Advanced_WorkingTreeMatches, result.Combined);
                 }),
-                Button("Preview stash...", async () =>
+                Button(Strings.Advanced_PreviewStashEllipsis, async () =>
                 {
-                    var name = await _dialogs.PromptAsync("Stash preview", "Stash", "stash@{0}");
+                    var name = await _dialogs.PromptAsync(Strings.Advanced_StashPreview, Strings.Advanced_Stash, "stash@{0}");
                     if (string.IsNullOrWhiteSpace(name))
                     {
                         return;
                     }
 
                     ProcessResult result = await _repository.Advanced.StashShowAsync(name);
-                    await _dialogs.ShowTextAsync("Stash " + name, result.Combined);
+                    await _dialogs.ShowTextAsync(string.Format(Strings.Advanced_StashTitle, name), result.Combined);
                 }),
-                Button("Rename branch...", async () =>
+                Button(Strings.Advanced_RenameBranchEllipsis, async () =>
                 {
-                    var oldName = await _dialogs.PromptAsync("Rename branch", "Current branch name", _repository.CurrentBranch);
+                    var oldName = await _dialogs.PromptAsync(Strings.Advanced_RenameBranch, Strings.Advanced_CurrentBranchName, _repository.CurrentBranch);
                     if (string.IsNullOrWhiteSpace(oldName))
                     {
                         return;
                     }
 
-                    var newName = await _dialogs.PromptAsync("Rename branch", "New branch name");
+                    var newName = await _dialogs.PromptAsync(Strings.Advanced_RenameBranch, Strings.Advanced_NewBranchName);
                     if (string.IsNullOrWhiteSpace(newName))
                     {
                         return;
                     }
 
-                    await RunAsync("Rename branch", () => _repository.Advanced.RenameBranchAsync(oldName, newName));
+                    await RunAsync(Strings.Advanced_RenameBranch, () => _repository.Advanced.RenameBranchAsync(oldName, newName));
                 }),
-                Button("Delete remote branch...", async () =>
+                Button(Strings.Advanced_DeleteRemoteBranchEllipsis, async () =>
                 {
-                    var remote = await _dialogs.PromptAsync("Delete remote branch", "Remote", "origin");
+                    var remote = await _dialogs.PromptAsync(Strings.Advanced_DeleteRemoteBranch, Strings.Advanced_Remote, "origin");
                     if (string.IsNullOrWhiteSpace(remote))
                     {
                         return;
                     }
 
-                    var branch = await _dialogs.PromptAsync("Delete remote branch", "Branch");
+                    var branch = await _dialogs.PromptAsync(Strings.Advanced_DeleteRemoteBranch, Strings.Advanced_Branch);
                     if (string.IsNullOrWhiteSpace(branch))
                     {
                         return;
                     }
 
-                    if (!await _dialogs.ConfirmAsync("Delete remote branch",
-                            $"Delete '{branch}' from '{remote}'?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_DeleteRemoteBranch,
+                            string.Format(Strings.Advanced_DeleteRemoteBranchConfirm, branch, remote)))
                     {
                         return;
                     }
 
-                    await RunAsync("Delete remote branch", () => _repository.Advanced.DeleteRemoteBranchAsync(remote, branch));
+                    await RunAsync(Strings.Advanced_DeleteRemoteBranch, () => _repository.Advanced.DeleteRemoteBranchAsync(remote, branch));
                 }),
-                Button("External diff...", async () =>
+                Button(Strings.Advanced_ExternalDiffEllipsis, async () =>
                 {
                     ChangedFile? file = _repository.SelectedUnstagedFile ?? _repository.SelectedStagedFile ?? _repository.SelectedCommitFile;
-                    if (file is null) { await _dialogs.ShowMessageAsync("External diff", "Select a file first."); return; }
+                    if (file is null) { await _dialogs.ShowMessageAsync(Strings.Advanced_ExternalDiff, Strings.Advanced_SelectAFileFirst); return; }
                     var command = _repository.Settings.Settings.ExternalDiffCommand;
                     if (string.IsNullOrWhiteSpace(command))
                     {
-                        await _dialogs.ShowMessageAsync("External diff", "Configure External diff in Settings first.");
+                        await _dialogs.ShowMessageAsync(Strings.Advanced_ExternalDiff, Strings.Advanced_ConfigureExternalDiffFirst);
                         return;
                     }
                     var full = System.IO.Path.Combine(_repository.Path, file.RelativePath.Replace('/', System.IO.Path.DirectorySeparatorChar));
                     command = command.Replace("{repo}", _repository.Path, StringComparison.OrdinalIgnoreCase)
                         .Replace("{file}", full, StringComparison.OrdinalIgnoreCase)
                         .Replace("{sha}", _repository.SelectedCommit?.Row.CommitId ?? "", StringComparison.OrdinalIgnoreCase);
-                    await RunAsync("External diff", () => RunShellAsync(command));
+                    await RunAsync(Strings.Advanced_ExternalDiff, () => RunShellAsync(command));
                 }),
-                Button("External merge...", async () =>
+                Button(Strings.Advanced_ExternalMergeEllipsis, async () =>
                 {
                     ChangedFile? file = _repository.SelectedUnstagedFile ?? _repository.SelectedStagedFile;
-                    if (file is null) { await _dialogs.ShowMessageAsync("External merge", "Select a conflicted file first."); return; }
+                    if (file is null) { await _dialogs.ShowMessageAsync(Strings.Advanced_ExternalMerge, Strings.Advanced_SelectAConflictedFileFirst); return; }
                     var command = _repository.Settings.Settings.ExternalMergeCommand;
                     if (string.IsNullOrWhiteSpace(command))
                     {
-                        await _dialogs.ShowMessageAsync("External merge", "Configure External merge in Settings first.");
+                        await _dialogs.ShowMessageAsync(Strings.Advanced_ExternalMerge, Strings.Advanced_ConfigureExternalMergeFirst);
                         return;
                     }
                     var full = System.IO.Path.Combine(_repository.Path, file.RelativePath.Replace('/', System.IO.Path.DirectorySeparatorChar));
                     IReadOnlyDictionary<string, string> stages = await _repository.Advanced.GetConflictStagesAsync(file.RelativePath);
                     if (stages.Count < 3)
                     {
-                        await _dialogs.ShowMessageAsync("External merge",
-                            "This conflict does not have base, local and remote stages (for example add/add or delete/modify). Use the built-in diff instead.");
+                        await _dialogs.ShowMessageAsync(Strings.Advanced_ExternalMerge,
+                            Strings.Advanced_ExternalMergeMissingStages);
                         return;
                     }
 
@@ -891,7 +891,7 @@ public sealed class AdvancedGitWindow : Window
                         .Replace("{remote}", stages["remote"], StringComparison.OrdinalIgnoreCase);
                     try
                     {
-                        await RunAsync("External merge", () => RunShellAsync(command));
+                        await RunAsync(Strings.Advanced_ExternalMerge, () => RunShellAsync(command));
                     }
                     finally
                     {
@@ -901,7 +901,7 @@ public sealed class AdvancedGitWindow : Window
                         }
                     }
                 }),
-                Button("Open hooks folder", async () =>
+                Button(Strings.Advanced_OpenHooksFolder, async () =>
                 {
                     try
                     {
@@ -912,7 +912,7 @@ public sealed class AdvancedGitWindow : Window
                         }
                         else
                         {
-                            _status.Text = "Hooks folder not found.";
+                            _status.Text = Strings.Advanced_HooksFolderNotFound;
                         }
                     }
                     catch (Exception ex)
@@ -920,18 +920,18 @@ public sealed class AdvancedGitWindow : Window
                         _status.Text = ex.Message;
                     }
                 }),
-                Button("Edit hook...", async () =>
+                Button(Strings.Advanced_EditHookEllipsis, async () =>
                 {
                     try
                     {
                         var hooks = await _repository.Advanced.GetHooksPathAsync();
                         if (hooks is null || !Directory.Exists(hooks))
                         {
-                            _status.Text = "Hooks folder not found.";
+                            _status.Text = Strings.Advanced_HooksFolderNotFound;
                             return;
                         }
 
-                        var name = await _dialogs.PromptAsync("Edit hook", "Hook file name", "pre-commit");
+                        var name = await _dialogs.PromptAsync(Strings.Advanced_EditHook, Strings.Advanced_HookFileName, "pre-commit");
                         if (string.IsNullOrWhiteSpace(name))
                         {
                             return;
@@ -939,7 +939,7 @@ public sealed class AdvancedGitWindow : Window
 
                         if (name.Contains('/') || name.Contains('\\') || name.Contains("..", StringComparison.Ordinal))
                         {
-                            _status.Text = "Enter a hook file name without a path.";
+                            _status.Text = Strings.Advanced_HookNameWithoutPath;
                             return;
                         }
 
@@ -947,7 +947,7 @@ public sealed class AdvancedGitWindow : Window
                         var initial = File.Exists(path)
                             ? await File.ReadAllTextAsync(path)
                             : "#!/bin/sh\n\n";
-                        var edited = await _dialogs.EditTextAsync("Edit hook " + name, path, initial);
+                        var edited = await _dialogs.EditTextAsync(string.Format(Strings.Advanced_EditHookTitle, name), path, initial);
                         if (edited is null)
                         {
                             return;
@@ -961,14 +961,14 @@ public sealed class AdvancedGitWindow : Window
                                 UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
                                 UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
                         }
-                        _status.Text = "Saved hook " + name + ".";
+                        _status.Text = string.Format(Strings.Advanced_SavedHook, name);
                     }
                     catch (Exception ex)
                     {
                         _status.Text = ex.Message;
                     }
                 }),
-                Button("Open terminal", () =>
+                Button(Strings.Advanced_OpenTerminal, () =>
                 {
                     _repository.OpenTerminalCommand.Execute(null);
                     _status.Text = _repository.StatusMessage;
@@ -979,11 +979,11 @@ public sealed class AdvancedGitWindow : Window
     private Control BuildExtras()
     {
         return Page(
-            new TextBlock { Text = "Git notes", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_GitNotes, FontWeight = FontWeight.SemiBold },
             Row(
-                Button("Show note...", async () =>
+                Button(Strings.Advanced_ShowNoteEllipsis, async () =>
                 {
-                    var revision = await _dialogs.PromptAsync("Show note", "Revision",
+                    var revision = await _dialogs.PromptAsync(Strings.Advanced_ShowNote, Strings.Advanced_Revision,
                         _repository.SelectedCommit?.Row.CommitId ?? "HEAD");
                     if (string.IsNullOrWhiteSpace(revision))
                     {
@@ -993,65 +993,65 @@ public sealed class AdvancedGitWindow : Window
                     ProcessResult result = await _repository.Advanced.NotesShowAsync(revision);
                     if (!result.Success)
                     {
-                        await _dialogs.ShowMessageAsync("Show note", result.Combined);
+                        await _dialogs.ShowMessageAsync(Strings.Advanced_ShowNote, result.Combined);
                         return;
                     }
-                    await _dialogs.ShowTextAsync("Note for " + revision, result.Output);
+                    await _dialogs.ShowTextAsync(string.Format(Strings.Advanced_NoteForTitle, revision), result.Output);
                 }),
-                Button("Add note...", async () =>
+                Button(Strings.Advanced_AddNoteEllipsis, async () =>
                 {
-                    var revision = await _dialogs.PromptAsync("Add note", "Revision",
+                    var revision = await _dialogs.PromptAsync(Strings.Advanced_AddNote, Strings.Advanced_Revision,
                         _repository.SelectedCommit?.Row.CommitId ?? "HEAD");
                     if (string.IsNullOrWhiteSpace(revision))
                     {
                         return;
                     }
 
-                    var message = await _dialogs.PromptAsync("Add note", "Note text");
+                    var message = await _dialogs.PromptAsync(Strings.Advanced_AddNote, Strings.Advanced_NoteText);
                     if (string.IsNullOrWhiteSpace(message))
                     {
                         return;
                     }
 
-                    await RunAsync("Add note", () => _repository.Advanced.NotesAddAsync(revision, message));
+                    await RunAsync(Strings.Advanced_AddNote, () => _repository.Advanced.NotesAddAsync(revision, message));
                 }),
-                Button("Remove note...", async () =>
+                Button(Strings.Advanced_RemoveNoteEllipsis, async () =>
                 {
-                    var revision = await _dialogs.PromptAsync("Remove note", "Revision",
+                    var revision = await _dialogs.PromptAsync(Strings.Advanced_RemoveNote, Strings.Advanced_Revision,
                         _repository.SelectedCommit?.Row.CommitId ?? "HEAD");
                     if (string.IsNullOrWhiteSpace(revision))
                     {
                         return;
                     }
 
-                    if (!await _dialogs.ConfirmAsync("Remove note", $"Remove the note on {revision}?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_RemoveNote, string.Format(Strings.Advanced_RemoveNoteConfirm, revision)))
                     {
                         return;
                     }
 
-                    await RunAsync("Remove note", () => _repository.Advanced.NotesRemoveAsync(revision));
+                    await RunAsync(Strings.Advanced_RemoveNote, () => _repository.Advanced.NotesRemoveAsync(revision));
                 })),
             new TextBlock
             {
-                Text = "Sparse checkout",
+                Text = Strings.Advanced_SparseCheckout,
                 FontWeight = FontWeight.SemiBold,
                 Margin = new Thickness(0, 8, 0, 0)
             },
             Row(
-                Button("Enable", async () =>
+                Button(Strings.Advanced_Enable, async () =>
                 {
-                    if (!await _dialogs.ConfirmAsync("Sparse checkout",
-                            "Enable cone-mode sparse checkout in this repository?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_SparseCheckout,
+                            Strings.Advanced_EnableSparseCheckoutConfirm))
                     {
                         return;
                     }
 
-                    await RunAsync("Enable sparse checkout", _repository.Advanced.SparseCheckoutInitAsync);
+                    await RunAsync(Strings.Advanced_EnableSparseCheckout, _repository.Advanced.SparseCheckoutInitAsync);
                 }),
-                Button("Set patterns...", async () =>
+                Button(Strings.Advanced_SetPatternsEllipsis, async () =>
                 {
-                    var text = await _dialogs.PromptAsync("Sparse checkout",
-                        "Folders/files separated by commas or new lines");
+                    var text = await _dialogs.PromptAsync(Strings.Advanced_SparseCheckout,
+                        Strings.Advanced_SparsePatternsPrompt);
                     if (string.IsNullOrWhiteSpace(text))
                     {
                         return;
@@ -1064,17 +1064,17 @@ public sealed class AdvancedGitWindow : Window
                         return;
                     }
 
-                    await RunAsync("Set sparse patterns", () => _repository.Advanced.SparseCheckoutSetAsync(patterns));
+                    await RunAsync(Strings.Advanced_SetSparsePatterns, () => _repository.Advanced.SparseCheckoutSetAsync(patterns));
                 }),
-                Button("Disable", async () =>
+                Button(Strings.Advanced_Disable, async () =>
                 {
-                    if (!await _dialogs.ConfirmAsync("Sparse checkout",
-                            "Disable sparse checkout and restore the full working tree?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_SparseCheckout,
+                            Strings.Advanced_DisableSparseCheckoutConfirm))
                     {
                         return;
                     }
 
-                    await RunAsync("Disable sparse checkout", _repository.Advanced.SparseCheckoutDisableAsync);
+                    await RunAsync(Strings.Advanced_DisableSparseCheckout, _repository.Advanced.SparseCheckoutDisableAsync);
                 })));
     }
 
@@ -1082,16 +1082,16 @@ public sealed class AdvancedGitWindow : Window
     {
         RefreshCustomActions();
         return Page(
-            new TextBlock { Text = "Saved custom actions", FontWeight = FontWeight.SemiBold },
+            new TextBlock { Text = Strings.Advanced_SavedCustomActions, FontWeight = FontWeight.SemiBold },
             new TextBlock
             {
-                Text = "Commands run in the repository. Placeholders: {repo}, {sha}, {file}.",
+                Text = Strings.Advanced_CustomActionsHint,
                 Classes = { "muted" },
                 FontSize = 11
             },
             _customActions,
             Row(
-                Button("Run selected", async () =>
+                Button(Strings.Advanced_RunSelected, async () =>
                 {
                     if (_customActions.SelectedItem is not CustomActionSetting action)
                     {
@@ -1100,15 +1100,15 @@ public sealed class AdvancedGitWindow : Window
 
                     await RunCustomCommandAsync(action.Command);
                 }),
-                Button("Add...", async () =>
+                Button(Strings.Advanced_AddEllipsis, async () =>
                 {
-                    var name = await _dialogs.PromptAsync("Custom action", "Name");
+                    var name = await _dialogs.PromptAsync(Strings.Advanced_CustomAction, Strings.Advanced_Name);
                     if (string.IsNullOrWhiteSpace(name))
                     {
                         return;
                     }
 
-                    var command = await _dialogs.PromptAsync("Custom action", "Command", "git status");
+                    var command = await _dialogs.PromptAsync(Strings.Advanced_CustomAction, Strings.Advanced_Command, "git status");
                     if (string.IsNullOrWhiteSpace(command))
                     {
                         return;
@@ -1122,14 +1122,14 @@ public sealed class AdvancedGitWindow : Window
                     _repository.Settings.Save();
                     RefreshCustomActions();
                 }),
-                Button("Delete", async () =>
+                Button(Strings.Advanced_Delete, async () =>
                 {
                     if (_customActions.SelectedItem is not CustomActionSetting action)
                     {
                         return;
                     }
 
-                    if (!await _dialogs.ConfirmAsync("Delete custom action", $"Delete '{action.Name}'?"))
+                    if (!await _dialogs.ConfirmAsync(Strings.Advanced_DeleteCustomAction, string.Format(Strings.Advanced_DeleteCustomActionConfirm, action.Name)))
                     {
                         return;
                     }
@@ -1138,9 +1138,9 @@ public sealed class AdvancedGitWindow : Window
                     _repository.Settings.Save();
                     RefreshCustomActions();
                 }),
-                Button("Run command...", async () =>
+                Button(Strings.Advanced_RunCommandEllipsis, async () =>
                 {
-                    var command = await _dialogs.PromptAsync("Custom action", "Command", "git status");
+                    var command = await _dialogs.PromptAsync(Strings.Advanced_CustomAction, Strings.Advanced_Command, "git status");
                     if (string.IsNullOrWhiteSpace(command))
                     {
                         return;
@@ -1164,7 +1164,7 @@ public sealed class AdvancedGitWindow : Window
             .Replace("{file}", _repository.SelectedCommitFile?.RelativePath
                                ?? _repository.SelectedUnstagedFile?.RelativePath
                                ?? _repository.SelectedStagedFile?.RelativePath ?? "", StringComparison.OrdinalIgnoreCase);
-        await RunAsync("Custom action", () => RunShellAsync(command));
+        await RunAsync(Strings.Advanced_CustomAction, () => RunShellAsync(command));
     }
 }
 

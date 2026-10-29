@@ -9,7 +9,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 {
     private readonly IDialogService _dialogs;
     private GitManager _gitManager;
-    private string _statusMessage = "Open a repository to get started.";
+    private string _statusMessage = Strings.Main_OpenRepositoryToGetStarted;
     private readonly Stack<string> _recentlyClosed = new();
 
     public MainWindowViewModel(AppSettingsService settings, IDialogService dialogs)
@@ -37,7 +37,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             if (p is RepositoryViewModel repository)
             {
                 CopyText?.Invoke(repository.Path);
-                _statusMessage = "Repository path copied.";
+                _statusMessage = Strings.Main_RepositoryPathCopied;
                 OnPropertyChanged(nameof(HomeStatusMessage));
             }
         });
@@ -62,9 +62,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
         });
         AboutCommand = new AsyncRelayCommand(() => _dialogs.ShowMessageAsync("Avgit",
-            $"Avgit {typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3)}\n\n" +
-            "A Git client for Windows, macOS and Linux.\n\n" +
-            "Commit graph, unified diff viewer, line-level staging, interactive rebase and repository tools."));
+            string.Format(Strings.Main_AboutText, typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3))));
         ExitCommand = new RelayCommand(() => ExitAction?.Invoke());
         CheckForUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
         RestartToUpdateCommand = new RelayCommand(() => Updates?.ApplyAndRestart());
@@ -129,7 +127,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public string Title => IsHomeVisible || Repository is null
         ? "Avgit"
-        : $"{Repository.Name} - Avgit";
+        : string.Format(Strings.Main_WindowTitle, Repository.Name);
 
     public string StatusMessage
     {
@@ -205,7 +203,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     public bool IsUpdateReady => UpdateReadyVersion is not null;
-    public string UpdateReadyText => $"Avgit {UpdateReadyVersion} is ready to install.";
+    public string UpdateReadyText => string.Format(Strings.Main_UpdateReadyToInstall, UpdateReadyVersion);
 
     /// <summary>
     /// Startup check: downloads a newer release quietly when automatic updates are
@@ -232,9 +230,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         if (Updates is null || !Updates.IsInstalled)
         {
-            await _dialogs.ShowMessageAsync("Check for updates",
-                "Updates are only available when Avgit was installed from a release (Setup.exe on Windows, the AppImage on Linux).\n\n" +
-                $"Releases: {UpdateService.RepositoryUrl}/releases").ConfigureAwait(true);
+            await _dialogs.ShowMessageAsync(Strings.Main_CheckForUpdatesTitle,
+                string.Format(Strings.Main_UpdatesUnavailable, UpdateService.RepositoryUrl)).ConfigureAwait(true);
             return;
         }
 
@@ -244,16 +241,16 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            await _dialogs.ShowMessageAsync("Check for updates", $"Could not check for updates: {ex.Message}").ConfigureAwait(true);
+            await _dialogs.ShowMessageAsync(Strings.Main_CheckForUpdatesTitle, string.Format(Strings.Main_CouldNotCheckForUpdates, ex.Message)).ConfigureAwait(true);
             return;
         }
 
         if (UpdateReadyVersion is null)
         {
-            await _dialogs.ShowMessageAsync("Check for updates", $"Avgit {Updates.CurrentVersion} is up to date.").ConfigureAwait(true);
+            await _dialogs.ShowMessageAsync(Strings.Main_CheckForUpdatesTitle, string.Format(Strings.Main_UpToDate, Updates.CurrentVersion)).ConfigureAwait(true);
         }
-        else if (await _dialogs.ConfirmAsync("Update ready",
-                     $"Avgit {UpdateReadyVersion} has been downloaded. Restart now to install it?").ConfigureAwait(true))
+        else if (await _dialogs.ConfirmAsync(Strings.Main_UpdateReadyTitle,
+                     string.Format(Strings.Main_UpdateDownloadedRestart, UpdateReadyVersion)).ConfigureAwait(true))
         {
             Updates.ApplyAndRestart();
         }
@@ -285,7 +282,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         // Keep the last repository selected so its tab stays highlighted; the
         // content pane switches to the home/recent screen instead.
         IsHomeVisible = true;
-        _statusMessage = "Select a recent repository or open another.";
+        _statusMessage = Strings.Main_SelectRecentOrOpen;
         OnPropertyChanged(nameof(StatusMessage));
         OnPropertyChanged(nameof(HomeStatusMessage));
         OnPropertyChanged(nameof(ShowRepositoryContent));
@@ -326,7 +323,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 return;
             }
         }
-        _statusMessage = "No recently closed repository.";
+        _statusMessage = Strings.Main_NoRecentlyClosed;
         OnPropertyChanged(nameof(HomeStatusMessage));
     }
 
@@ -422,7 +419,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         SaveOpenTabs();
         Repository = null;
         IsHomeVisible = true;
-        _statusMessage = "Open a repository to get started.";
+        _statusMessage = Strings.Main_OpenRepositoryToGetStarted;
         OnPropertyChanged(nameof(HasRepository));
         OnPropertyChanged(nameof(WelcomeVisible));
         OnPropertyChanged(nameof(ShowRepositoryContent));
@@ -452,7 +449,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             Repository = null;
             IsHomeVisible = true;
-            _statusMessage = "Open a repository to get started.";
+            _statusMessage = Strings.Main_OpenRepositoryToGetStarted;
             OnPropertyChanged(nameof(StatusMessage));
             OnPropertyChanged(nameof(HomeStatusMessage));
         }
@@ -476,7 +473,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private async Task OpenRepositoryAsync()
     {
-        var folder = await _dialogs.PickFolderAsync("Open repository");
+        var folder = await _dialogs.PickFolderAsync(Strings.Main_OpenRepositoryPickerTitle);
         if (folder is not null)
         {
             await OpenPathAsync(folder);
@@ -503,15 +500,15 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         if (!GitManager.IsRepositoryRoot(root))
         {
-            await _dialogs.ShowMessageAsync("Not a repository",
-                $"'{root}' does not contain a .git directory.");
+            await _dialogs.ShowMessageAsync(Strings.Main_NotARepositoryTitle,
+                string.Format(Strings.Main_NotARepositoryMessage, root));
             return;
         }
 
         RepositoryViewModel repo = CreateRepository(root);
 
         repo.IsBusy = true;
-        repo.StatusMessage = $"Opening {root}...";
+        repo.StatusMessage = string.Format(Strings.Main_OpeningRepository, root);
         try
         {
             Repositories.Add(repo);
@@ -530,7 +527,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            await _dialogs.ShowMessageAsync("Could not open repository", ex.ToString());
+            await _dialogs.ShowMessageAsync(Strings.Main_CouldNotOpenRepository, ex.ToString());
             repo.StatusMessage = ex.Message;
         }
         finally
@@ -541,26 +538,26 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private async Task CloneRepositoryAsync()
     {
-        var url = await _dialogs.PromptAsync("Clone repository", "Repository URL", string.Empty);
+        var url = await _dialogs.PromptAsync(Strings.Main_CloneRepositoryTitle, Strings.Main_CloneRepositoryUrlLabel, string.Empty);
         if (string.IsNullOrWhiteSpace(url))
         {
             return;
         }
 
-        (string? Value, bool Flag)? options = await _dialogs.PromptWithCheckBoxAsync("Clone repository",
-            "Additional git clone options (optional, e.g. --depth 1 --branch dev)", string.Empty, "Partial clone (blobless)", false);
+        (string? Value, bool Flag)? options = await _dialogs.PromptWithCheckBoxAsync(Strings.Main_CloneRepositoryTitle,
+            Strings.Main_CloneOptionsLabel, string.Empty, Strings.Main_ClonePartialCheckBox, false);
         if (options is null)
         {
             return;
         }
 
-        var parent = await _dialogs.PickFolderAsync("Choose a folder for the clone");
+        var parent = await _dialogs.PickFolderAsync(Strings.Main_CloneParentPickerTitle);
         if (parent is null)
         {
             return;
         }
 
-        var name = await _dialogs.PromptAsync("Clone repository", "Folder name", GuessNameFromUrl(url));
+        var name = await _dialogs.PromptAsync(Strings.Main_CloneRepositoryTitle, Strings.Main_CloneFolderNameLabel, GuessNameFromUrl(url));
         if (string.IsNullOrWhiteSpace(name))
         {
             return;
@@ -569,15 +566,15 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var destination = System.IO.Path.Combine(parent, name);
         if (System.IO.Directory.Exists(destination) && System.IO.Directory.EnumerateFileSystemEntries(destination).Any())
         {
-            await _dialogs.ShowMessageAsync("Clone failed", "The destination folder is not empty.");
+            await _dialogs.ShowMessageAsync(Strings.Main_CloneFailedTitle, Strings.Main_CloneDestinationNotEmpty);
             return;
         }
 
         RepositoryViewModel? previous = Repository;
         IsHomeBusy = true;
-        _statusMessage = "Cloning...";
+        _statusMessage = Strings.Main_Cloning;
         OnPropertyChanged(nameof(HomeStatusMessage));
-        previous?.StatusMessage = "Cloning...";
+        previous?.StatusMessage = Strings.Main_Cloning;
 
         try
         {
@@ -585,8 +582,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             ProcessResult result = await _gitManager.Git.CloneAsync(url, destination, options.Value.Flag, extraOptions);
             if (!result.Success)
             {
-                await _dialogs.ShowMessageAsync("Clone failed", result.Combined);
-                _statusMessage = "Clone failed.";
+                await _dialogs.ShowMessageAsync(Strings.Main_CloneFailedTitle, result.Combined);
+                _statusMessage = Strings.Main_CloneFailedStatus;
                 OnPropertyChanged(nameof(HomeStatusMessage));
                 return;
             }
@@ -605,30 +602,30 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private async Task InitRepositoryAsync()
     {
-        var folder = await _dialogs.PickFolderAsync("Create repository in folder");
+        var folder = await _dialogs.PickFolderAsync(Strings.Main_InitPickerTitle);
         if (folder is null)
         {
             return;
         }
 
-        if (!await _dialogs.ConfirmAsync("Create repository", $"Create a new Git repository in '{folder}'?"))
+        if (!await _dialogs.ConfirmAsync(Strings.Main_InitTitle, string.Format(Strings.Main_InitConfirm, folder)))
         {
             return;
         }
 
         RepositoryViewModel? previous = Repository;
         IsHomeBusy = true;
-        _statusMessage = "Creating repository...";
+        _statusMessage = Strings.Main_CreatingRepository;
         OnPropertyChanged(nameof(HomeStatusMessage));
-        previous?.StatusMessage = "Creating repository...";
+        previous?.StatusMessage = Strings.Main_CreatingRepository;
 
         try
         {
             ProcessResult result = await _gitManager.Git.InitAsync(folder);
             if (!result.Success)
             {
-                await _dialogs.ShowMessageAsync("Create repository failed", result.Combined);
-                _statusMessage = "Create repository failed.";
+                await _dialogs.ShowMessageAsync(Strings.Main_InitFailedTitle, result.Combined);
+                _statusMessage = Strings.Main_InitFailedStatus;
                 OnPropertyChanged(nameof(HomeStatusMessage));
                 return;
             }

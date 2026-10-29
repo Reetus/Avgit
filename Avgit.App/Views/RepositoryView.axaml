@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="using:Avgit.App.Resources"
              xmlns:vm="using:Avgit.App.ViewModels"
              xmlns:views="using:Avgit.App.Views"
              x:Class="Avgit.App.Views.RepositoryView"
@@ -14,26 +15,26 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconBranch}" />
-                <TextBlock Text="BRANCHES" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_BranchesHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
-              <Button Classes="flat" Content="+ New branch" HorizontalAlignment="Left"
+              <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_NewBranch}" HorizontalAlignment="Left"
                       Command="{Binding CreateBranchCommand}" />
               <ListBox ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch, Mode=TwoWay}"
                        DoubleTapped="OnBranchDoubleTapped" HorizontalAlignment="Stretch">
                 <ListBox.ContextMenu>
                   <ContextMenu>
-                    <MenuItem Header="Checkout" Command="{Binding CheckoutBranchCommand}"
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_Checkout}" Command="{Binding CheckoutBranchCommand}"
                               CommandParameter="{Binding SelectedBranch}"
                               IsVisible="{Binding !SelectedBranch.IsInOtherWorktree, FallbackValue=True}" />
-                    <MenuItem Header="Open worktree" Command="{Binding OpenBranchWorktreeCommand}"
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_OpenWorktree}" Command="{Binding OpenBranchWorktreeCommand}"
                               CommandParameter="{Binding SelectedBranch}"
                               IsVisible="{Binding SelectedBranch.IsInOtherWorktree, FallbackValue=False}" />
-                    <MenuItem Header="Create worktree..." Command="{Binding AddWorktreeForBranchCommand}"
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_CreateWorktree}" Command="{Binding AddWorktreeForBranchCommand}"
                               CommandParameter="{Binding SelectedBranch}"
                               IsVisible="{Binding SelectedBranch.CanAddWorktree, FallbackValue=False}" />
-                    <MenuItem Header="Delete branch" Command="{Binding DeleteBranchCommand}"
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_DeleteBranch}" Command="{Binding DeleteBranchCommand}"
                               CommandParameter="{Binding SelectedBranch}"
                               IsVisible="{Binding SelectedBranch.CanDelete, FallbackValue=False}" />
                   </ContextMenu>
@@ -55,7 +56,7 @@
                       <Button Grid.Column="4" Classes="flat" Content="×" FontSize="12" Padding="4,0"
                               IsVisible="{Binding CanDelete}"
                               Command="{Binding $parent[ListBox].DataContext.DeleteBranchCommand}"
-                              CommandParameter="{Binding}" ToolTip.Tip="Delete branch" />
+                              CommandParameter="{Binding}" ToolTip.Tip="{x:Static res:Strings.Repo_View_DeleteBranch}" />
                     </Grid>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -68,18 +69,18 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconWorktree}" />
-                <TextBlock Text="WORKTREES" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_WorktreesHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
               <StackPanel Orientation="Horizontal" Spacing="4">
-                <Button Classes="flat" Content="+ New worktree" Command="{Binding AddWorktreeCommand}"
-                        ToolTip.Tip="Create a new branch in its own folder" />
-                <Button Classes="flat" Content="Prune" Command="{Binding PruneWorktreesCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_NewWorktree}" Command="{Binding AddWorktreeCommand}"
+                        ToolTip.Tip="{x:Static res:Strings.Repo_View_NewWorktreeToolTip}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_Prune}" Command="{Binding PruneWorktreesCommand}"
                         IsVisible="{Binding HasPrunableWorktrees}"
-                        ToolTip.Tip="Forget worktrees whose folders are missing" />
+                        ToolTip.Tip="{x:Static res:Strings.Repo_View_PruneToolTip}" />
               </StackPanel>
-              <TextBlock Text="No linked worktrees." Classes="muted" FontSize="10" Margin="8,3"
+              <TextBlock Text="{x:Static res:Strings.Repo_View_NoLinkedWorktrees}" Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasLinkedWorktrees}" />
               <ListBox ItemsSource="{Binding Worktrees}" DoubleTapped="OnWorktreeDoubleTapped"
                        HorizontalAlignment="Stretch" IsVisible="{Binding HasLinkedWorktrees}">
@@ -99,14 +100,14 @@
                                      IsVisible="{Binding HasBadges}" />
                         </StackPanel>
                       </StackPanel>
-                      <Button Grid.Column="2" Classes="flat" Content="Open" FontSize="10" Padding="4,0"
+                      <Button Grid.Column="2" Classes="flat" Content="{x:Static res:Strings.Common_Open}" FontSize="10" Padding="4,0"
                               IsVisible="{Binding CanOpen}" VerticalAlignment="Center"
                               Command="{Binding $parent[ListBox].DataContext.OpenWorktreeCommand}"
-                              CommandParameter="{Binding}" ToolTip.Tip="Open this worktree in a tab" />
+                              CommandParameter="{Binding}" ToolTip.Tip="{x:Static res:Strings.Repo_View_OpenWorktreeToolTip}" />
                       <Button Grid.Column="3" Classes="flat" Content="×" FontSize="12" Padding="4,0"
                               IsVisible="{Binding CanRemove}" VerticalAlignment="Center"
                               Command="{Binding $parent[ListBox].DataContext.RemoveWorktreeCommand}"
-                              CommandParameter="{Binding}" ToolTip.Tip="Remove worktree (keeps the branch)" />
+                              CommandParameter="{Binding}" ToolTip.Tip="{x:Static res:Strings.Repo_View_RemoveWorktreeToolTip}" />
                     </Grid>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -119,13 +120,13 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconRemotes}" />
-                <TextBlock Text="REMOTES" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_RemotesHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
-              <Button Classes="flat" Content="+ Add remote" HorizontalAlignment="Left"
+              <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_AddRemote}" HorizontalAlignment="Left"
                       Command="{Binding AddRemoteCommand}" />
-              <TextBlock Text="No remotes configured." Classes="muted" FontSize="10" Margin="8,3"
+              <TextBlock Text="{x:Static res:Strings.Repo_View_NoRemotes}" Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasRemotes}" />
               <ItemsControl ItemsSource="{Binding Remotes}" HorizontalAlignment="Stretch">
                 <ItemsControl.ItemTemplate>
@@ -135,12 +136,12 @@
                         <TextBlock Text="{Binding Display}" FontSize="11" FontWeight="SemiBold" />
                         <TextBlock Text="{Binding Url}" Classes="muted" FontSize="10" TextTrimming="CharacterEllipsis" />
                       </StackPanel>
-                      <Button Grid.Column="1" Classes="flat" Content="Edit" FontSize="10" Padding="4,0"
-                              ToolTip.Tip="Rename or change remote URL"
+                      <Button Grid.Column="1" Classes="flat" Content="{x:Static res:Strings.Repo_View_Edit}" FontSize="10" Padding="4,0"
+                              ToolTip.Tip="{x:Static res:Strings.Repo_View_EditRemoteToolTip}"
                               Command="{Binding $parent[ItemsControl].DataContext.EditRemoteCommand}"
                               CommandParameter="{Binding}" />
                       <Button Grid.Column="2" Classes="flat" Content="×" FontSize="12" Padding="4,0"
-                              ToolTip.Tip="Remove remote"
+                              ToolTip.Tip="{x:Static res:Strings.Repo_View_RemoveRemoteToolTip}"
                               Command="{Binding $parent[ItemsControl].DataContext.DeleteRemoteCommand}"
                               CommandParameter="{Binding}" />
                     </Grid>
@@ -155,11 +156,11 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconRemoteBranches}" />
-                <TextBlock Text="REMOTE BRANCHES" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_RemoteBranchesHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
-              <TextBlock Text="No remote branches." Classes="muted" FontSize="10" Margin="8,3"
+              <TextBlock Text="{x:Static res:Strings.Repo_View_NoRemoteBranches}" Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasRemoteBranches}" />
               <ListBox ItemsSource="{Binding RemoteBranches}" SelectedItem="{Binding SelectedRemoteBranch, Mode=TwoWay}" DoubleTapped="OnBranchDoubleTapped"
                        HorizontalAlignment="Stretch">
@@ -180,11 +181,11 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconTag}" />
-                <TextBlock Text="TAGS" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_TagsHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
-              <TextBlock Text="No tags." Classes="muted" FontSize="10" Margin="8,3"
+              <TextBlock Text="{x:Static res:Strings.Repo_View_NoTags}" Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasTags}" />
             <ListBox ItemsSource="{Binding Tags}" DoubleTapped="OnTagDoubleTapped"
                      HorizontalAlignment="Stretch">
@@ -195,7 +196,7 @@
                                TextTrimming="CharacterEllipsis" />
                     <Button Grid.Column="1" Classes="flat" Content="×" FontSize="12" Padding="4,0"
                             Command="{Binding $parent[ListBox].DataContext.DeleteTagCommand}"
-                            CommandParameter="{Binding}" ToolTip.Tip="Delete tag" />
+                            CommandParameter="{Binding}" ToolTip.Tip="{x:Static res:Strings.Repo_View_DeleteTagToolTip}" />
                   </Grid>
                 </DataTemplate>
               </ListBox.ItemTemplate>
@@ -208,13 +209,13 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconStash}" />
-                <TextBlock Text="STASHES" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_StashesHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
-              <Button Classes="flat" Content="+ Stash changes" HorizontalAlignment="Left"
+              <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_StashChanges}" HorizontalAlignment="Left"
                       Command="{Binding StashCommand}" />
-              <TextBlock Text="No stashes." Classes="muted" FontSize="10" Margin="8,3"
+              <TextBlock Text="{x:Static res:Strings.Repo_View_NoStashes}" Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasStashes}" />
               <ListBox ItemsSource="{Binding Stashes}" DoubleTapped="OnStashDoubleTapped"
                        HorizontalAlignment="Stretch">
@@ -223,15 +224,15 @@
                     <Grid ColumnDefinitions="*,Auto,Auto,Auto" Height="22">
                       <TextBlock Text="{Binding Display}" FontSize="11" VerticalAlignment="Center"
                                  TextTrimming="CharacterEllipsis" />
-                      <Button Grid.Column="1" Classes="flat" Content="Apply" FontSize="10" Padding="4,0"
+                      <Button Grid.Column="1" Classes="flat" Content="{x:Static res:Strings.Repo_View_ApplyStash}" FontSize="10" Padding="4,0"
                               Command="{Binding $parent[ListBox].DataContext.ApplyStashCommand}"
                               CommandParameter="{Binding}" />
-                      <Button Grid.Column="2" Classes="flat" Content="Pop" FontSize="10" Padding="4,0"
+                      <Button Grid.Column="2" Classes="flat" Content="{x:Static res:Strings.Repo_View_PopStash}" FontSize="10" Padding="4,0"
                               Command="{Binding $parent[ListBox].DataContext.PopStashCommand}"
                               CommandParameter="{Binding}" />
                       <Button Grid.Column="3" Classes="flat" Content="×" FontSize="12" Padding="4,0"
                               Command="{Binding $parent[ListBox].DataContext.DropStashCommand}"
-                              CommandParameter="{Binding}" ToolTip.Tip="Drop stash" />
+                              CommandParameter="{Binding}" ToolTip.Tip="{x:Static res:Strings.Repo_View_DropStashToolTip}" />
                     </Grid>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -243,7 +244,7 @@
             <Expander.Header>
               <StackPanel Classes="section" Orientation="Horizontal" Spacing="7">
                 <PathIcon Data="{StaticResource IconRepository}" />
-                <TextBlock Text="REPOSITORY" />
+                <TextBlock Text="{x:Static res:Strings.Repo_View_RepositoryHeader}" />
               </StackPanel>
             </Expander.Header>
             <StackPanel Spacing="3" Margin="6,2">
@@ -251,10 +252,10 @@
               <TextBlock Text="{Binding RepoTypeText}" Classes="muted" FontSize="10" />
               <TextBlock Text="{Binding Path}" Classes="muted" FontSize="10" TextWrapping="Wrap" />
               <TextBlock Classes="muted" FontSize="10" TextWrapping="Wrap" IsVisible="{Binding IsLinkedWorktree}"
-                         Text="{Binding MainWorktreePath, StringFormat='Main worktree: {0}'}" />
+                         Text="{Binding MainWorktreePath, StringFormat={x:Static res:Strings.Repo_View_MainWorktreeFormat}}" />
               <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
-                <Button Classes="flat" Content="Open folder" Command="{Binding OpenInExplorerCommand}" />
-                <Button Classes="flat" Content="Refresh" Command="{Binding RefreshCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_OpenFolder}" Command="{Binding OpenInExplorerCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.Common_Refresh}" Command="{Binding RefreshCommand}" />
               </StackPanel>
             </StackPanel>
           </Expander>
@@ -265,10 +266,10 @@
     <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" />
 
     <TabControl Grid.Column="2">
-      <TabItem Header="History">
+      <TabItem Header="{x:Static res:Strings.Repo_View_HistoryTab}">
         <views:HistoryView />
       </TabItem>
-      <TabItem Header="File Status">
+      <TabItem Header="{x:Static res:Strings.Repo_View_FileStatusTab}">
         <views:WorkingCopyView />
       </TabItem>
     </TabControl>
