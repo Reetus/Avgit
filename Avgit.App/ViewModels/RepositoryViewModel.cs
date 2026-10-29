@@ -1191,20 +1191,41 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasStashes));
 
         var previousFilter = SelectedBranchFilter;
-        BranchFilterOptions.Clear();
-        BranchFilterOptions.Add("(all branches)");
-        foreach (BranchRef branch in Branches)
-        {
-            BranchFilterOptions.Add(branch.Name);
-        }
-
-        foreach (BranchRef branch in RemoteBranches)
-        {
-            BranchFilterOptions.Add(branch.Name);
-        }
-
+        List<string> options = ["(all branches)", .. Branches.Select(b => b.Name), .. RemoteBranches.Select(b => b.Name)];
+        UpdateInPlace(BranchFilterOptions, options);
         _selectedBranchFilter = BranchFilterOptions.Contains(previousFilter) ? previousFilter : "(all branches)";
         OnPropertyChanged(nameof(SelectedBranchFilter));
+    }
+
+    /// <summary>
+    /// Makes <paramref name="target"/> equal to <paramref name="items"/> by moving, inserting and
+    /// removing entries. Clearing it instead made the branch filter ComboBox drop its selected
+    /// item on every refresh and show nothing.
+    /// </summary>
+    private static void UpdateInPlace(ObservableCollection<string> target, IReadOnlyList<string> items)
+    {
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (i < target.Count && string.Equals(target[i], items[i], StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var existing = target.IndexOf(items[i]);
+            if (existing > i)
+            {
+                target.Move(existing, i);
+            }
+            else
+            {
+                target.Insert(i, items[i]);
+            }
+        }
+
+        while (target.Count > items.Count)
+        {
+            target.RemoveAt(target.Count - 1);
+        }
     }
 
     private bool ReportHandlerError(string context)
