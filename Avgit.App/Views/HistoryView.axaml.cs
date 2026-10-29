@@ -30,7 +30,18 @@ public partial class HistoryView : UserControl
         // Switching to the File Status tab detaches this view without changing its
         // DataContext, so DataContextChanged alone would not reconnect it on return
         // and clicks on commits would be ignored.
-        AttachedToVisualTree += (_, _) => SetRepository(DataContext as RepositoryViewModel);
+        AttachedToVisualTree += (_, _) =>
+        {
+            SetRepository(DataContext as RepositoryViewModel);
+            // A history reload while hidden rebuilt the rows and asked for the selection
+            // to be restored while nothing was listening; restore it now.
+            if (_repository?.SelectedCommit is { } selected
+                && this.FindControl<ListBox>("CommitList")?.SelectedItems is { } items
+                && !items.Contains(selected))
+            {
+                OnScrollToCommit(selected.Row.CommitId);
+            }
+        };
         DetachedFromVisualTree += (_, _) => SetRepository(null);
     }
 

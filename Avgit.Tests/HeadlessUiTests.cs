@@ -898,6 +898,8 @@ public class HeadlessUiTests
 
         using TempRepo repo = await TempRepo.CreateAsync();
         var settings = new AppSettingsService(Path.Combine(ArtifactDirectory, "settings-tabswitch.json"));
+        // No watcher refreshes: a late one would restore the list's selection and hide a missed restore.
+        settings.Settings.AutoRefresh = false;
         var vm = new MainWindowViewModel(settings, new FakeDialogService());
         var window = new MainWindow { DataContext = vm, Width = 1360, Height = 860 };
         window.Show();
@@ -929,9 +931,13 @@ public class HeadlessUiTests
         // A refresh while File Status is showing replaces the history rows; on return the
         // list must still highlight the selected commit, and clicks must still work.
         var selectedSha = repository.SelectedCommit!.Row.CommitId;
+        CommitRowViewModel oldRow = repository.LogRows[0];
         tabs.SelectedIndex = 1;
         Dispatcher.UIThread.RunJobs();
         await repository.RefreshAsync();
+        // Let the rebuild finish while History is still hidden, so its request to
+        // highlight the selected row goes unheard.
+        await WaitForAsync(() => repository.LogRows.Count > 0 && !ReferenceEquals(repository.LogRows[0], oldRow));
         tabs.SelectedIndex = 0;
         Dispatcher.UIThread.RunJobs();
         ListBox history = window.GetVisualDescendants().OfType<ListBox>().First(l => l.Name == "CommitList");
@@ -944,6 +950,43 @@ public class HeadlessUiTests
         window.MouseUp(firstPoint, MouseButton.Left);
         await WaitForAsync(() => repository.CommitInfo?.Sha == repository.LogRows[0].Row.CommitId);
 
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task Refresh_with_the_history_visible_keeps_the_selected_commit()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        using TempRepo repo = await TempRepo.CreateAsync();
+        var settings = new AppSettingsService(Path.Combine(ArtifactDirectory, "settings-visible-refresh.json"));
+        settings.Settings.AutoRefresh = false;
+        var vm = new MainWindowViewModel(settings, new FakeDialogService());
+        // A shown window matters: the branch filter ComboBox is what wrote null back
+        // when a refresh rebuilt its options, reloading the history at the tip.
+        var window = new MainWindow { DataContext = vm, Width = 1360, Height = 860 };
+        window.Show();
+        await vm.OpenPathAsync(repo.Path);
+        Dispatcher.UIThread.RunJobs();
+        RepositoryViewModel repository = vm.Repository!;
+
+        CommitRowViewModel older = repository.LogRows[2];
+        repository.SetContextCommit(older);
+        await WaitForAsync(() => repository.CommitInfo?.Sha == older.Row.CommitId);
+
+        await repository.RefreshAsync();
+        for (var i = 0; i < 10; i++)
+        {
+            await Task.Delay(25);
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        Assert.Equal(older.Row.CommitId, repository.SelectedCommit?.Row.CommitId);
+        Assert.Equal(older.Row.CommitId, repository.CommitInfo?.Sha);
+        Assert.Equal("(all branches)", repository.SelectedBranchFilter);
         window.Close();
     }
 
