@@ -987,6 +987,23 @@ public class HeadlessUiTests
         Assert.Equal(older.Row.CommitId, repository.SelectedCommit?.Row.CommitId);
         Assert.Equal(older.Row.CommitId, repository.CommitInfo?.Sha);
         Assert.Equal("(all branches)", repository.SelectedBranchFilter);
+
+        // The ComboBox itself still shows the filter; rebuilding its options used to blank it.
+        ComboBox filter = window.GetVisualDescendants().OfType<ComboBox>()
+            .First(c => ReferenceEquals(c.ItemsSource, repository.BranchFilterOptions));
+        Assert.Equal("(all branches)", filter.SelectedItem);
+
+        // New and deleted branches still update the options without losing the selection.
+        Assert.True((await repo.Git.CreateBranchAsync(repo.Path, "zz-new", null, checkout: false)).Success);
+        await repository.RefreshAsync();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Contains("zz-new", repository.BranchFilterOptions);
+        Assert.Equal("(all branches)", filter.SelectedItem);
+        Assert.True((await repo.Git.DeleteBranchAsync(repo.Path, "zz-new", force: true)).Success);
+        await repository.RefreshAsync();
+        Dispatcher.UIThread.RunJobs();
+        Assert.DoesNotContain("zz-new", repository.BranchFilterOptions);
+        Assert.Equal("(all branches)", filter.SelectedItem);
         window.Close();
     }
 
