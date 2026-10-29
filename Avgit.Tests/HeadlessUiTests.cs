@@ -888,6 +888,65 @@ public class HeadlessUiTests
         Assert.Equal("d-untracked.txt", repository.SelectedUnstagedFile?.RelativePath);
     }
 
+    [AvaloniaFact]
+    public async Task Clicking_a_commit_after_visiting_file_status_still_shows_it()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        using TempRepo repo = await TempRepo.CreateAsync();
+        var settings = new AppSettingsService(Path.Combine(ArtifactDirectory, "settings-tabswitch.json"));
+        var vm = new MainWindowViewModel(settings, new FakeDialogService());
+        var window = new MainWindow { DataContext = vm, Width = 1360, Height = 860 };
+        window.Show();
+        await vm.OpenPathAsync(repo.Path);
+        Dispatcher.UIThread.RunJobs();
+        RepositoryViewModel repository = vm.Repository!;
+
+        TabControl tabs = window.GetVisualDescendants().OfType<TabControl>()
+            .First(t => t.Items.OfType<TabItem>().Any(i => i.Header as string == "File Status"));
+
+        // Leaving History takes it out of the visual tree while its DataContext stays
+        // the same; on return, clicks must still reach the view model.
+        for (var round = 1; round <= 2; round++)
+        {
+            tabs.SelectedIndex = 1;
+            Dispatcher.UIThread.RunJobs();
+            tabs.SelectedIndex = 0;
+            Dispatcher.UIThread.RunJobs();
+
+            ListBox list = window.GetVisualDescendants().OfType<ListBox>().First(l => l.Name == "CommitList");
+            var index = round;
+            var row = (Control)list.ContainerFromIndex(index)!;
+            Point point = row.TranslatePoint(new Point(40, 10), window)!.Value;
+            window.MouseDown(point, MouseButton.Left);
+            window.MouseUp(point, MouseButton.Left);
+            await WaitForAsync(() => repository.CommitInfo?.Sha == repository.LogRows[index].Row.CommitId);
+        }
+
+        // A refresh while File Status is showing replaces the history rows; on return the
+        // list must still highlight the selected commit, and clicks must still work.
+        var selectedSha = repository.SelectedCommit!.Row.CommitId;
+        tabs.SelectedIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+        await repository.RefreshAsync();
+        tabs.SelectedIndex = 0;
+        Dispatcher.UIThread.RunJobs();
+        ListBox history = window.GetVisualDescendants().OfType<ListBox>().First(l => l.Name == "CommitList");
+        await WaitForAsync(() => history.SelectedItems!.OfType<CommitRowViewModel>().Any(r => r.Row.CommitId == selectedSha));
+        Assert.Equal(selectedSha, repository.SelectedCommit!.Row.CommitId);
+
+        var first = (Control)history.ContainerFromIndex(0)!;
+        Point firstPoint = first.TranslatePoint(new Point(40, 10), window)!.Value;
+        window.MouseDown(firstPoint, MouseButton.Left);
+        window.MouseUp(firstPoint, MouseButton.Left);
+        await WaitForAsync(() => repository.CommitInfo?.Sha == repository.LogRows[0].Row.CommitId);
+
+        window.Close();
+    }
+
     private static async Task WaitForAsync(Func<bool> condition, int timeoutMs = 15000)
     {
         var started = Environment.TickCount64;
