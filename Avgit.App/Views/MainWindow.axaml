@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="using:Avgit.App.Resources"
         xmlns:vm="using:Avgit.App.ViewModels"
         xmlns:views="using:Avgit.App.Views"
         xmlns:controls="using:Avgit.App.Controls"
@@ -20,41 +21,41 @@
   </Window.KeyBindings>
   <DockPanel>
     <Menu DockPanel.Dock="Top" Background="{StaticResource Panel}">
-      <MenuItem Header="_File">
-        <MenuItem Header="Open Repository..." Command="{Binding OpenRepositoryCommand}" />
-        <MenuItem Header="Reopen Closed Repository" Command="{Binding ReopenClosedRepositoryCommand}" />
-        <MenuItem Header="Clone Repository..." Command="{Binding CloneRepositoryCommand}" />
-        <MenuItem Header="Create Repository..." Command="{Binding InitRepositoryCommand}" />
+      <MenuItem Header="{x:Static res:Strings.Main_MenuFile}">
+        <MenuItem Header="{x:Static res:Strings.Main_OpenRepository}" Command="{Binding OpenRepositoryCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_ReopenClosedRepository}" Command="{Binding ReopenClosedRepositoryCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_CloneRepository}" Command="{Binding CloneRepositoryCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_CreateRepository}" Command="{Binding InitRepositoryCommand}" />
         <Separator />
-        <MenuItem Header="Close Repository" Command="{Binding CloseRepositoryCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_CloseRepository}" Command="{Binding CloseRepositoryCommand}" />
         <Separator />
-        <MenuItem Header="Settings..." Command="{Binding SettingsCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_SettingsMenu}" Command="{Binding SettingsCommand}" />
         <Separator />
-        <MenuItem Header="Exit" Command="{Binding ExitCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_Exit}" Command="{Binding ExitCommand}" />
       </MenuItem>
-      <MenuItem Header="_Repository">
-        <MenuItem Header="Refresh" Command="{Binding Repository.RefreshCommand}" />
+      <MenuItem Header="{x:Static res:Strings.Main_MenuRepository}">
+        <MenuItem Header="{x:Static res:Strings.Common_Refresh}" Command="{Binding Repository.RefreshCommand}" />
         <Separator />
-        <MenuItem Header="Fetch" Command="{Binding Repository.FetchCommand}" />
-        <MenuItem Header="Fetch All Remotes" Command="{Binding Repository.FetchAllCommand}" />
-        <MenuItem Header="Pull" Command="{Binding Repository.PullCommand}" />
-        <MenuItem Header="Pull with Rebase" Command="{Binding Repository.PullRebaseCommand}" />
-        <MenuItem Header="Push" Command="{Binding Repository.PushCommand}" />
-        <MenuItem Header="Push to Remote..." Command="{Binding Repository.PushToRemoteCommand}" />
-        <MenuItem Header="Force Push (with lease)" Command="{Binding Repository.ForcePushCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_Fetch}" Command="{Binding Repository.FetchCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_FetchAllRemotes}" Command="{Binding Repository.FetchAllCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_Pull}" Command="{Binding Repository.PullCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_PullWithRebase}" Command="{Binding Repository.PullRebaseCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_Push}" Command="{Binding Repository.PushCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_PushToRemote}" Command="{Binding Repository.PushToRemoteCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_ForcePushWithLease}" Command="{Binding Repository.ForcePushCommand}" />
         <Separator />
-        <MenuItem Header="Create Branch..." Command="{Binding Repository.CreateBranchCommand}" />
-        <MenuItem Header="Create Tag..." Command="{Binding Repository.CreateTagCommand}" />
-        <MenuItem Header="Stash Changes..." Command="{Binding Repository.StashCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_CreateBranch}" Command="{Binding Repository.CreateBranchCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_CreateTag}" Command="{Binding Repository.CreateTagCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_StashChanges}" Command="{Binding Repository.StashCommand}" />
         <Separator />
-        <MenuItem Header="Advanced Git..." Click="OnAdvancedGitClick" />
-        <MenuItem Header="Open in File Explorer" Command="{Binding Repository.OpenInExplorerCommand}" />
-        <MenuItem Header="Open in Terminal" Command="{Binding Repository.OpenTerminalCommand}" InputGesture="Ctrl+Shift+C" />
+        <MenuItem Header="{x:Static res:Strings.Main_AdvancedGit}" Click="OnAdvancedGitClick" />
+        <MenuItem Header="{x:Static res:Strings.Main_OpenInFileExplorer}" Command="{Binding Repository.OpenInExplorerCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_OpenInTerminal}" Command="{Binding Repository.OpenTerminalCommand}" InputGesture="Ctrl+Shift+C" />
       </MenuItem>
-      <MenuItem Header="_Help">
-        <MenuItem Header="Check for Updates..." Command="{Binding CheckForUpdatesCommand}" />
+      <MenuItem Header="{x:Static res:Strings.Main_MenuHelp}">
+        <MenuItem Header="{x:Static res:Strings.Main_CheckForUpdates}" Command="{Binding CheckForUpdatesCommand}" />
         <Separator />
-        <MenuItem Header="About Avgit" Command="{Binding AboutCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_AboutAvgit}" Command="{Binding AboutCommand}" />
       </MenuItem>
     </Menu>
 
@@ -77,11 +78,11 @@
               <Border Padding="10,5" Background="Transparent">
                 <Border.ContextMenu>
                   <ContextMenu>
-                    <MenuItem Header="Close" Click="OnTabCloseClick" />
-                    <MenuItem Header="Close Others" Click="OnTabCloseOthersClick" />
-                    <MenuItem Header="Close All" Click="OnTabCloseAllClick" />
+                    <MenuItem Header="{x:Static res:Strings.Common_Close}" Click="OnTabCloseClick" />
+                    <MenuItem Header="{x:Static res:Strings.Main_CloseOthers}" Click="OnTabCloseOthersClick" />
+                    <MenuItem Header="{x:Static res:Strings.Main_CloseAll}" Click="OnTabCloseAllClick" />
                     <Separator />
-                    <MenuItem Header="Copy repository path" Click="OnTabCopyPathClick" />
+                    <MenuItem Header="{x:Static res:Strings.Main_CopyRepositoryPath}" Click="OnTabCopyPathClick" />
                   </ContextMenu>
                 </Border.ContextMenu>
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
@@ -91,7 +92,7 @@
                              ToolTip.Tip="{Binding Path}" />
                   <Button Classes="flat" Content="×" FontSize="14" Width="20" Height="20"
                           Padding="0" MinWidth="0" MinHeight="0"
-                          ToolTip.Tip="Close repository"
+                          ToolTip.Tip="{x:Static res:Strings.Main_CloseRepositoryToolTip}"
                           Command="{Binding $parent[ListBox].DataContext.CloseRepositoryCommand}"
                           CommandParameter="{Binding}" />
                 </StackPanel>
@@ -103,7 +104,7 @@
                      IsVisible="{Binding IsHomeBusy}" VerticalAlignment="Center" Margin="0,0,8,0" />
         <Button Grid.Column="2" Classes="flat" Content="+" FontSize="18" Width="32" Height="30"
                 Margin="6,0,0,0" VerticalAlignment="Center"
-                ToolTip.Tip="Home / recent repositories"
+                ToolTip.Tip="{x:Static res:Strings.Main_HomeToolTip}"
                 Command="{Binding ShowHomeCommand}" />
       </Grid>
     </Border>
@@ -113,29 +114,29 @@
       <Grid ColumnDefinitions="Auto,*,Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" IsEnabled="{Binding ShowRepositoryContent}">
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconOpen}"
-                  Content="Open" Command="{Binding OpenRepositoryCommand}" />
+                  Content="{x:Static res:Strings.Common_Open}" Command="{Binding OpenRepositoryCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconRefresh}"
-                  Content="Refresh" Command="{Binding Repository.RefreshCommand}" />
+                  Content="{x:Static res:Strings.Common_Refresh}" Command="{Binding Repository.RefreshCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconFetch}"
-                  Content="Fetch" Command="{Binding Repository.FetchCommand}" />
+                  Content="{x:Static res:Strings.Main_Fetch}" Command="{Binding Repository.FetchCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconPull}"
-                  Content="Pull" Command="{Binding Repository.PullCommand}" />
+                  Content="{x:Static res:Strings.Main_Pull}" Command="{Binding Repository.PullCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconPush}"
-                  Content="Push" Command="{Binding Repository.PushCommand}" />
+                  Content="{x:Static res:Strings.Main_Push}" Command="{Binding Repository.PushCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconCommit}"
-                  Content="Commit" Command="{Binding Repository.CommitCommand}"
+                  Content="{x:Static res:Strings.Main_Commit}" Command="{Binding Repository.CommitCommand}"
                   IsEnabled="{Binding Repository.CanCommit, FallbackValue=False}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconBranch}"
-                  Content="Branch" Command="{Binding Repository.CreateBranchCommand}" />
+                  Content="{x:Static res:Strings.Main_Branch}" Command="{Binding Repository.CreateBranchCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconTag}"
-                  Content="Tag" Command="{Binding Repository.CreateTagCommand}" />
+                  Content="{x:Static res:Strings.Main_Tag}" Command="{Binding Repository.CreateTagCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconStash}"
-                  Content="Stash" Command="{Binding Repository.StashCommand}" />
+                  Content="{x:Static res:Strings.Main_Stash}" Command="{Binding Repository.StashCommand}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconTerminal}"
-                  Content="Terminal" Command="{Binding Repository.OpenTerminalCommand}"
-                  ToolTip.Tip="Open a terminal in the repository folder (Ctrl+Shift+C)" />
+                  Content="{x:Static res:Strings.Main_Terminal}" Command="{Binding Repository.OpenTerminalCommand}"
+                  ToolTip.Tip="{x:Static res:Strings.Main_TerminalToolTip}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconRemote}"
-                  Content="Remote" Command="{Binding Repository.OpenRemoteCommand}"
+                  Content="{x:Static res:Strings.Main_Remote}" Command="{Binding Repository.OpenRemoteCommand}"
                   IsVisible="{Binding Repository.HasRemoteWebUrl, FallbackValue=False}"
                   ToolTip.Tip="{Binding Repository.RemoteWebUrlToolTip, FallbackValue=''}" />
         </StackPanel>
@@ -144,14 +145,14 @@
           <PathIcon Data="{StaticResource IconWorktree}" Width="14" Height="12" Foreground="#58A6FF"
                     Background="Transparent" VerticalAlignment="Center"
                     IsVisible="{Binding Repository.IsLinkedWorktree, FallbackValue=False}"
-                    ToolTip.Tip="{Binding Repository.MainWorktreePath, StringFormat='Linked worktree of {0}', FallbackValue=''}" />
+                    ToolTip.Tip="{Binding Repository.MainWorktreePath, StringFormat={x:Static res:Strings.Main_LinkedWorktreeOfFormat}, FallbackValue=''}" />
           <TextBlock Text="{Binding Repository.BranchAndRevisionText}" VerticalAlignment="Center" FontSize="12" />
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
           <ProgressBar Width="90" Height="4" IsIndeterminate="True" VerticalAlignment="Center"
                        IsVisible="{Binding Repository.IsBusy, FallbackValue=False}" />
           <Button Classes="toolbar icon" controls:ButtonIcon.Data="{StaticResource IconSettings}"
-                  Content="Settings" Command="{Binding SettingsCommand}" Margin="0" />
+                  Content="{x:Static res:Strings.Common_Settings}" Command="{Binding SettingsCommand}" Margin="0" />
         </StackPanel>
       </Grid>
     </Border>
@@ -160,8 +161,8 @@
             BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1" Padding="8,4">
       <StackPanel Orientation="Horizontal" Spacing="10">
         <TextBlock Text="{Binding UpdateReadyText}" FontSize="12" VerticalAlignment="Center" />
-        <Button Classes="accent" Content="Restart to update" Command="{Binding RestartToUpdateCommand}" />
-        <TextBlock Text="or it installs the next time Avgit starts." Classes="muted" FontSize="11" VerticalAlignment="Center" />
+        <Button Classes="accent" Content="{x:Static res:Strings.Main_RestartToUpdate}" Command="{Binding RestartToUpdateCommand}" />
+        <TextBlock Text="{x:Static res:Strings.Main_UpdateInstallsNextStart}" Classes="muted" FontSize="11" VerticalAlignment="Center" />
       </StackPanel>
     </Border>
 

@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="using:Avgit.App.Resources"
              xmlns:vm="using:Avgit.App.ViewModels"
              xmlns:views="using:Avgit.App.Views"
              x:Class="Avgit.App.Views.WorkingCopyView"
@@ -14,8 +15,8 @@
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Text="{Binding StagedHeader}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <Button Classes="flat" Content="Unstage selected" Command="{Binding UnstageSelectedCommand}" />
-            <Button Classes="flat" Content="Unstage all" Command="{Binding UnstageAllCommand}" />
+            <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_UnstageSelected}" Command="{Binding UnstageSelectedCommand}" />
+            <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_UnstageAll}" Command="{Binding UnstageAllCommand}" />
           </StackPanel>
         </Grid>
       </Border>
@@ -43,10 +44,10 @@
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Text="{Binding UnstagedHeader}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <Button Classes="flat" Content="Stage selected" Command="{Binding StageSelectedCommand}" />
-            <Button Classes="flat" Content="Stage all" Command="{Binding StageAllCommand}" />
-            <Button Classes="flat" Content="Discard" Command="{Binding DiscardSelectedCommand}" />
-            <Button Classes="flat" Content="Discard all" Command="{Binding DiscardAllCommand}" />
+            <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_StageSelected}" Command="{Binding StageSelectedCommand}" />
+            <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_StageAll}" Command="{Binding StageAllCommand}" />
+            <Button Classes="flat" Content="{x:Static res:Strings.Common_Discard}" Command="{Binding DiscardSelectedCommand}" />
+            <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_DiscardAll}" Command="{Binding DiscardAllCommand}" />
           </StackPanel>
         </Grid>
       </Border>
@@ -77,43 +78,43 @@
             <StackPanel Spacing="5">
               <TextBlock Text="{Binding ConflictText}" FontSize="11" TextWrapping="Wrap" />
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <Button Classes="flat" Content="Abort merge" Command="{Binding AbortMergeCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_AbortMerge}" Command="{Binding AbortMergeCommand}"
                         IsVisible="{Binding IsMergeInProgress}" />
-                <Button Classes="flat" Content="Abort rebase" Command="{Binding AbortRebaseCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_AbortRebase}" Command="{Binding AbortRebaseCommand}"
                         IsVisible="{Binding IsRebaseInProgress}" />
-                <Button Classes="flat" Content="Continue rebase" Command="{Binding ContinueRebaseCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_ContinueRebase}" Command="{Binding ContinueRebaseCommand}"
                         IsVisible="{Binding IsRebaseInProgress}" />
-                <Button Classes="flat" Content="Skip commit" Command="{Binding SkipRebaseCommitCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_SkipCommit}" Command="{Binding SkipRebaseCommitCommand}"
                         IsVisible="{Binding IsRebaseInProgress}" />
-                <Button Classes="flat" Content="Continue cherry-pick" Command="{Binding CherryPickContinueCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_ContinueCherryPick}" Command="{Binding CherryPickContinueCommand}"
                         IsVisible="{Binding IsCherryPickInProgress}" />
-                <Button Classes="flat" Content="Skip cherry-pick" Command="{Binding CherryPickSkipCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_SkipCherryPick}" Command="{Binding CherryPickSkipCommand}"
                         IsVisible="{Binding IsCherryPickInProgress}" />
-                <Button Classes="flat" Content="Abort cherry-pick" Command="{Binding CherryPickAbortCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_AbortCherryPick}" Command="{Binding CherryPickAbortCommand}"
                         IsVisible="{Binding IsCherryPickInProgress}" />
-                <Button Classes="flat" Content="Continue revert" Command="{Binding RevertContinueCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_ContinueRevert}" Command="{Binding RevertContinueCommand}"
                         IsVisible="{Binding IsRevertInProgress}" />
-                <Button Classes="flat" Content="Abort revert" Command="{Binding RevertAbortCommand}"
+                <Button Classes="flat" Content="{x:Static res:Strings.WorkingCopy_AbortRevert}" Command="{Binding RevertAbortCommand}"
                         IsVisible="{Binding IsRevertInProgress}" />
               </StackPanel>
             </StackPanel>
           </Border>
           <TextBlock Text="{Binding SummaryText}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
-          <TextBox Text="{Binding CommitMessage, Mode=TwoWay}" PlaceholderText="Commit message"
+          <TextBox Text="{Binding CommitMessage, Mode=TwoWay}" PlaceholderText="{x:Static res:Strings.WorkingCopy_CommitMessagePlaceholder}"
                    AcceptsReturn="True" TextWrapping="Wrap" Height="70" FontSize="12" />
           <Grid RowDefinitions="Auto,Auto" RowSpacing="6">
             <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-              <CheckBox Content="Amend last commit" IsChecked="{Binding Amend, Mode=TwoWay}"
+              <CheckBox Content="{x:Static res:Strings.WorkingCopy_AmendLastCommit}" IsChecked="{Binding Amend, Mode=TwoWay}"
                         FontSize="11" VerticalAlignment="Center" />
-              <CheckBox Content="Sign off" IsChecked="{Binding SignOff, Mode=TwoWay}"
+              <CheckBox Content="{x:Static res:Strings.WorkingCopy_SignOff}" IsChecked="{Binding SignOff, Mode=TwoWay}"
                         FontSize="11" VerticalAlignment="Center" />
-              <CheckBox Content="GPG sign" IsChecked="{Binding GpgSign, Mode=TwoWay}"
+              <CheckBox Content="{x:Static res:Strings.WorkingCopy_GpgSign}" IsChecked="{Binding GpgSign, Mode=TwoWay}"
                         FontSize="11" VerticalAlignment="Center" />
             </StackPanel>
-            <CheckBox Grid.Row="1" Content="Push after committing" IsChecked="{Binding PushAfterCommit, Mode=TwoWay}"
+            <CheckBox Grid.Row="1" Content="{x:Static res:Strings.WorkingCopy_PushAfterCommitting}" IsChecked="{Binding PushAfterCommit, Mode=TwoWay}"
                       FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Left" />
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
-              <Button Classes="toolbar" Content="Stash" Command="{Binding StashCommand}" />
+              <Button Classes="toolbar" Content="{x:Static res:Strings.Main_Stash}" Command="{Binding StashCommand}" />
               <Button Classes="accent" Content="{Binding CommitButtonText}" MinWidth="110" Height="32"
                       HorizontalContentAlignment="Center"
                       Command="{Binding CommitCommand}" IsEnabled="{Binding CanCommit}" />
@@ -132,13 +133,13 @@
       <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
               BorderThickness="0,0,0,1" Padding="8,5">
         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
-          <TextBlock Text="Context" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
+          <TextBlock Text="{x:Static res:Strings.History_Context}" Classes="muted" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0" />
           <ComboBox Grid.Column="1" ItemsSource="{Binding ContextOptions}"
                     SelectedItem="{Binding DiffContext, Mode=TwoWay}" Width="70" Height="26" FontSize="12" />
-          <CheckBox Grid.Column="2" Content="Ignore whitespace" IsChecked="{Binding IgnoreWhitespace, Mode=TwoWay}"
+          <CheckBox Grid.Column="2" Content="{x:Static res:Strings.History_IgnoreWhitespace}" IsChecked="{Binding IgnoreWhitespace, Mode=TwoWay}"
                     FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" />
-          <Button Grid.Column="3" Classes="flat" Content="Open file" Command="{Binding OpenSelectedFileCommand}" />
-          <Button Grid.Column="4" Classes="flat" Content="Open folder" Command="{Binding OpenInExplorerCommand}" />
+          <Button Grid.Column="3" Classes="flat" Content="{x:Static res:Strings.WorkingCopy_OpenFile}" Command="{Binding OpenSelectedFileCommand}" />
+          <Button Grid.Column="4" Classes="flat" Content="{x:Static res:Strings.Repo_View_OpenFolder}" Command="{Binding OpenInExplorerCommand}" />
         </Grid>
       </Border>
       <views:DiffView Grid.Row="1" DataContext="{Binding WorkingDiff}" />

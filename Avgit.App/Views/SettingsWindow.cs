@@ -13,7 +13,7 @@ public sealed class SettingsWindow : Window
 {
     public SettingsWindow(AppSettingsService settings, MainWindowViewModel vm)
     {
-        Title = "Settings";
+        Title = Strings.Common_Settings;
         Width = 640;
         Height = 590;
         CanResize = false;
@@ -21,37 +21,37 @@ public sealed class SettingsWindow : Window
         Background = new SolidColorBrush(Color.Parse("#252526"));
 
         var gitBox = new TextBox { Text = settings.Settings.GitExecutable };
-        var sshBox = new TextBox { Text = settings.Settings.GitSshCommand, PlaceholderText = "e.g. ssh -i C:\\keys\\id_ed25519" };
-        var generateKey = new Button { Content = "Generate key...", Margin = new Thickness(6, 0, 0, 0) };
+        var sshBox = new TextBox { Text = settings.Settings.GitSshCommand, PlaceholderText = Strings.Settings_SshCommandPlaceholder };
+        var generateKey = new Button { Content = Strings.Settings_GenerateKeyEllipsis, Margin = new Thickness(6, 0, 0, 0) };
         var sshRow = new DockPanel();
         DockPanel.SetDock(generateKey, Dock.Right);
         sshRow.Children.Add(generateKey);
         sshRow.Children.Add(sshBox);
-        var credentialBox = new TextBox { Text = settings.Settings.GitCredentialHelper, PlaceholderText = "e.g. manager-core or store" };
-        var diffBox = new TextBox { Text = settings.Settings.ExternalDiffCommand, PlaceholderText = "command with {repo}, {file}, {sha}" };
-        var mergeBox = new TextBox { Text = settings.Settings.ExternalMergeCommand, PlaceholderText = "command with {repo}, {file}, {base}, {local}, {remote}" };
-        var autoRefreshBox = new CheckBox { Content = "Auto-refresh on file changes", IsChecked = settings.Settings.AutoRefresh };
+        var credentialBox = new TextBox { Text = settings.Settings.GitCredentialHelper, PlaceholderText = Strings.Settings_CredentialHelperPlaceholder };
+        var diffBox = new TextBox { Text = settings.Settings.ExternalDiffCommand, PlaceholderText = Strings.Settings_ExternalDiffPlaceholder };
+        var mergeBox = new TextBox { Text = settings.Settings.ExternalMergeCommand, PlaceholderText = Strings.Settings_ExternalMergePlaceholder };
+        var autoRefreshBox = new CheckBox { Content = Strings.Settings_AutoRefreshOnFileChanges, IsChecked = settings.Settings.AutoRefresh };
         var untrackedBox = new CheckBox
         {
-            Content = "Show files inside untracked folders (off: one entry per folder, faster)",
+            Content = Strings.Settings_ShowFilesInUntrackedFolders,
             IsChecked = settings.Settings.ShowFilesInUntrackedFolders
         };
         var commitGraphBox = new CheckBox
         {
-            Content = "Write a commit-graph when missing (much faster history in large repositories)",
+            Content = Strings.Settings_MaintainCommitGraph,
             IsChecked = settings.Settings.MaintainCommitGraph
         };
         var updatesBox = new CheckBox
         {
-            Content = "Download new versions automatically (installed on restart)",
+            Content = Strings.Settings_DownloadUpdatesAutomatically,
             IsChecked = settings.Settings.CheckForUpdates
         };
         var terminalBox = new TextBox
         {
             Text = settings.Settings.TerminalShell,
             PlaceholderText = OperatingSystem.IsWindows()
-                ? "default: PowerShell (pwsh if installed); e.g. cmd.exe"
-                : "default: login shell ($SHELL); e.g. /bin/zsh"
+                ? Strings.Settings_TerminalPlaceholderWindows
+                : Strings.Settings_TerminalPlaceholderUnix
         };
 
         var grid = new Grid
@@ -63,16 +63,16 @@ public sealed class SettingsWindow : Window
             ColumnSpacing = 10
         };
 
-        AddRow(grid, 0, "Git executable", gitBox);
-        AddRow(grid, 1, "SSH command", sshRow);
-        AddRow(grid, 2, "Credential helper", credentialBox);
-        AddRow(grid, 3, "External diff", diffBox);
-        AddRow(grid, 4, "External merge", mergeBox);
-        AddRow(grid, 5, "Terminal shell", terminalBox);
-        AddRow(grid, 6, "Auto refresh", autoRefreshBox);
-        AddRow(grid, 7, "Untracked files", untrackedBox);
-        AddRow(grid, 8, "Performance", commitGraphBox);
-        AddRow(grid, 9, "Updates", updatesBox);
+        AddRow(grid, 0, Strings.Settings_GitExecutable, gitBox);
+        AddRow(grid, 1, Strings.Settings_SSHCommand, sshRow);
+        AddRow(grid, 2, Strings.Settings_CredentialHelper, credentialBox);
+        AddRow(grid, 3, Strings.Settings_ExternalDiff, diffBox);
+        AddRow(grid, 4, Strings.Settings_ExternalMerge, mergeBox);
+        AddRow(grid, 5, Strings.Settings_TerminalShell, terminalBox);
+        AddRow(grid, 6, Strings.Settings_AutoRefresh, autoRefreshBox);
+        AddRow(grid, 7, Strings.Settings_UntrackedFiles, untrackedBox);
+        AddRow(grid, 8, Strings.Settings_Performance, commitGraphBox);
+        AddRow(grid, 9, Strings.Settings_Updates, updatesBox);
 
         var pathText = new TextBlock
         {
@@ -98,7 +98,7 @@ public sealed class SettingsWindow : Window
             {
                 IStorageFile? file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
                 {
-                    Title = "Create SSH key",
+                    Title = Strings.Settings_CreateSSHKey,
                     SuggestedFileName = "id_ed25519",
                     ShowOverwritePrompt = true
                 });
@@ -116,8 +116,8 @@ public sealed class SettingsWindow : Window
 
                 if (File.Exists(path))
                 {
-                    if (!await dialogs.ConfirmAsync("Overwrite SSH key",
-                            $"'{path}' already exists. Replace it? The existing private key cannot be recovered."))
+                    if (!await dialogs.ConfirmAsync(Strings.Settings_OverwriteSSHKey,
+                            string.Format(Strings.Settings_OverwriteSshKeyConfirm, path)))
                     {
                         return;
                     }
@@ -132,7 +132,7 @@ public sealed class SettingsWindow : Window
                     }
                     catch (Exception ex)
                     {
-                        await dialogs.ShowMessageAsync("SSH key", ex.Message);
+                        await dialogs.ShowMessageAsync(Strings.Settings_SSHKey, ex.Message);
                         return;
                     }
                 }
@@ -144,7 +144,7 @@ public sealed class SettingsWindow : Window
                 ]);
                 if (!result.Success)
                 {
-                    await dialogs.ShowMessageAsync("SSH key", result.Combined);
+                    await dialogs.ShowMessageAsync(Strings.Settings_SSHKey, result.Combined);
                     return;
                 }
 
@@ -152,13 +152,13 @@ public sealed class SettingsWindow : Window
             }
             catch (Exception ex)
             {
-                await dialogs.ShowMessageAsync("SSH key", ex.Message);
+                await dialogs.ShowMessageAsync(Strings.Settings_SSHKey, ex.Message);
             }
         };
 
-        var cancel = new Button { Content = "Cancel", Width = 90 };
+        var cancel = new Button { Content = Strings.Common_Cancel, Width = 90 };
         cancel.Click += (_, _) => Close();
-        var save = new Button { Content = "Save", Width = 90, Classes = { "accent" }, IsDefault = true };
+        var save = new Button { Content = Strings.Settings_Save, Width = 90, Classes = { "accent" }, IsDefault = true };
         save.Click += (_, _) =>
         {
             settings.Settings.GitExecutable = string.IsNullOrWhiteSpace(gitBox.Text) ? "git" : gitBox.Text!.Trim();

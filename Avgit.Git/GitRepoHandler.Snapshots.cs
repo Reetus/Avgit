@@ -513,13 +513,13 @@ public sealed partial class GitRepoHandler
         var end = output.IndexOf(GroupSeparator);
         if (end < 0)
         {
-            return new CommitResult(null, $"Unexpected output while reading commit {revision}.");
+            return new CommitResult(null, string.Format(GitStrings.Commit_UnexpectedOutput, revision));
         }
 
         var fields = output[..end].Split(UnitSeparator);
         if (fields.Length < 11)
         {
-            return new CommitResult(null, $"Unexpected output while reading commit {revision}.");
+            return new CommitResult(null, string.Format(GitStrings.Commit_UnexpectedOutput, revision));
         }
 
         DateTimeOffset.TryParse(fields[7], CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset authorDate);
@@ -761,8 +761,8 @@ public sealed partial class GitRepoHandler
         var message = string.IsNullOrWhiteSpace(result.Error) ? result.Output : result.Error;
         var firstLine = message.Split('\n').FirstOrDefault()?.Trim();
         return string.IsNullOrWhiteSpace(firstLine)
-            ? $"{operation} failed (exit {result.ExitCode})."
-            : $"{operation} failed: {firstLine}";
+            ? string.Format(GitStrings.Failure_ExitCode, operation, result.ExitCode)
+            : string.Format(GitStrings.Failure_Message, operation, firstLine);
     }
 
     /// <summary>

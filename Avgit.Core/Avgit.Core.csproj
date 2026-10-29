@@ -11,4 +11,14 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
+
+  <!-- User-facing text (diff captions); the CoreStrings class is generated at build time. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\CoreStrings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)CoreStrings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Avgit.Core.Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>CoreStrings</StronglyTypedClassName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

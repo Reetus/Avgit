@@ -29,7 +29,7 @@ public partial class App : Application
 
             dialogs.Owner = window;
             AsyncRelayCommand.UnhandledError = ex =>
-                _ = dialogs.ShowMessageAsync("Unexpected error", ex.Message);
+                _ = dialogs.ShowMessageAsync(Strings.App_UnexpectedError, ex.Message);
             viewModel.ExitAction = () => window.Close();
             viewModel.CopyText = text =>
             {

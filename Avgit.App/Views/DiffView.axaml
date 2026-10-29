@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="using:Avgit.App.Resources"
              xmlns:vm="using:Avgit.App.ViewModels"
              xmlns:controls="using:Avgit.App.Controls"
              x:Class="Avgit.App.Views.DiffView"
@@ -26,11 +27,11 @@
             <TextBlock Text="{Binding Description}" Classes="muted" FontSize="11" VerticalAlignment="Center" />
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <Button Classes="flat" Content="Stage file" IsVisible="{Binding CanStage}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_StageFile}" IsVisible="{Binding CanStage}"
                     Command="{Binding StageCommand}" CommandParameter="{Binding File}" />
-            <Button Classes="flat" Content="Unstage file" IsVisible="{Binding CanUnstage}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_UnstageFile}" IsVisible="{Binding CanUnstage}"
                     Command="{Binding UnstageCommand}" CommandParameter="{Binding File}" />
-            <Button Classes="flat" Content="Discard" IsVisible="{Binding CanDiscard}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Common_Discard}" IsVisible="{Binding CanDiscard}"
                     Command="{Binding DiscardCommand}" CommandParameter="{Binding File}" />
           </StackPanel>
         </Grid>
@@ -43,17 +44,17 @@
           <TextBlock Text="{Binding Description}" Foreground="#8FB8D8" FontFamily="{StaticResource MonoFont}" FontSize="11"
                      VerticalAlignment="Center" />
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-            <Button Classes="flat" Content="Stage hunk" IsVisible="{Binding CanStage}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_StageHunk}" IsVisible="{Binding CanStage}"
                     Command="{Binding StageCommand}" CommandParameter="{Binding Hunk}" />
-            <Button Classes="flat" Content="Unstage hunk" IsVisible="{Binding CanUnstage}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_UnstageHunk}" IsVisible="{Binding CanUnstage}"
                     Command="{Binding UnstageCommand}" CommandParameter="{Binding Hunk}" />
-            <Button Classes="flat" Content="Discard hunk" IsVisible="{Binding CanDiscard}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_DiscardHunk}" IsVisible="{Binding CanDiscard}"
                     Command="{Binding DiscardCommand}" CommandParameter="{Binding Hunk}" />
-            <Button Classes="flat" Content="Stage selected lines" IsVisible="{Binding CanStage}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_StageSelectedLines}" IsVisible="{Binding CanStage}"
                     Command="{Binding StageSelectedLinesCommand}" CommandParameter="{Binding Hunk}" />
-            <Button Classes="flat" Content="Unstage selected lines" IsVisible="{Binding CanUnstage}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_UnstageSelectedLines}" IsVisible="{Binding CanUnstage}"
                     Command="{Binding UnstageSelectedLinesCommand}" CommandParameter="{Binding Hunk}" />
-            <Button Classes="flat" Content="Discard selected lines" IsVisible="{Binding CanDiscardLines}"
+            <Button Classes="flat" Content="{x:Static res:Strings.Diff_DiscardSelectedLines}" IsVisible="{Binding CanDiscardLines}"
                     Command="{Binding DiscardSelectedLinesCommand}" CommandParameter="{Binding Hunk}" />
           </StackPanel>
         </Grid>
@@ -121,7 +122,7 @@
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
         <TextBlock Grid.Column="1" Classes="muted" FontSize="11" VerticalAlignment="Center"
-                   Text="{Binding Files.Count, StringFormat='{}{0} file(s)'}" />
+                   Text="{Binding Files.Count, StringFormat={x:Static res:Strings.Diff_FileCountFormat}}" />
       </Grid>
     </Border>
 
@@ -133,16 +134,16 @@
                     KeyDown="OnDiffKeyDown">
         <ItemsControl.ContextMenu>
           <ContextMenu Opening="OnDiffMenuOpening" Closing="OnDiffMenuClosing">
-            <MenuItem Header="Copy" InputGesture="Ctrl+C" Tag="copy" Click="OnCopySelectedLines" />
-            <MenuItem Header="Copy with +/- markers" Tag="copy-markers" Click="OnCopySelectedLinesWithMarkers" />
-            <MenuItem Header="Copy new version" Tag="copy-new" Click="OnCopyNewVersion" />
-            <MenuItem Header="Copy old version" Tag="copy-old" Click="OnCopyOldVersion" />
+            <MenuItem Header="{x:Static res:Strings.Diff_Copy}" InputGesture="Ctrl+C" Tag="copy" Click="OnCopySelectedLines" />
+            <MenuItem Header="{x:Static res:Strings.Diff_CopyWithMarkers}" Tag="copy-markers" Click="OnCopySelectedLinesWithMarkers" />
+            <MenuItem Header="{x:Static res:Strings.Diff_CopyNewVersion}" Tag="copy-new" Click="OnCopyNewVersion" />
+            <MenuItem Header="{x:Static res:Strings.Diff_CopyOldVersion}" Tag="copy-old" Click="OnCopyOldVersion" />
             <Separator Tag="workseparator" IsVisible="False" />
-            <MenuItem Header="Stage selected lines" Tag="stage" IsVisible="False" Click="OnStageSelectedLines" />
-            <MenuItem Header="Unstage selected lines" Tag="unstage" IsVisible="False" Click="OnUnstageSelectedLines" />
-            <MenuItem Header="Discard selected lines" Tag="discard" IsVisible="False" Click="OnDiscardSelectedLines" />
+            <MenuItem Header="{x:Static res:Strings.Diff_StageSelectedLines}" Tag="stage" IsVisible="False" Click="OnStageSelectedLines" />
+            <MenuItem Header="{x:Static res:Strings.Diff_UnstageSelectedLines}" Tag="unstage" IsVisible="False" Click="OnUnstageSelectedLines" />
+            <MenuItem Header="{x:Static res:Strings.Diff_DiscardSelectedLines}" Tag="discard" IsVisible="False" Click="OnDiscardSelectedLines" />
             <Separator />
-            <MenuItem Header="Copy file path" Tag="copy-path" Click="OnCopyFilePath" />
+            <MenuItem Header="{x:Static res:Strings.Diff_CopyFilePath}" Tag="copy-path" Click="OnCopyFilePath" />
           </ContextMenu>
         </ItemsControl.ContextMenu>
         <ItemsControl.Template>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="FileState_New" xml:space="preserve">
+    <value>New file</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_Deleted" xml:space="preserve">
+    <value>Deleted</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_Renamed" xml:space="preserve">
+    <value>Renamed</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_RenamedFrom" xml:space="preserve">
+    <value>Renamed from {0}</value>
+    <comment>{0} = previous path</comment>
+  </data>
+  <data name="FileState_Copied" xml:space="preserve">
+    <value>Copied</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_CopiedFrom" xml:space="preserve">
+    <value>Copied from {0}</value>
+    <comment>{0} = source path</comment>
+  </data>
+  <data name="FileState_Untracked" xml:space="preserve">
+    <value>Untracked</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_Unmodified" xml:space="preserve">
+    <value>Unmodified</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_SubmoduleCommitChanged" xml:space="preserve">
+    <value>Submodule commit changed</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_Conflicted" xml:space="preserve">
+    <value>Conflicted</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileState_Modified" xml:space="preserve">
+    <value>Modified</value>
+    <comment>File diff caption: change kind</comment>
+  </data>
+  <data name="FileCaption_Binary" xml:space="preserve">
+    <value>{0} (binary)</value>
+    <comment>{0} = change kind, e.g. Modified</comment>
+  </data>
+  <data name="FileCaption_LineCounts" xml:space="preserve">
+    <value>{0:N0} added, {1:N0} removed</value>
+    <comment>{0} = added lines, {1} = removed lines</comment>
+  </data>
+  <data name="FileCaption_LineCountsTruncated" xml:space="preserve">
+    <value>{0:N0}+ added, {1:N0}+ removed</value>
+    <comment>Diff was truncated, so counts are lower bounds. {0} = added lines, {1} = removed lines</comment>
+  </data>
+  <data name="FileCaption_ModeChanged" xml:space="preserve">
+    <value>mode {0} → {1}</value>
+    <comment>{0} = old file mode, {1} = new file mode (e.g. 100644)</comment>
+  </data>
+  <data name="FileCaption_DiffHidden" xml:space="preserve">
+    <value>diff hidden</value>
+    <comment>Caption part, lower case; parts are joined with ' · '</comment>
+  </data>
+  <data name="FileEmpty_DiffHidden" xml:space="preserve">
+    <value>The diff for this file is hidden.</value>
+  </data>
+  <data name="FileEmpty_Binary" xml:space="preserve">
+    <value>Binary file; no text diff is available.</value>
+  </data>
+  <data name="FileEmpty_TooLarge" xml:space="preserve">
+    <value>This diff is too large to display.</value>
+  </data>
+  <data name="FileEmpty_ModeOnly" xml:space="preserve">
+    <value>Only the file mode changed ({0} → {1}).</value>
+    <comment>{0} = old file mode, {1} = new file mode</comment>
+  </data>
+  <data name="FileEmpty_RenamedOnly" xml:space="preserve">
+    <value>Renamed without content changes.</value>
+  </data>
+  <data name="FileEmpty_CopiedOnly" xml:space="preserve">
+    <value>Copied without content changes.</value>
+  </data>
+  <data name="FileEmpty_EmptyFile" xml:space="preserve">
+    <value>The file is empty.</value>
+  </data>
+  <data name="FileEmpty_EmptyFileDeleted" xml:space="preserve">
+    <value>An empty file was deleted.</value>
+  </data>
+  <data name="FileEmpty_NoContentChanges" xml:space="preserve">
+    <value>No content changes.</value>
+  </data>
+  <data name="HunkCaption_FirstLines" xml:space="preserve">
+    <value>First {0:N0} line(s)</value>
+    <comment>Truncated whole-file hunk. {0} = lines shown</comment>
+  </data>
+  <data name="HunkCaption_WholeFile" xml:space="preserve">
+    <value>Whole file, {0:N0} line(s)</value>
+    <comment>{0} = line count</comment>
+  </data>
+  <data name="HunkCaption_DeletedLines" xml:space="preserve">
+    <value>{0:N0} deleted line(s)</value>
+    <comment>{0} = line count</comment>
+  </data>
+  <data name="HunkCaption_LineRemoved" xml:space="preserve">
+    <value>Line {0} removed</value>
+    <comment>{0} = line number</comment>
+  </data>
+  <data name="HunkCaption_LinesRemoved" xml:space="preserve">
+    <value>Lines {0}–{1} removed</value>
+    <comment>{0} = first line number, {1} = last line number</comment>
+  </data>
+  <data name="HunkCaption_Line" xml:space="preserve">
+    <value>Line {0}</value>
+    <comment>{0} = line number</comment>
+  </data>
+  <data name="HunkCaption_Lines" xml:space="preserve">
+    <value>Lines {0}–{1}</value>
+    <comment>{0} = first line number, {1} = last line number</comment>
+  </data>
+  <data name="HunkCaption_Truncated" xml:space="preserve">
+    <value>{0} (truncated)</value>
+    <comment>{0} = hunk range caption</comment>
+  </data>
+</root>

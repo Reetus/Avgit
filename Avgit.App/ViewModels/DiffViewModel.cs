@@ -29,7 +29,7 @@ public sealed partial class DiffViewModel : ObservableObject
     public partial string Title { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string EmptyMessage { get; set; } = "Select a file to view its diff.";
+    public partial string EmptyMessage { get; set; } = Strings.DiffVm_SelectFile;
 
     public bool HasContent
     {
@@ -170,7 +170,7 @@ public sealed partial class DiffViewModel : ObservableObject
 
             if (file.Binary)
             {
-                DisplayItems.Add(new DiffNoteItem("Binary file; no text diff is available."));
+                DisplayItems.Add(new DiffNoteItem(Strings.DiffVm_BinaryFile));
                 continue;
             }
 
@@ -203,17 +203,17 @@ public sealed partial class DiffViewModel : ObservableObject
         }
 
         HasContent = files.Count > 0;
-        EmptyMessage = files.Count == 0 ? "No changes to display." : string.Empty;
+        EmptyMessage = files.Count == 0 ? Strings.DiffVm_NoChanges : string.Empty;
     }
 
-    public void Clear(string message = "Select a file to view its diff.")
+    public void Clear(string? message = null)
     {
         ResetSelection();
         Files.Clear();
         DisplayItems.Clear();
         ReleaseImages();
         Title = string.Empty;
-        EmptyMessage = message;
+        EmptyMessage = message ?? Strings.DiffVm_SelectFile;
         HasContent = false;
         CanStage = CanUnstage = CanDiscard = false;
     }
@@ -304,8 +304,8 @@ public sealed partial class DiffViewModel : ObservableObject
         }
 
         var count = _lineItems.Count(line => line.IsSelected && line.Line.Marker is '+' or '-');
-        var what = count == 1 ? "the selected changed line" : $"the {count:N0} selected changed lines";
-        if (!await ConfirmAction("Discard lines", $"Discard {what}? This cannot be undone.").ConfigureAwait(true))
+        var message = count == 1 ? Strings.DiffVm_DiscardLineConfirm : string.Format(Strings.DiffVm_DiscardLinesConfirm, count);
+        if (!await ConfirmAction(Strings.DiffVm_DiscardLinesTitle, message).ConfigureAwait(true))
         {
             return;
         }
@@ -509,7 +509,7 @@ public sealed partial class DiffViewModel : ObservableObject
 
         if (bytes.Data is not { } data)
         {
-            side.SetError(bytes.Error ?? "Could not read the image.");
+            side.SetError(bytes.Error ?? Strings.DiffVm_CouldNotReadImage);
             return;
         }
 
@@ -528,7 +528,7 @@ public sealed partial class DiffViewModel : ObservableObject
 
         if (image is null)
         {
-            side.SetError($"Could not decode the image ({DiffImages.FormatSize(data.Length)}).");
+            side.SetError(string.Format(Strings.DiffVm_CouldNotDecodeImage, DiffImages.FormatSize(data.Length)));
         }
         else if (token.IsCancellationRequested)
         {

@@ -40,15 +40,15 @@ public sealed partial class CommitRowViewModel(HistoryRow row) : ObservableObjec
     public string Author => Row.AuthorDisplay;
     public string TimestampText => Row.Timestamp.ToString("yyyy-MM-dd HH:mm");
     public string Sha => Row.ShortId;
-    public string ParentsText => Row.ParentIds.Length > 1 ? $"merge {Row.ParentIds.Length}" : string.Empty;
+    public string ParentsText => Row.ParentIds.Length > 1 ? string.Format(Strings.DiffVm_MergeParents, Row.ParentIds.Length) : string.Empty;
     public bool IsMerge => Row.ParentIds.Length > 1;
     public bool HasLabels => Row.Refs.Length > 0;
     public IReadOnlyList<RefPill> Pills => _pills ??= RefPill.FromLabels(Row.Refs, _worktreeBranches);
     public string LabelsToolTip => string.Join("\n", Row.Refs.Select(l => l.Kind switch
     {
-        RefKind.Tag => $"tag: {l.Name}",
+        RefKind.Tag => string.Format(Strings.DiffVm_TagToolTip, l.Name),
         RefKind.RemoteBranch => l.Name,
-        RefKind.Branch when _worktreeBranches.Contains(l.Name) => $"{l.Name} (in another worktree)",
+        RefKind.Branch when _worktreeBranches.Contains(l.Name) => string.Format(Strings.DiffVm_BranchInOtherWorktree, l.Name),
         _ => l.Name
     }));
 

@@ -103,7 +103,7 @@ public sealed class DialogService : IDialogService
         ScrollViewer.SetVerticalScrollBarVisibility(editor, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
         ScrollViewer.SetHorizontalScrollBarVisibility(editor, Avalonia.Controls.Primitives.ScrollBarVisibility.Auto);
         panel.Children.Add(editor);
-        var close = new Button { Content = "Close", Width = 90, HorizontalAlignment = HorizontalAlignment.Right };
+        var close = new Button { Content = Strings.Common_Close, Width = 90, HorizontalAlignment = HorizontalAlignment.Right };
         close.Click += (_, _) => window.Close();
         panel.Children.Add(close);
         window.Content = panel;
@@ -148,9 +148,9 @@ public sealed class DialogService : IDialogService
             HorizontalAlignment = HorizontalAlignment.Right,
             Spacing = 8
         };
-        var cancel = new Button { Content = "Cancel", Width = 90 };
+        var cancel = new Button { Content = Strings.Common_Cancel, Width = 90 };
         cancel.Click += (_, _) => window.Close();
-        var ok = new Button { Content = "Run rebase", Width = 110, Classes = { "accent" }, IsDefault = true };
+        var ok = new Button { Content = Strings.Dialog_RunRebase, Width = 110, Classes = { "accent" }, IsDefault = true };
         ok.Click += (_, _) =>
         {
             value = editor.Text;
@@ -201,9 +201,9 @@ public sealed class DialogService : IDialogService
             HorizontalAlignment = HorizontalAlignment.Right,
             Spacing = 8
         };
-        var no = new Button { Content = "Cancel", Width = 90 };
+        var no = new Button { Content = Strings.Common_Cancel, Width = 90 };
         no.Click += (_, _) => window.Close();
-        var yes = new Button { Content = "OK", Width = 90, Classes = { "accent" } };
+        var yes = new Button { Content = Strings.Common_OK, Width = 90, Classes = { "accent" } };
         yes.Click += (_, _) => { result = true; window.Close(); };
         buttons.Children.Add(no);
         buttons.Children.Add(yes);
@@ -248,7 +248,7 @@ public sealed class DialogService : IDialogService
             panel.Children.Add(button);
         }
 
-        var cancel = new Button { Content = "Cancel", Width = 90, HorizontalAlignment = HorizontalAlignment.Right };
+        var cancel = new Button { Content = Strings.Common_Cancel, Width = 90, HorizontalAlignment = HorizontalAlignment.Right };
         cancel.Click += (_, _) => window.Close();
         panel.Children.Add(cancel);
 
@@ -271,7 +271,7 @@ public sealed class DialogService : IDialogService
             MaxHeight = 160,
             Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap, Foreground = Brushes.White }
         });
-        var ok = new Button { Content = "OK", Width = 90, HorizontalAlignment = HorizontalAlignment.Right, Classes = { "accent" } };
+        var ok = new Button { Content = Strings.Common_OK, Width = 90, HorizontalAlignment = HorizontalAlignment.Right, Classes = { "accent" } };
         ok.Click += (_, _) => window.Close();
         panel.Children.Add(ok);
         window.Content = panel;
@@ -313,9 +313,9 @@ public sealed class DialogService : IDialogService
             HorizontalAlignment = HorizontalAlignment.Right,
             Spacing = 8
         };
-        var cancel = new Button { Content = "Cancel", Width = 90 };
+        var cancel = new Button { Content = Strings.Common_Cancel, Width = 90 };
         cancel.Click += (_, _) => window.Close();
-        var ok = new Button { Content = "OK", Width = 90, Classes = { "accent" }, IsDefault = true };
+        var ok = new Button { Content = Strings.Common_OK, Width = 90, Classes = { "accent" }, IsDefault = true };
         ok.Click += (_, _) =>
         {
             value = textBox.Text?.Trim();

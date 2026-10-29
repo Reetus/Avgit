@@ -28,6 +28,18 @@
     <ProjectReference Include="..\Avgit.Git\Avgit.Git.csproj" />
   </ItemGroup>
 
+  <!-- User-facing text. The strongly typed Strings class is generated at build time
+       (no Visual Studio custom tool), so XAML can use {x:Static res:Strings.Key}. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Avgit.App.Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="Avgit.Tests" />
   </ItemGroup>

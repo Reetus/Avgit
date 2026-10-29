@@ -53,9 +53,9 @@ public static class DiffImages
 
     public static string FormatSize(long bytes) => bytes switch
     {
-        < 1024 => $"{bytes:N0} B",
-        < 1024 * 1024 => $"{bytes / 1024.0:N1} KB",
-        _ => $"{bytes / (1024.0 * 1024):N1} MB"
+        < 1024 => string.Format(Strings.DiffVm_SizeBytes, bytes),
+        < 1024 * 1024 => string.Format(Strings.DiffVm_SizeKilobytes, bytes / 1024.0),
+        _ => string.Format(Strings.DiffVm_SizeMegabytes, bytes / (1024.0 * 1024))
     };
 }
 
@@ -72,12 +72,12 @@ public sealed partial class DiffImageSide(string label, ImageOrigin origin) : Ob
     public bool HasImage => Image is not null;
 
     [ObservableProperty]
-    public partial string Info { get; private set; } = "Loading…";
+    public partial string Info { get; private set; } = Strings.DiffVm_ImageLoading;
 
     public void SetImage(Bitmap image, long byteCount)
     {
         Image = image;
-        Info = $"{image.PixelSize.Width:N0} × {image.PixelSize.Height:N0} px · {DiffImages.FormatSize(byteCount)}";
+        Info = string.Format(Strings.DiffVm_ImageInfo, image.PixelSize.Width, image.PixelSize.Height, DiffImages.FormatSize(byteCount));
     }
 
     public void SetError(string message) => Info = message;
@@ -102,13 +102,13 @@ public sealed class DiffImageItem : DiffDisplayItem
         File = file;
         if (sides.Old is { } before)
         {
-            Sides.Add(new DiffImageSide("Old File", before));
+            Sides.Add(new DiffImageSide(Strings.DiffVm_OldFile, before));
         }
 
         if (sides.New is { } after)
         {
             // An unmodified file is shown as its content, not as a change.
-            Sides.Add(new DiffImageSide(file.State == PathState.Unchanged ? "File" : "New File", after));
+            Sides.Add(new DiffImageSide(file.State == PathState.Unchanged ? Strings.DiffVm_File : Strings.DiffVm_NewFile, after));
         }
     }
 

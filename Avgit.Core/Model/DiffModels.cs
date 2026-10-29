@@ -88,32 +88,32 @@ public partial class FileDiff(DiffSetup setup) : ObservableObject
         var parts = new List<string>(4);
         var what = State switch
         {
-            PathState.New => "New file",
-            PathState.Removed => "Deleted",
-            PathState.Moved => string.IsNullOrEmpty(OldPath) ? "Renamed" : $"Renamed from {OldPath}",
-            PathState.Duplicated => string.IsNullOrEmpty(OldPath) ? "Copied" : $"Copied from {OldPath}",
-            PathState.Untracked => "Untracked",
-            PathState.Unchanged => "Unmodified",
-            PathState.SubmoduleCommitChanged => "Submodule commit changed",
-            PathState.Conflicted => "Conflicted",
-            _ => "Modified"
+            PathState.New => CoreStrings.FileState_New,
+            PathState.Removed => CoreStrings.FileState_Deleted,
+            PathState.Moved => string.IsNullOrEmpty(OldPath) ? CoreStrings.FileState_Renamed : string.Format(CoreStrings.FileState_RenamedFrom, OldPath),
+            PathState.Duplicated => string.IsNullOrEmpty(OldPath) ? CoreStrings.FileState_Copied : string.Format(CoreStrings.FileState_CopiedFrom, OldPath),
+            PathState.Untracked => CoreStrings.FileState_Untracked,
+            PathState.Unchanged => CoreStrings.FileState_Unmodified,
+            PathState.SubmoduleCommitChanged => CoreStrings.FileState_SubmoduleCommitChanged,
+            PathState.Conflicted => CoreStrings.FileState_Conflicted,
+            _ => CoreStrings.FileState_Modified
         };
-        parts.Add(Binary ? what + " (binary)" : what);
+        parts.Add(Binary ? string.Format(CoreStrings.FileCaption_Binary, what) : what);
 
         if (!Binary && (AddedLines > 0 || RemovedLines > 0 || Truncated))
         {
-            var more = Truncated ? "+" : string.Empty;
-            parts.Add($"{AddedLines:N0}{more} added, {RemovedLines:N0}{more} removed");
+            parts.Add(string.Format(Truncated ? CoreStrings.FileCaption_LineCountsTruncated : CoreStrings.FileCaption_LineCounts,
+                AddedLines, RemovedLines));
         }
 
         if (OldMode != 0 && NewMode != 0 && OldMode != NewMode)
         {
-            parts.Add($"mode {OldMode} → {NewMode}");
+            parts.Add(string.Format(CoreStrings.FileCaption_ModeChanged, OldMode, NewMode));
         }
 
         if (Suppressed)
         {
-            parts.Add("diff hidden");
+            parts.Add(CoreStrings.FileCaption_DiffHidden);
         }
 
         return string.Join(" · ", parts);
@@ -154,31 +154,31 @@ public partial class FileDiff(DiffSetup setup) : ObservableObject
 
             if (Suppressed)
             {
-                return "The diff for this file is hidden.";
+                return CoreStrings.FileEmpty_DiffHidden;
             }
 
             if (Binary)
             {
-                return "Binary file; no text diff is available.";
+                return CoreStrings.FileEmpty_Binary;
             }
 
             if (Truncated)
             {
-                return "This diff is too large to display.";
+                return CoreStrings.FileEmpty_TooLarge;
             }
 
             if (OldMode != 0 && NewMode != 0 && OldMode != NewMode)
             {
-                return $"Only the file mode changed ({OldMode} → {NewMode}).";
+                return string.Format(CoreStrings.FileEmpty_ModeOnly, OldMode, NewMode);
             }
 
             return State switch
             {
-                PathState.Moved => "Renamed without content changes.",
-                PathState.Duplicated => "Copied without content changes.",
-                PathState.New or PathState.Untracked or PathState.Unchanged => "The file is empty.",
-                PathState.Removed => "An empty file was deleted.",
-                _ => "No content changes."
+                PathState.Moved => CoreStrings.FileEmpty_RenamedOnly,
+                PathState.Duplicated => CoreStrings.FileEmpty_CopiedOnly,
+                PathState.New or PathState.Untracked or PathState.Unchanged => CoreStrings.FileEmpty_EmptyFile,
+                PathState.Removed => CoreStrings.FileEmpty_EmptyFileDeleted,
+                _ => CoreStrings.FileEmpty_NoContentChanges
             };
         }
     }
@@ -313,25 +313,29 @@ public partial class Hunk(FileDiff owner) : ObservableObject, IHunk
         if (wholeFile)
         {
             range = Truncated || Owner.Truncated
-                ? $"First {LineItems.Count(l => l.Marker != '\\'):N0} line(s)"
-                : $"Whole file, {newCount:N0} line(s)";
+                ? string.Format(CoreStrings.HunkCaption_FirstLines, LineItems.Count(l => l.Marker != '\\'))
+                : string.Format(CoreStrings.HunkCaption_WholeFile, newCount);
         }
         else if (Owner.State == PathState.Removed && NewEnd == 0)
         {
-            range = $"{oldCount:N0} deleted line(s)";
+            range = string.Format(CoreStrings.HunkCaption_DeletedLines, oldCount);
         }
         else if (newCount == 0)
         {
-            range = oldCount == 1 ? $"Line {OldStart} removed" : $"Lines {OldStart}–{OldEnd} removed";
+            range = oldCount == 1
+                ? string.Format(CoreStrings.HunkCaption_LineRemoved, OldStart)
+                : string.Format(CoreStrings.HunkCaption_LinesRemoved, OldStart, OldEnd);
         }
         else
         {
-            range = newCount == 1 ? $"Line {NewStart}" : $"Lines {NewStart}–{NewEnd}";
+            range = newCount == 1
+                ? string.Format(CoreStrings.HunkCaption_Line, NewStart)
+                : string.Format(CoreStrings.HunkCaption_Lines, NewStart, NewEnd);
         }
 
         if (Truncated && !wholeFile)
         {
-            range += " (truncated)";
+            range = string.Format(CoreStrings.HunkCaption_Truncated, range);
         }
 
         return string.IsNullOrEmpty(Annotation) ? range : $"{Annotation} · {range}";

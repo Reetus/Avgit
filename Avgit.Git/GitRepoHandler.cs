@@ -544,14 +544,14 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
             if (file.Status == PathState.Conflicted)
             {
                 return firstFailure ?? new ProcessResult(-1, string.Empty,
-                    $"Cannot discard '{rel}': resolve the conflict or abort the merge/rebase.");
+                    string.Format(GitStrings.Discard_Conflicted, rel));
             }
 
             if (file.Status == PathState.Untracked)
             {
                 if (!TryDelete(abs))
                 {
-                    firstFailure ??= new ProcessResult(-1, string.Empty, $"Could not delete '{rel}'.");
+                    firstFailure ??= new ProcessResult(-1, string.Empty, string.Format(GitStrings.Discard_CouldNotDelete, rel));
                 }
 
                 continue;
@@ -567,7 +567,7 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
                 }
                 if (!TryDelete(abs))
                 {
-                    firstFailure ??= new ProcessResult(-1, string.Empty, $"Could not delete '{rel}'.");
+                    firstFailure ??= new ProcessResult(-1, string.Empty, string.Format(GitStrings.Discard_CouldNotDelete, rel));
                 }
 
                 continue;
@@ -978,7 +978,7 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
                 IReadOnlyDictionary<string, string> remotes = await GetRemotesAsync(path, cancellationToken).ConfigureAwait(false);
                 if (remotes.Count == 0)
                 {
-                    return new ProcessResult(-1, string.Empty, "No remote is configured for this repository.");
+                    return new ProcessResult(-1, string.Empty, GitStrings.Push_NoRemote);
                 }
 
                 remoteName = remotes.ContainsKey("origin") ? "origin" : remotes.Keys.First();
@@ -988,7 +988,7 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         if (string.IsNullOrWhiteSpace(branch) && string.IsNullOrWhiteSpace(detachedTarget))
         {
             return new ProcessResult(-1, string.Empty,
-                "Cannot push a detached HEAD without a destination branch name.");
+                GitStrings.Push_DetachedWithoutTarget);
         }
 
         if (!hasUpstream && !remoteWasSpecified && !string.IsNullOrWhiteSpace(branch))
@@ -1178,8 +1178,7 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         if (!string.IsNullOrWhiteSpace(merges.Output))
         {
             throw new InvalidOperationException(
-                "Interactive rebase over a range containing merge commits is not supported. " +
-                "Choose a linear range, or restructure the merge manually.");
+                GitStrings.Rebase_MergesNotSupported);
         }
 
         // Record format: full-sha US short-sha US full-message RS. Full messages
@@ -1324,12 +1323,12 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         var folder = Path.GetFileName(fullDestination);
         if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent))
         {
-            return new ProcessResult(-1, string.Empty, "Destination parent directory does not exist.");
+            return new ProcessResult(-1, string.Empty, GitStrings.Clone_ParentMissing);
         }
 
         if (string.IsNullOrEmpty(folder))
         {
-            return new ProcessResult(-1, string.Empty, "Destination folder name is empty.");
+            return new ProcessResult(-1, string.Empty, GitStrings.Clone_FolderNameEmpty);
         }
 
         var args = new List<string> { "-c", "core.quotepath=false" };
