@@ -63,6 +63,9 @@
     <DataTemplate DataType="{x:Type vm:DiffLineItem}">
       <!-- checkbox | old line no | new line no | +/- | text. Empty number sides are collapsed. -->
       <Grid ColumnDefinitions="24,Auto,Auto,16,*" Background="{Binding Background}" MinHeight="22">
+        <!-- Translucent overlay keeps the added/removed tint visible; the border is the accent bar. -->
+        <Border Grid.ColumnSpan="5" Background="#332E6FD8" BorderBrush="#6EA8FE" BorderThickness="3,0,0,0"
+                IsVisible="{Binding IsSelected}" IsHitTestVisible="False" />
         <CheckBox Grid.Column="0" Classes="diffcheck" IsChecked="{Binding Line.Selected, Mode=TwoWay}"
                   IsVisible="{Binding ShowCheckBox}" Margin="2,0,0,0" HorizontalAlignment="Left" />
         <TextBlock Grid.Column="1" Text="{Binding OldLineNo}" Foreground="{Binding LineNumberBrush}"
@@ -126,7 +129,22 @@
       <!-- The ScrollViewer lives inside the ItemsControl template so the panel can
            virtualize: only visible lines get controls. A StackPanel inside an outer
            ScrollViewer created a control per diff line, freezing on large diffs. -->
-      <ItemsControl ItemsSource="{Binding DisplayItems}">
+      <ItemsControl x:Name="DiffItems" ItemsSource="{Binding DisplayItems}" Focusable="True"
+                    KeyDown="OnDiffKeyDown">
+        <ItemsControl.ContextMenu>
+          <ContextMenu Opening="OnDiffMenuOpening" Closing="OnDiffMenuClosing">
+            <MenuItem Header="Copy" InputGesture="Ctrl+C" Tag="copy" Click="OnCopySelectedLines" />
+            <MenuItem Header="Copy with +/- markers" Tag="copy-markers" Click="OnCopySelectedLinesWithMarkers" />
+            <MenuItem Header="Copy new version" Tag="copy-new" Click="OnCopyNewVersion" />
+            <MenuItem Header="Copy old version" Tag="copy-old" Click="OnCopyOldVersion" />
+            <Separator Tag="workseparator" IsVisible="False" />
+            <MenuItem Header="Stage selected lines" Tag="stage" IsVisible="False" Click="OnStageSelectedLines" />
+            <MenuItem Header="Unstage selected lines" Tag="unstage" IsVisible="False" Click="OnUnstageSelectedLines" />
+            <MenuItem Header="Discard selected lines" Tag="discard" IsVisible="False" Click="OnDiscardSelectedLines" />
+            <Separator />
+            <MenuItem Header="Copy file path" Tag="copy-path" Click="OnCopyFilePath" />
+          </ContextMenu>
+        </ItemsControl.ContextMenu>
         <ItemsControl.Template>
           <ControlTemplate>
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">

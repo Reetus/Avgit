@@ -2122,6 +2122,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     {
         CommitDiff.ReadImageAction = ReadImageAsync;
         WorkingDiff.ReadImageAction = ReadImageAsync;
+        // CopyText is assigned after this repository is constructed, so read it when copying.
+        CommitDiff.CopyText = text => CopyText?.Invoke(text);
+        WorkingDiff.CopyText = text => CopyText?.Invoke(text);
+        WorkingDiff.ConfirmAction = Dialogs.ConfirmAsync;
+        WorkingDiff.DiscardConfirmedLinesAction = hunk => ApplyHunkAsync(hunk, stage: false, unstage: false, discard: true,
+            selectedOnly: true, confirmed: true);
         WorkingDiff.StageFileAction = file => StageFilesAsync([FindRecord(file.FileName, staged: false) ?? MakeRecord(file.FileName, staged: false)]);
         WorkingDiff.UnstageFileAction = file => UnstageFilesAsync([FindRecord(file.FileName, staged: true) ?? MakeRecord(file.FileName, staged: true)]);
         WorkingDiff.DiscardFileAction = file => DiscardFilesAsync([FindRecord(file.FileName, staged: false) ?? MakeRecord(file.FileName, staged: false)], confirm: true);
@@ -2292,7 +2298,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async Task ApplyHunkAsync(Hunk hunk, bool stage, bool unstage, bool discard, bool selectedOnly = false)
+    /// <param name="confirmed">The caller already asked before discarding (one question for several hunks).</param>
+    private async Task ApplyHunkAsync(Hunk hunk, bool stage, bool unstage, bool discard, bool selectedOnly = false,
+        bool confirmed = false)
     {
         // A new/untracked/deleted file has no counterpart tree entry to patch, so
         // operate on the whole file instead of trying to apply a hunk patch.
@@ -2328,7 +2336,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (discard && !await Dialogs.ConfirmAsync("Discard hunk", "Discard the selected hunk? This cannot be undone.").ConfigureAwait(true))
+        if (discard && !confirmed
+            && !await Dialogs.ConfirmAsync("Discard hunk", "Discard the selected hunk? This cannot be undone.").ConfigureAwait(true))
         {
             return;
         }
