@@ -152,7 +152,7 @@ public sealed class RemoteEntry
     public string Display => string.IsNullOrEmpty(Name) ? Url : Name;
 }
 
-public abstract class DiffDisplayItem
+public abstract class DiffDisplayItem : ObservableObject
 {
 }
 
@@ -197,7 +197,7 @@ public sealed class DiffHunkHeaderItem : DiffDisplayItem
     public ICommand? DiscardSelectedLinesCommand { get; init; }
 }
 
-public sealed class DiffLineItem(HunkLine line, IHunk hunk, FileDiff file, bool showCheckBox,
+public sealed partial class DiffLineItem(HunkLine line, IHunk hunk, FileDiff file, bool showCheckBox,
     DiffGutter? gutter = null) : DiffDisplayItem
 {
     private static readonly IBrush AddedBackground = new SolidColorBrush(Color.Parse("#17351F"));
@@ -216,6 +216,11 @@ public sealed class DiffLineItem(HunkLine line, IHunk hunk, FileDiff file, bool 
     public HunkLine Line { get; } = line;
     public IHunk Hunk { get; } = hunk;
     public FileDiff File { get; } = file;
+
+    /// <summary>Row selection made for copying; separate from <see cref="HunkLine.Selected"/> staging.</summary>
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+
     public string Text => Line.Text;
     public string PrefixText => Line.Marker == ' ' ? " " : Line.Marker.ToString();
     public string OldLineNo => Line.OldLineNo;

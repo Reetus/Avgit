@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows.Input;
 using Avalonia.Media.Imaging;
 using Avgit.Core.Diff;
@@ -66,8 +67,55 @@ public sealed partial class DiffViewModel : ObservableObject
     /// <summary>Reads one side of an image comparison; without it images show as binary files.</summary>
     public Func<ImageOrigin, CancellationToken, Task<ImageBytes>>? ReadImageAction { get; set; }
 
+    /// <summary>Receives text copied from the diff; the app sets the system clipboard.</summary>
+    public Action<string>? CopyText { get; set; }
+
+    /// <summary>Asks the user to confirm (title, message); used once before discarding a selection.</summary>
+    public Func<string, string, Task<bool>>? ConfirmAction { get; set; }
+
+    /// <summary>
+    /// Discards the checked lines of one hunk without asking again. The menu confirms once
+    /// for the whole selection, which may span several hunks.
+    /// </summary>
+    public Func<Hunk, Task>? DiscardConfirmedLinesAction { get; set; }
+
     private CancellationTokenSource? _imageLoadCts;
     private readonly List<DiffImageSide> _imageSides = [];
+
+    // Row selection is kept here instead of in the controls because the virtualizing
+    // panel recycles containers. The order of _lineItems is the order lines are shown.
+    private readonly List<DiffLineItem> _lineItems = [];
+    private readonly Dictionary<DiffLineItem, int> _lineIndex = [];
+    private readonly HashSet<DiffLineItem> _selectedLines = [];
+    private DiffLineItem? _selectionAnchor;
+
+    public bool HasSelection => _selectedLines.Count > 0;
+    public DiffLineItem? SelectionAnchor => _selectionAnchor;
+
+    /// <summary>Selected lines in display order.</summary>
+    public IReadOnlyList<DiffLineItem> SelectedLines
+    {
+        get
+        {
+            var selected = new List<DiffLineItem>(_selectedLines.Count);
+            foreach (DiffLineItem item in _lineItems)
+            {
+                if (item.IsSelected)
+                {
+                    selected.Add(item);
+                }
+            }
+
+            return selected;
+        }
+    }
+
+    public bool CanStageSelection => CanStage && SelectionAllows(line => !line.Hunk.Truncated);
+    public bool CanUnstageSelection => CanUnstage && SelectionAllows(line => !line.Hunk.Truncated);
+
+    // Line-level discard is not offered for new files (see ApplyNewFileSelectionAsync).
+    public bool CanDiscardSelection => CanDiscard && SelectionAllows(line =>
+        !line.Hunk.Truncated && line.File.State is not (PathState.New or PathState.Untracked));
 
     public ICommand StageFileCommand { get; }
     public ICommand UnstageFileCommand { get; }
@@ -90,6 +138,7 @@ public sealed partial class DiffViewModel : ObservableObject
         CanStage = canStage;
         CanUnstage = canUnstage;
         CanDiscard = canDiscard;
+        ResetSelection();
         Files.Clear();
         DisplayItems.Clear();
         ReleaseImages();
@@ -145,7 +194,10 @@ public sealed partial class DiffViewModel : ObservableObject
 
                 foreach (HunkLine line in hunk.LineItems)
                 {
-                    DisplayItems.Add(new DiffLineItem(line, hunk, file, canStage || canUnstage || canDiscard, gutter));
+                    var item = new DiffLineItem(line, hunk, file, canStage || canUnstage || canDiscard, gutter);
+                    _lineIndex[item] = _lineItems.Count;
+                    _lineItems.Add(item);
+                    DisplayItems.Add(item);
                 }
             }
         }
@@ -156,6 +208,7 @@ public sealed partial class DiffViewModel : ObservableObject
 
     public void Clear(string message = "Select a file to view its diff.")
     {
+        ResetSelection();
         Files.Clear();
         DisplayItems.Clear();
         ReleaseImages();
@@ -163,6 +216,273 @@ public sealed partial class DiffViewModel : ObservableObject
         EmptyMessage = message;
         HasContent = false;
         CanStage = CanUnstage = CanDiscard = false;
+    }
+
+    /// <summary>Applies a click to one line: shift extends, ctrl toggles, otherwise selects only it.</summary>
+    public void SelectLine(DiffLineItem line, bool extend, bool toggle)
+    {
+        if (!_lineIndex.ContainsKey(line))
+        {
+            return;
+        }
+
+        if (extend && _selectionAnchor is not null)
+        {
+            SelectRangeCore(_selectionAnchor, line, add: toggle);
+            return;
+        }
+
+        if (toggle)
+        {
+            SetSelected(line, !line.IsSelected);
+        }
+        else
+        {
+            SelectOnly(line);
+        }
+
+        _selectionAnchor = line;
+    }
+
+    /// <summary>Selects every line between two rows, as a shift+click or a drag does.</summary>
+    public void SelectRange(DiffLineItem from, DiffLineItem to) => SelectRangeCore(from, to, add: false);
+
+    public void SelectAllLines()
+    {
+        foreach (DiffLineItem line in _lineItems)
+        {
+            SetSelected(line, true);
+        }
+
+        _selectionAnchor ??= _lineItems.FirstOrDefault();
+    }
+
+    public void ClearSelection()
+    {
+        foreach (DiffLineItem line in _selectedLines.ToList())
+        {
+            SetSelected(line, false);
+        }
+
+        _selectionAnchor = null;
+    }
+
+    public void CopySelectedLines() => CopyText?.Invoke(BuildCopyText(line => true, withMarkers: false));
+
+    /// <summary>Copies the selection as a diff snippet with each line's <c>+</c>, <c>-</c> or space.</summary>
+    public void CopySelectedLinesWithMarkers() => CopyText?.Invoke(BuildCopyText(line => true, withMarkers: true));
+
+    public void CopyNewVersion() => CopyText?.Invoke(
+        BuildCopyText(line => line.Line.Marker is ' ' or '+', withMarkers: false));
+
+    public void CopyOldVersion() => CopyText?.Invoke(
+        BuildCopyText(line => line.Line.Marker is ' ' or '-', withMarkers: false));
+
+    /// <summary>Copies the repository-relative path of the line the menu was opened on.</summary>
+    public void CopyFilePath(DiffLineItem? line)
+    {
+        line ??= _lineItems.FirstOrDefault(item => item.IsSelected);
+        if (line is not null)
+        {
+            CopyText?.Invoke(line.File.FileName);
+        }
+    }
+
+    public Task StageSelectedLinesAsync() => ApplySelectionAsync(StageSelectedLinesAction, CanStageSelection);
+
+    public Task UnstageSelectedLinesAsync() => ApplySelectionAsync(UnstageSelectedLinesAction, CanUnstageSelection);
+
+    /// <summary>
+    /// Discards the selected changed lines after one confirmation. Asking per hunk would let
+    /// a cancel part-way through leave some hunks discarded and others not.
+    /// </summary>
+    public async Task DiscardSelectedLinesAsync()
+    {
+        if (!CanDiscardSelection || ConfirmAction is null)
+        {
+            return;
+        }
+
+        var count = _lineItems.Count(line => line.IsSelected && line.Line.Marker is '+' or '-');
+        var what = count == 1 ? "the selected changed line" : $"the {count:N0} selected changed lines";
+        if (!await ConfirmAction("Discard lines", $"Discard {what}? This cannot be undone.").ConfigureAwait(true))
+        {
+            return;
+        }
+
+        await ApplySelectionAsync(DiscardConfirmedLinesAction, allowed: true).ConfigureAwait(true);
+    }
+
+    private void SelectOnly(DiffLineItem line)
+    {
+        foreach (DiffLineItem item in _selectedLines.ToList())
+        {
+            if (!ReferenceEquals(item, line))
+            {
+                SetSelected(item, false);
+            }
+        }
+
+        SetSelected(line, true);
+    }
+
+    private void SelectRangeCore(DiffLineItem from, DiffLineItem to, bool add)
+    {
+        if (!_lineIndex.TryGetValue(from, out var start) || !_lineIndex.TryGetValue(to, out var end))
+        {
+            return;
+        }
+
+        if (start > end)
+        {
+            (start, end) = (end, start);
+        }
+
+        if (!add)
+        {
+            foreach (DiffLineItem item in _selectedLines.ToList())
+            {
+                if (!_lineIndex.TryGetValue(item, out var index) || index < start || index > end)
+                {
+                    SetSelected(item, false);
+                }
+            }
+        }
+
+        for (var i = start; i <= end; i++)
+        {
+            SetSelected(_lineItems[i], true);
+        }
+    }
+
+    private void SetSelected(DiffLineItem line, bool selected)
+    {
+        if (line.IsSelected == selected)
+        {
+            return;
+        }
+
+        line.IsSelected = selected;
+        if (selected)
+        {
+            _selectedLines.Add(line);
+        }
+        else
+        {
+            _selectedLines.Remove(line);
+        }
+    }
+
+    private void ResetSelection()
+    {
+        ClearSelection();
+        _lineItems.Clear();
+        _lineIndex.Clear();
+    }
+
+    /// <summary>True when a changed line is selected and every changed selected line passes the check.</summary>
+    private bool SelectionAllows(Func<DiffLineItem, bool> allowed)
+    {
+        var anyChanged = false;
+        foreach (DiffLineItem line in _lineItems)
+        {
+            if (!line.IsSelected || line.Line.Marker is not ('+' or '-'))
+            {
+                continue;
+            }
+
+            anyChanged = true;
+            if (!allowed(line))
+            {
+                return false;
+            }
+        }
+
+        return anyChanged;
+    }
+
+    /// <summary>
+    /// Copies selected lines joined with <c>\n</c>. Raw text keeps tabs and is used
+    /// instead of the tab-expanded display text; "no newline" markers are skipped.
+    /// </summary>
+    private string BuildCopyText(Func<DiffLineItem, bool> include, bool withMarkers)
+    {
+        var text = new StringBuilder();
+        var first = true;
+        foreach (DiffLineItem item in _lineItems)
+        {
+            if (!item.IsSelected || item.Line.Marker == '\\' || !include(item))
+            {
+                continue;
+            }
+
+            if (!first)
+            {
+                text.Append('\n');
+            }
+
+            first = false;
+            if (withMarkers)
+            {
+                text.Append(item.Line.Marker);
+            }
+
+            var raw = item.Line.RawText;
+            text.Append(raw.EndsWith('\r') ? raw[..^1] : raw);
+        }
+
+        return text.ToString();
+    }
+
+    /// <summary>
+    /// Runs the existing selected-line action once per hunk that has a selected change.
+    /// The staging checkboxes are snapshotted so menu actions do not disturb them.
+    /// </summary>
+    private async Task ApplySelectionAsync(Func<Hunk, Task>? action, bool allowed)
+    {
+        if (!allowed || action is null)
+        {
+            return;
+        }
+
+        var selected = new HashSet<HunkLine>();
+        var hunks = new List<Hunk>();
+        foreach (DiffLineItem item in _lineItems)
+        {
+            if (!item.IsSelected || item.Line.Marker is not ('+' or '-'))
+            {
+                continue;
+            }
+
+            selected.Add(item.Line);
+            if (item.Hunk is Hunk hunk && !hunks.Contains(hunk))
+            {
+                hunks.Add(hunk);
+            }
+        }
+
+        foreach (Hunk hunk in hunks)
+        {
+            IList<HunkLine> lines = hunk.LineItems;
+            var checkboxes = new bool[lines.Count];
+            for (var i = 0; i < lines.Count; i++)
+            {
+                checkboxes[i] = lines[i].Selected;
+                lines[i].Selected = lines[i].Marker is '+' or '-' && selected.Contains(lines[i]);
+            }
+
+            try
+            {
+                await action(hunk).ConfigureAwait(true);
+            }
+            finally
+            {
+                for (var i = 0; i < lines.Count; i++)
+                {
+                    lines[i].Selected = checkboxes[i];
+                }
+            }
+        }
     }
 
     private static async Task LoadImageAsync(DiffImageSide side,

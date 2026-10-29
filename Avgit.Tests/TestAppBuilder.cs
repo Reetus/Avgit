@@ -25,6 +25,10 @@ public static class TestAppBuilder
 public sealed class FakeDialogService : Avgit.App.Services.IDialogService
 {
     public List<string> Messages { get; } = [];
+    public List<(string Title, string Message)> Confirmations { get; } = [];
+
+    /// <summary>The answer ConfirmAsync gives (true unless a test cancels).</summary>
+    public bool ConfirmResult { get; set; } = true;
     public Queue<string?> PromptResponses { get; } = new();
     public IReadOnlyList<RebasePlanItem>? RebasePlan { get; set; }
 
@@ -47,7 +51,11 @@ public sealed class FakeDialogService : Avgit.App.Services.IDialogService
         string title, IReadOnlyList<RebasePlanItem> commits)
         => Task.FromResult(RebasePlan);
 
-    public Task<bool> ConfirmAsync(string title, string message) => Task.FromResult(true);
+    public Task<bool> ConfirmAsync(string title, string message)
+    {
+        Confirmations.Add((title, message));
+        return Task.FromResult(ConfirmResult);
+    }
 
     /// <summary>Answers for ChooseAsync, in order; an empty queue (or null) cancels.</summary>
     public Queue<string?> ChoiceResponses { get; } = new();
