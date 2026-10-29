@@ -4,6 +4,10 @@ Avgit is a native **Avalonia 12** Git client for Windows, macOS and Linux. It dr
 
 Inspired by Sourcetree. Avgit is an independent project and is not affiliated with or endorsed by Atlassian; Sourcetree is a trademark of Atlassian.
 
+![History: commit graph with branches, merges, tags and remote branches, the sidebar with worktrees and stashes, and a commit's diff](docs/screenshots/history.png)
+
+![File Status: staged, unstaged and untracked changes, a working-copy diff with line staging, and the commit area](docs/screenshots/file-status.png)
+
 ## Features
 
 - Open, clone (including blobless partial clones) and initialise repositories, with a recent-repository list.
@@ -240,6 +244,13 @@ The test suite covers:
 - Headless Avalonia rendering of the main views and view-model interactions.
 
 Headless render artifacts are written under the OS temporary directory in `avgit-headless/`.
+
+The README screenshots come from a fictional repository (several authors, branches, merges, tags, a remote, a worktree, a stash and pending changes) built by `ReadmeScreenshots`. It is skipped unless `AVGIT_SCREENSHOTS` names the output folder. `AVGIT_DEMO_DIR` sets where the demo repository is created; its path appears in the screenshots, so keep it short:
+
+```powershell
+$env:AVGIT_SCREENSHOTS = "$PWD\docs\screenshots"; $env:AVGIT_DEMO_DIR = "D:\avgit-demo"
+dotnet test Avgit.Tests --filter "FullyQualifiedName~ReadmeScreenshots"
+```
 
 ## Keyboard and interaction notes
 
