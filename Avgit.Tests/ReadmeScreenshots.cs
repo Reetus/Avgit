@@ -113,13 +113,7 @@ public class ReadmeScreenshots
             }
 
             await Git(repo, "add", "-A");
-            var when = Start.AddHours(++step * 9 + (step % 3) * 2).ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture);
-            (string name, string email) = Authors[author];
-            var env = new Dictionary<string, string>
-            {
-                ["GIT_AUTHOR_NAME"] = name, ["GIT_AUTHOR_EMAIL"] = email, ["GIT_AUTHOR_DATE"] = when,
-                ["GIT_COMMITTER_NAME"] = name, ["GIT_COMMITTER_EMAIL"] = email, ["GIT_COMMITTER_DATE"] = when
-            };
+            Dictionary<string, string> env = Identity(author, Start.AddHours(++step * 9 + (step % 3) * 2));
             ProcessResult result = await ProcessRunner.RunAsync("git", repo, ["commit", "-q", "-m", message], null, env);
             if (!result.Success)
             {
@@ -129,13 +123,7 @@ public class ReadmeScreenshots
 
         async Task Merge(int author, string branch)
         {
-            var when = Start.AddHours(++step * 9).ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture);
-            (string name, string email) = Authors[author];
-            var env = new Dictionary<string, string>
-            {
-                ["GIT_AUTHOR_NAME"] = name, ["GIT_AUTHOR_EMAIL"] = email, ["GIT_AUTHOR_DATE"] = when,
-                ["GIT_COMMITTER_NAME"] = name, ["GIT_COMMITTER_EMAIL"] = email, ["GIT_COMMITTER_DATE"] = when
-            };
+            Dictionary<string, string> env = Identity(author, Start.AddHours(++step * 9));
             ProcessResult result = await ProcessRunner.RunAsync("git", repo,
                 ["merge", "--no-ff", "-q", "-m", $"Merge branch '{branch}'", branch], null, env);
             if (!result.Success)
@@ -252,6 +240,22 @@ public class ReadmeScreenshots
         await Git(repo, "add", "CHANGELOG.md");
         Directory.CreateDirectory(Path.Combine(repo, "docs"));
         await File.WriteAllTextAsync(Path.Combine(repo, "docs", "retries.md"), "# Retries\n\nRequests that time out are retried up to three times.\n");
+    }
+
+    /// <summary>Git environment that makes <paramref name="author"/> author and commit at <paramref name="when"/>.</summary>
+    private static Dictionary<string, string> Identity(int author, DateTimeOffset when)
+    {
+        (string name, string email) = Authors[author];
+        var date = when.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture);
+        return new Dictionary<string, string>
+        {
+            ["GIT_AUTHOR_NAME"] = name,
+            ["GIT_AUTHOR_EMAIL"] = email,
+            ["GIT_AUTHOR_DATE"] = date,
+            ["GIT_COMMITTER_NAME"] = name,
+            ["GIT_COMMITTER_EMAIL"] = email,
+            ["GIT_COMMITTER_DATE"] = date
+        };
     }
 
     private static string Code(string type, string body) =>
