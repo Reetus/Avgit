@@ -52,8 +52,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private string? _displayedCommitSha;
     // SHA of the most recent commit load (possibly still running).
     private string? _requestedCommitSha;
-    private string? _compareBaseSha;
-    private bool _rangeMode;
+    // Two commits selected in the history show their comparison in the right-hand
+    // panes. The compare base is the one stored for the context-menu workflow.
+    private CommitPair? _comparePair;
+    private CommitSide? _compareBase;
+    private CommitPair? _requestedComparePair;
+    private CommitPair? _displayedComparePair;
+    private bool _restoringCommitSelection;
     private Task? _selectionTask;
     private int _workingDiffGeneration;
     // What the working diff currently shows; a refresh producing the same text
@@ -155,11 +160,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         RevertCommitCommand = new AsyncRelayCommand(RevertSelectedAsync);
         SetCompareBaseCommand = new RelayCommand(() =>
         {
-            _compareBaseSha = SelectedCommit?.Row.CommitId;
-            _rangeMode = false;
-            StatusMessage = _compareBaseSha is null ? "Select a commit to compare." : $"Compare base: {_compareBaseSha[..Math.Min(8, _compareBaseSha.Length)]}";
+            _compareBase = SelectedCommit is { } row ? CommitSide.FromRow(row) : null;
+            // Only records the base: the panes keep matching the list's selection.
+            StatusMessage = _compareBase is null ? "Select a commit to compare." : $"Compare base: {_compareBase.ShortSha}";
         });
         CompareWithBaseCommand = new AsyncRelayCommand(CompareWithBaseAsync);
+        SwapCompareCommand = new AsyncRelayCommand(SwapCompareAsync);
         RebaseCommitCommand = new AsyncRelayCommand(RebaseCommitAsync);
         ResetCommitCommand = new AsyncRelayCommand(ResetCommitAsync);
         ApplyStashCommand = new AsyncRelayCommand(p => ApplyStashAsync(p as StashEntry));
@@ -275,6 +281,14 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         {
             if (SetProperty(ref _selectedCommit, value))
             {
+                // An explicit single-commit selection replaces the list's
+                // multi-selection (e.g. jumping to a branch's tip).
+                _selectedCommits.Clear();
+                if (value is not null)
+                {
+                    _selectedCommits.Add(value);
+                }
+
                 _selectionTask = SelectCommitAsync(value);
             }
         }
@@ -284,6 +298,73 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     {
         _selectedCommits.Clear();
         _selectedCommits.AddRange(commits);
+
+        // A refresh restores the list's selection; that is not a user change and
+        // must not replace the panes the refresh is keeping.
+        if (_restoringCommitSelection)
+        {
+            return;
+        }
+
+        switch (_selectedCommits.Count)
+        {
+            case 1 when _comparePair is not null:
+                // Back from a comparison to one commit: show that commit again.
+                SetContextCommit(_selectedCommits[0]);
+                break;
+            case 2:
+                ShowCompareForSelection();
+                break;
+            case >= 3 when _comparePair is not null:
+                // Three or more commits keep the normal details of the active
+                // (last-clicked) commit.
+                CommitRowViewModel active = _selectedCommit is not null && _selectedCommits.Contains(_selectedCommit)
+                    ? _selectedCommit
+                    : _selectedCommits[0];
+                SetContextCommit(active);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Applies a selection restored by the history list without treating it as a
+    /// user selection change (which would start loading other panes).
+    /// </summary>
+    public void RestoreCommitSelection(Action apply)
+    {
+        _restoringCommitSelection = true;
+        try
+        {
+            apply();
+        }
+        finally
+        {
+            _restoringCommitSelection = false;
+        }
+    }
+
+    /// <summary>The rows the history list currently shows as selected.</summary>
+    public IReadOnlyList<CommitRowViewModel> SelectedCommits => _selectedCommits;
+
+    private void ShowCompareForSelection()
+    {
+        int first = LogRows.IndexOf(_selectedCommits[0]);
+        int second = LogRows.IndexOf(_selectedCommits[1]);
+        if (first < 0 || second < 0 || first == second)
+        {
+            return;
+        }
+
+        // LogRows is newest-first, so the row further down is the older side.
+        CommitRowViewModel baseRow = first > second ? _selectedCommits[0] : _selectedCommits[1];
+        CommitRowViewModel targetRow = first > second ? _selectedCommits[1] : _selectedCommits[0];
+        var pair = new CommitPair(CommitSide.FromRow(baseRow), CommitSide.FromRow(targetRow));
+        if (Equals(pair, _requestedComparePair))
+        {
+            return;
+        }
+
+        _selectionTask = ShowCompareAsync(pair);
     }
 
     /// <summary>
@@ -292,6 +373,23 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     /// </summary>
     public void SetContextCommit(CommitRowViewModel? commit)
     {
+        if (_restoringCommitSelection)
+        {
+            return;
+        }
+
+        // With exactly two commits selected the panes show their comparison;
+        // the active commit only drives the commands that act on one commit.
+        if (_selectedCommits.Count == 2)
+        {
+            if (!ReferenceEquals(_selectedCommit, commit))
+            {
+                _selectedCommit = commit;
+                OnPropertyChanged(nameof(SelectedCommit));
+            }
+            return;
+        }
+
         // Skip only when this commit is both selected and already displayed; a
         // selected row whose details were never shown (e.g. after a refresh
         // raced with a click) must still load when clicked.
@@ -351,6 +449,29 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial CommitInfoViewModel? CommitInfo { get; private set; }
+
+    /// <summary>Two commits are selected, so the right-hand panes compare them.</summary>
+    public bool IsComparingCommits => _comparePair is not null;
+
+    public string CompareBaseSha => _comparePair?.Base.ShortSha ?? string.Empty;
+    public string CompareBaseSubject => _comparePair?.Base.Title ?? string.Empty;
+    public string CompareTargetSha => _comparePair?.Target.ShortSha ?? string.Empty;
+    public string CompareTargetSubject => _comparePair?.Target.Title ?? string.Empty;
+
+    private void SetComparePair(CommitPair? pair)
+    {
+        if (Equals(_comparePair, pair))
+        {
+            return;
+        }
+
+        _comparePair = pair;
+        OnPropertyChanged(nameof(IsComparingCommits));
+        OnPropertyChanged(nameof(CompareBaseSha));
+        OnPropertyChanged(nameof(CompareBaseSubject));
+        OnPropertyChanged(nameof(CompareTargetSha));
+        OnPropertyChanged(nameof(CompareTargetSubject));
+    }
 
     public string CommitMessage
     {
@@ -795,6 +916,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ICommand RevertCommitCommand { get; }
     public ICommand SetCompareBaseCommand { get; }
     public ICommand CompareWithBaseCommand { get; }
+    public ICommand SwapCompareCommand { get; }
     public ICommand RebaseCommitCommand { get; }
     public ICommand ResetCommitCommand { get; }
     public ICommand ApplyStashCommand { get; }
@@ -1175,6 +1297,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         IsLoadingHistory = true;
         CommitRowViewModel? toSelect;
         bool sameSelection;
+        CommitPair? compareToShow = null;
         try
         {
             LogPage page = await Handler.GetLogPageAsync(Path, BuildLogQuery(0, _logLimit)).ConfigureAwait(true);
@@ -1200,6 +1323,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             // Read the selection only now: the user may have clicked another commit
             // while git log was running, and that click must win over the old one.
             var selectedSha = SelectedCommit?.Row.CommitId;
+            CommitPair? compare = _comparePair;
             LogRows.Clear();
             _historyGraph = graph;
             foreach (CommitRowViewModel? row in rows)
@@ -1218,20 +1342,57 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             CommitRowViewModel? reselect = selectedSha is null
                 ? null
                 : LogRows.FirstOrDefault(r => r.Row.CommitId == selectedSha);
-            // Commit contents are immutable for a given SHA, so reloading the
-            // details/diff is unnecessary when the reselected commit is the one
-            // already displayed.
-            sameSelection = !selectTip
-                            && reselect is not null
-                            && string.Equals(_displayedCommitSha, reselect.Row.CommitId, StringComparison.Ordinal);
-            toSelect = selectTip ? LogRows.FirstOrDefault() : (reselect ?? LogRows.FirstOrDefault());
-            _selectedCommit = toSelect;
-            _selectedCommits.Clear();
-            if (toSelect is not null)
+            CommitRowViewModel? compareBaseRow = compare is null
+                ? null
+                : LogRows.FirstOrDefault(r => r.Row.CommitId == compare.Base.Sha);
+            CommitRowViewModel? compareTargetRow = compare is null
+                ? null
+                : LogRows.FirstOrDefault(r => r.Row.CommitId == compare.Target.Sha);
+            if (!selectTip && compareBaseRow is not null && compareTargetRow is not null)
             {
-                _selectedCommits.Add(toSelect);
+                // Keep the comparison across a refresh, re-resolved to the new rows.
+                var refreshed = new CommitPair(CommitSide.FromRow(compareBaseRow), CommitSide.FromRow(compareTargetRow));
+                SetComparePair(refreshed);
+                toSelect = reselect is not null
+                           && (ReferenceEquals(reselect, compareBaseRow) || ReferenceEquals(reselect, compareTargetRow))
+                    ? reselect
+                    : compareTargetRow;
+                _selectedCommits.Clear();
+                _selectedCommits.Add(compareBaseRow);
+                _selectedCommits.Add(compareTargetRow);
+                // Commit contents are immutable for a given SHA, so reloading the
+                // comparison is unnecessary when it is the one already displayed.
+                sameSelection = Equals(refreshed, _displayedComparePair);
+                if (!sameSelection)
+                {
+                    compareToShow = refreshed;
+                }
+            }
+            else
+            {
+                if (compare is not null)
+                {
+                    // The compared commits left the (filtered) history.
+                    _requestedComparePair = null;
+                    _displayedComparePair = null;
+                    SetComparePair(null);
+                }
+
+                // Commit contents are immutable for a given SHA, so reloading the
+                // details/diff is unnecessary when the reselected commit is the one
+                // already displayed.
+                sameSelection = !selectTip
+                                && reselect is not null
+                                && string.Equals(_displayedCommitSha, reselect.Row.CommitId, StringComparison.Ordinal);
+                toSelect = selectTip ? LogRows.FirstOrDefault() : (reselect ?? LogRows.FirstOrDefault());
+                _selectedCommits.Clear();
+                if (toSelect is not null)
+                {
+                    _selectedCommits.Add(toSelect);
+                }
             }
 
+            _selectedCommit = toSelect;
             OnPropertyChanged(nameof(SelectedCommit));
             OnPropertyChanged(nameof(LogCountText));
             if (toSelect is not null)
@@ -1249,7 +1410,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         // A watcher refresh must not clear and rebuild the commit diff when the
         // selected commit is unchanged; that caused a visible flash.
-        if (!sameSelection)
+        if (compareToShow is not null)
+        {
+            await ShowCompareAsync(compareToShow).ConfigureAwait(true);
+        }
+        else if (!sameSelection)
         {
             await SelectCommitAsync(toSelect).ConfigureAwait(true);
         }
@@ -1334,6 +1499,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         // A newer click makes the previous lookup pointless; stop its git process.
         _commitSelectionCts?.Cancel();
         _requestedCommitSha = row?.Row.CommitId;
+        _requestedComparePair = null;
+        _displayedComparePair = null;
+        SetComparePair(null);
         if (row is null)
         {
             _displayedCommitSha = null;
@@ -1348,7 +1516,6 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         SetLoadingCommitDetails(true);
         try
         {
-            _rangeMode = false;
             // One git process returns details, refs and changed files.
             CommitResult result = await Handler.GetCommitAsync(Path, row.Row.CommitId, cts.Token).ConfigureAwait(true);
             // A newer selection owns the panes; drop this result (including errors).
@@ -1401,8 +1568,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private async Task LoadCommitDiffAsync()
     {
         ChangedFile? file = SelectedCommitFile;
+        CommitPair? pair = _comparePair;
         CommitRowViewModel? commit = SelectedCommit;
-        if (file is null || commit is null)
+        if (file is null || (pair is null && commit is null))
         {
             CommitDiff.Clear("Select a file in the commit to view its diff.");
             return;
@@ -1411,15 +1579,15 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var generation = ++_commitDiffGeneration;
         _commitDiffCts?.Cancel();
         CancellationTokenSource cts = _commitDiffCts = new CancellationTokenSource();
-        var baseSha = _compareBaseSha;
-        var useRange = _rangeMode && !string.IsNullOrWhiteSpace(baseSha);
+        var revision = pair?.Target.Sha ?? commit!.Row.CommitId;
+        var baseSha = pair?.Base.Sha;
         var request = new DiffSpec
         {
-            Kind = useRange ? DiffRequestKind.CommitRange : DiffRequestKind.Commit,
-            BaseRevision = useRange ? baseSha : null,
-            Revision = commit.Row.CommitId,
+            Kind = pair is not null ? DiffRequestKind.CommitRange : DiffRequestKind.Commit,
+            BaseRevision = baseSha,
+            Revision = revision,
             // Parents are known from history, so the diff needs no rev-list lookup.
-            FirstParent = useRange ? null : (commit.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : string.Empty),
+            FirstParent = pair is not null ? null : (commit!.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : string.Empty),
             Files = BuildDiffPaths(file),
             Context = DiffContext,
             IgnoreWhitespace = IgnoreWhitespace
@@ -1432,7 +1600,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             // Drop the result if a newer diff was requested or the selection moved to
             // another commit meanwhile (rows are re-created on refresh, so compare SHAs).
             if (generation != _commitDiffGeneration
-                || !string.Equals(SelectedCommit?.Row.CommitId, commit.Row.CommitId, StringComparison.Ordinal))
+                || !Equals(_comparePair, pair)
+                || (pair is null && !string.Equals(SelectedCommit?.Row.CommitId, commit!.Row.CommitId, StringComparison.Ordinal)))
             {
                 return;
             }
@@ -1444,7 +1613,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
             var env = new DiffSetup
             {
-                Subject = useRange ? DiffSubject.Range : DiffSubject.SingleCommit,
+                Subject = pair is not null ? DiffSubject.Range : DiffSubject.SingleCommit,
                 Scope = DiffScope.WorkTreeVsHead
             };
             List<FileDiff> files = await Task.Run(() => ParseDiff(raw, env)).ConfigureAwait(true);
@@ -1464,12 +1633,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 }
             }
 
-            var shortBase = baseSha is null ? string.Empty : baseSha[..Math.Min(8, baseSha.Length)];
-            var title = useRange
-                ? $"{shortBase}..{commit.Row.ShortId}  {file.RelativePath}"
-                : $"{commit.Row.ShortId}  {file.RelativePath}";
-            var revision = commit.Row.CommitId;
-            var oldRevision = useRange ? baseSha : (commit.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : null);
+            var title = pair is not null
+                ? $"{pair.Base.ShortSha}..{pair.Target.ShortSha}  {file.RelativePath}"
+                : $"{commit!.Row.ShortId}  {file.RelativePath}";
+            var oldRevision = pair is not null
+                ? pair.Base.Sha
+                : (commit!.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : null);
             CommitDiff.SetFiles(files, title, canStage: false, canUnstage: false, canDiscard: false,
                 imageSides: f => DiffImages.SidesFor(f,
                     oldRevision is null ? null : p => ImageOrigin.Object($"{oldRevision}:{p}"),
@@ -1484,26 +1653,40 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async Task CompareWithBaseAsync()
+    /// <summary>
+    /// Shows the changed files and diff between two commits in the right-hand
+    /// panes. <see cref="CommitPair.Base"/> is normally the older commit; swapping
+    /// reverses the pair.
+    /// </summary>
+    private async Task ShowCompareAsync(CommitPair pair, bool keepSelectedFile = false)
     {
-        if (_selectionTask is not null)
-        {
-            await _selectionTask.ConfigureAwait(true);
-        }
+        var generation = ++_commitSelectionGeneration;
+        _commitSelectionCts?.Cancel();
+        CancellationTokenSource cts = _commitSelectionCts = new CancellationTokenSource();
+        var keepPath = keepSelectedFile ? SelectedCommitFile?.RelativePath : null;
 
-        if (string.IsNullOrWhiteSpace(_compareBaseSha) || SelectedCommit is null)
-        {
-            StatusMessage = "Set a compare base commit first.";
-            return;
-        }
-
-        IsBusy = true;
+        // The panes no longer show one commit's details.
+        _requestedCommitSha = null;
+        _displayedCommitSha = null;
+        _requestedComparePair = pair;
+        SetComparePair(pair);
+        SetLoadingCommitDetails(true);
         try
         {
             Handler.ClearLastError();
-            IReadOnlyList<ChangedFile> changes = await Handler.GetRangeChangesAsync(Path, _compareBaseSha, SelectedCommit.Row.CommitId).ConfigureAwait(true);
+            IReadOnlyList<ChangedFile> changes =
+                await Handler.GetRangeChangesAsync(Path, pair.Base.Sha, pair.Target.Sha, cts.Token).ConfigureAwait(true);
+            if (generation != _commitSelectionGeneration)
+            {
+                return;
+            }
+
             if (ReportHandlerError("Could not compare commits"))
             {
+                _requestedComparePair = null;
+                _displayedComparePair = null;
+                CommitFiles.Clear();
+                CommitDiff.Clear("Could not compare commits.");
                 return;
             }
 
@@ -1513,9 +1696,12 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 CommitFiles.Add(change);
             }
 
-            _rangeMode = true;
-            _selectedCommitFile = CommitFiles.FirstOrDefault();
+            _selectedCommitFile = keepPath is null
+                ? null
+                : CommitFiles.FirstOrDefault(f => string.Equals(f.RelativePath, keepPath, StringComparison.Ordinal));
+            _selectedCommitFile ??= CommitFiles.FirstOrDefault();
             OnPropertyChanged(nameof(SelectedCommitFile));
+            _displayedComparePair = pair;
             if (_selectedCommitFile is not null)
             {
                 await LoadCommitDiffAsync().ConfigureAwait(true);
@@ -1524,6 +1710,52 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             {
                 CommitDiff.Clear("No changed files in this range.");
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // A newer selection superseded this comparison.
+        }
+        catch (Exception ex)
+        {
+            _requestedComparePair = null;
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            if (generation == _commitSelectionGeneration)
+            {
+                SetLoadingCommitDetails(false);
+            }
+        }
+    }
+
+    private async Task SwapCompareAsync()
+    {
+        if (_comparePair is not { } pair)
+        {
+            return;
+        }
+
+        await ShowCompareAsync(new CommitPair(pair.Target, pair.Base), keepSelectedFile: true).ConfigureAwait(true);
+    }
+
+    private async Task CompareWithBaseAsync()
+    {
+        if (_selectionTask is not null)
+        {
+            await _selectionTask.ConfigureAwait(true);
+        }
+
+        if (_compareBase is null || SelectedCommit is null)
+        {
+            StatusMessage = "Set a compare base commit first.";
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            await ShowCompareAsync(new CommitPair(_compareBase, CommitSide.FromRow(SelectedCommit))).ConfigureAwait(true);
         }
         finally
         {
@@ -3641,6 +3873,16 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             StatusMessage = ex.Message;
         }
     }
+
+    /// <summary>One side of a comparison, labelled from its history row.</summary>
+    private sealed record CommitSide(string Sha, string ShortSha, string Title)
+    {
+        public static CommitSide FromRow(CommitRowViewModel row) =>
+            new(row.Row.CommitId, row.Row.ShortId, row.Row.Title);
+    }
+
+    /// <summary>The two commits compared in the right-hand panes; <see cref="Base"/> is the older side.</summary>
+    private sealed record CommitPair(CommitSide Base, CommitSide Target);
 }
 
 

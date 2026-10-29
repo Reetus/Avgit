@@ -68,14 +68,33 @@ public partial class HistoryView : UserControl
         Dispatcher.UIThread.Post(() =>
         {
             ListBox? list = this.FindControl<ListBox>("CommitList");
-            if (list is null)
+            if (list is null || _repository is null)
             {
                 return;
             }
 
             list.ScrollIntoView(row);
-            list.SelectedItems?.Clear();
-            list.SelectedItems?.Add(row);
+            RepositoryViewModel repository = _repository;
+            // A click since the refresh owns the selection now.
+            if (!ReferenceEquals(repository.SelectedCommit, row))
+            {
+                return;
+            }
+
+            // A comparison has two selected rows; restore both so the list keeps
+            // matching the comparison the panes show after a refresh.
+            repository.RestoreCommitSelection(() =>
+            {
+                list.SelectedItems?.Clear();
+                list.SelectedItems?.Add(row);
+                foreach (CommitRowViewModel other in repository.SelectedCommits)
+                {
+                    if (!ReferenceEquals(other, row))
+                    {
+                        list.SelectedItems?.Add(other);
+                    }
+                }
+            });
         });
     }
 

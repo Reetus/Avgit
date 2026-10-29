@@ -30,7 +30,7 @@ Inspired by Sourcetree. Avgit is an independent project and is not affiliated wi
   - Authentication failure: points to the credential helper and SSH settings.
   - No upstream: retried automatically with `--set-upstream`.
 - Sidebar for local branches, remote branches, remotes, tags and stashes.
-- Compare a selected commit against a stored compare base, with changed files and range diff.
+- Compare two selected commits directly in the history: Ctrl+click (or Shift+click) two commits to see the changed files and per-file diff between the older and newer side, with a Swap button to reverse the direction. Selecting one commit returns to its details; three or more keep the active commit's details. A selected commit can still be compared against a stored compare base.
 - File history, blame, reflog, log-message search, working-tree grep, Git notes and sparse checkout.
 - Patches, archives, tag push, branch rename and remote-branch deletion.
 - Auto-refresh via file watching (including index/ref changes) with a Settings toggle; open tabs are restored on restart, with reopen-closed support.

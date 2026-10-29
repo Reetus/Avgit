@@ -112,32 +112,56 @@
                      IsIndeterminate="True" IsVisible="{Binding IsLoadingCommit}" />
         <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="10,8"
                 BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1">
-          <StackPanel Spacing="5">
-            <TextBlock Text="{Binding CommitInfo.Title}" FontSize="14" FontWeight="SemiBold"
-                       TextWrapping="Wrap" />
-            <TextBlock Text="{Binding CommitInfo.Message}" Classes="muted" FontSize="11" TextWrapping="Wrap"
-                       MaxHeight="56" IsVisible="{Binding CommitInfo.HasMoreMessage}" />
-            <Grid ColumnDefinitions="Auto,*">
-              <TextBlock Text="{Binding CommitInfo.ShortSha}" FontFamily="{StaticResource MonoFont}" FontSize="11"
-                         Foreground="#58A6FF" Margin="0,0,12,0" />
-              <TextBlock Grid.Column="1" Classes="muted" FontSize="11">
-                <Run Text="{Binding CommitInfo.Author}" />
-                <Run Text="  " />
-                <Run Text="{Binding CommitInfo.AuthorDateText}" />
-              </TextBlock>
-            </Grid>
-            <TextBlock Text="{Binding CommitInfo.TagsText}" Foreground="#3FB950" FontSize="11" />
-            <TextBlock Text="{Binding CommitInfo.ParentsText}" Classes="muted" FontSize="10" />
-            <WrapPanel Orientation="Horizontal">
-              <Button Classes="flat" Content="Checkout" Command="{Binding CheckoutCommitCommand}" />
-              <Button Classes="flat" Content="Branch here" Command="{Binding CreateBranchAtCommitCommand}" />
-              <Button Classes="flat" Content="Tag here" Command="{Binding CreateTagAtCommitCommand}" />
-              <Button Classes="flat" Content="Merge" Command="{Binding MergeCommitCommand}" />
-              <Button Classes="flat" Content="Rebase onto" Command="{Binding RebaseCommitCommand}" />
-              <Button Classes="flat" Content="Reset --hard" Command="{Binding ResetCommitCommand}" />
-              <Button Classes="flat" Content="Copy SHA" Command="{Binding CopyCommitShaCommand}" />
-            </WrapPanel>
-          </StackPanel>
+          <Grid>
+            <StackPanel Spacing="5" IsVisible="{Binding !IsComparingCommits}">
+              <TextBlock Text="{Binding CommitInfo.Title}" FontSize="14" FontWeight="SemiBold"
+                         TextWrapping="Wrap" />
+              <TextBlock Text="{Binding CommitInfo.Message}" Classes="muted" FontSize="11" TextWrapping="Wrap"
+                         MaxHeight="56" IsVisible="{Binding CommitInfo.HasMoreMessage}" />
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Text="{Binding CommitInfo.ShortSha}" FontFamily="{StaticResource MonoFont}" FontSize="11"
+                           Foreground="#58A6FF" Margin="0,0,12,0" />
+                <TextBlock Grid.Column="1" Classes="muted" FontSize="11">
+                  <Run Text="{Binding CommitInfo.Author}" />
+                  <Run Text="  " />
+                  <Run Text="{Binding CommitInfo.AuthorDateText}" />
+                </TextBlock>
+              </Grid>
+              <TextBlock Text="{Binding CommitInfo.TagsText}" Foreground="#3FB950" FontSize="11" />
+              <TextBlock Text="{Binding CommitInfo.ParentsText}" Classes="muted" FontSize="10" />
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="flat" Content="Checkout" Command="{Binding CheckoutCommitCommand}" />
+                <Button Classes="flat" Content="Branch here" Command="{Binding CreateBranchAtCommitCommand}" />
+                <Button Classes="flat" Content="Tag here" Command="{Binding CreateTagAtCommitCommand}" />
+                <Button Classes="flat" Content="Merge" Command="{Binding MergeCommitCommand}" />
+                <Button Classes="flat" Content="Rebase onto" Command="{Binding RebaseCommitCommand}" />
+                <Button Classes="flat" Content="Reset --hard" Command="{Binding ResetCommitCommand}" />
+                <Button Classes="flat" Content="Copy SHA" Command="{Binding CopyCommitShaCommand}" />
+              </WrapPanel>
+            </StackPanel>
+
+            <StackPanel Spacing="5" IsVisible="{Binding IsComparingCommits}">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="Comparing commits" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="flat" Content="Swap" Command="{Binding SwapCompareCommand}"
+                        ToolTip.Tip="Swap the base and target of the comparison" />
+              </Grid>
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="2">
+                <TextBlock Text="From" Classes="muted" FontSize="10" Width="34" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" FontSize="11" TextTrimming="CharacterEllipsis">
+                  <Run Text="{Binding CompareBaseSha}" FontFamily="{StaticResource MonoFont}" Foreground="#58A6FF" />
+                  <Run Text="  " />
+                  <Run Text="{Binding CompareBaseSubject}" />
+                </TextBlock>
+                <TextBlock Grid.Row="1" Text="To" Classes="muted" FontSize="10" Width="34" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1" Grid.Column="1" FontSize="11" TextTrimming="CharacterEllipsis">
+                  <Run Text="{Binding CompareTargetSha}" FontFamily="{StaticResource MonoFont}" Foreground="#58A6FF" />
+                  <Run Text="  " />
+                  <Run Text="{Binding CompareTargetSubject}" />
+                </TextBlock>
+              </Grid>
+            </StackPanel>
+          </Grid>
         </Border>
 
         <Border Grid.Row="1" Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
