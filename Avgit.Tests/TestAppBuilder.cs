@@ -64,6 +64,18 @@ public sealed class FakeDialogService : Avgit.App.Services.IDialogService
     /// <summary>Every ChooseAsync call: its message and the options it offered.</summary>
     public List<(string Message, IReadOnlyList<string> Options)> Choices { get; } = [];
 
+    /// <summary>Answers for PickAsync, in order; an empty queue (or null) cancels.</summary>
+    public Queue<string?> PickResponses { get; } = new();
+
+    /// <summary>Every PickAsync call: its message, the items offered and the one preselected.</summary>
+    public List<(string Message, IReadOnlyList<string> Items, string? Selected)> Picks { get; } = [];
+
+    public Task<string?> PickAsync(string title, string message, IReadOnlyList<string> items, string? selected = null)
+    {
+        Picks.Add((message, items, selected));
+        return Task.FromResult(PickResponses.Count > 0 ? PickResponses.Dequeue() : null);
+    }
+
     public Task<string?> ChooseAsync(string title, string message, IReadOnlyList<string> options)
     {
         Choices.Add((message, options));

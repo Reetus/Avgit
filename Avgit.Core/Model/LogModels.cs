@@ -139,6 +139,12 @@ public class BranchRef
 
     public bool CanDelete => !IsCheckedOut && WorktreePath is null;
 
+    /// <summary>The branch tracks a remote branch (which may since have been deleted).</summary>
+    public bool HasUpstream => Kind == RefKind.Branch && Upstream is not null;
+
+    /// <summary>A local branch without an upstream, which can be given one.</summary>
+    public bool CanSetUpstream => Kind == RefKind.Branch && Upstream is null;
+
     /// <summary>A branch can be given its own worktree only while no worktree has it checked out.</summary>
     public bool CanAddWorktree => Kind == RefKind.Branch && !IsCheckedOut && WorktreePath is null;
 

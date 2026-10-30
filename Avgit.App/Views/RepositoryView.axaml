@@ -39,6 +39,15 @@
                     <MenuItem Header="{x:Static res:Strings.Repo_View_CreateWorktree}" Command="{Binding AddWorktreeForBranchCommand}"
                               CommandParameter="{Binding SelectedBranch}"
                               IsVisible="{Binding SelectedBranch.CanAddWorktree, FallbackValue=False}" />
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_SetUpstream}" Command="{Binding SetUpstreamCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding SelectedBranch.CanSetUpstream, FallbackValue=False}" />
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_ChangeUpstream}" Command="{Binding SetUpstreamCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding SelectedBranch.HasUpstream, FallbackValue=False}" />
+                    <MenuItem Header="{x:Static res:Strings.Repo_View_UnsetUpstream}" Command="{Binding UnsetUpstreamCommand}"
+                              CommandParameter="{Binding SelectedBranch}"
+                              IsVisible="{Binding SelectedBranch.HasUpstream, FallbackValue=False}" />
                     <MenuItem Header="{x:Static res:Strings.Repo_View_DeleteBranch}" Command="{Binding DeleteBranchCommand}"
                               CommandParameter="{Binding SelectedBranch}"
                               IsVisible="{Binding SelectedBranch.CanDelete, FallbackValue=False}" />

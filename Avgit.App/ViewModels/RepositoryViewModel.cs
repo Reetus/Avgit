@@ -149,6 +149,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         CheckoutBranchCommand = new AsyncRelayCommand(p => CheckoutBranchAsync(p as BranchRef));
         CheckoutReferenceCommand = new AsyncRelayCommand(p => CheckoutReferenceAsync(p as string));
         DeleteBranchCommand = new AsyncRelayCommand(p => DeleteBranchAsync(p as BranchRef));
+        SetUpstreamCommand = new AsyncRelayCommand(p => SetUpstreamAsync(p as BranchRef));
+        UnsetUpstreamCommand = new AsyncRelayCommand(p => UnsetUpstreamAsync(p as BranchRef));
         AddWorktreeCommand = new AsyncRelayCommand(() => AddWorktreeAsync(null));
         AddWorktreeForBranchCommand = new AsyncRelayCommand(p => p is BranchRef branch ? AddWorktreeAsync(branch) : Task.CompletedTask);
         OpenWorktreeCommand = new AsyncRelayCommand(p => OpenWorktreeAsync(p as WorktreeEntry));
@@ -965,6 +967,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ICommand CheckoutBranchCommand { get; }
     public ICommand CheckoutReferenceCommand { get; }
     public ICommand DeleteBranchCommand { get; }
+    public ICommand SetUpstreamCommand { get; }
+    public ICommand UnsetUpstreamCommand { get; }
     public ICommand AddWorktreeCommand { get; }
     public ICommand AddWorktreeForBranchCommand { get; }
     public ICommand OpenWorktreeCommand { get; }
@@ -3130,6 +3134,52 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         ProcessResult result = await Handler.CheckoutAsync(Path, reference).ConfigureAwait(true);
         await HandleOperationResultAsync(Strings.Repo_OpCheckout, result, reloadAll: true).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Lets the user pick the remote branch <paramref name="branch"/> tracks. The current
+    /// upstream starts selected, or else the remote branch with the same name.
+    /// </summary>
+    private async Task SetUpstreamAsync(BranchRef? branch)
+    {
+        if (branch is not { Kind: RefKind.Branch })
+        {
+            return;
+        }
+
+        List<string> remoteBranches = [.. RemoteBranches.Select(b => b.Name)];
+        if (remoteBranches.Count == 0)
+        {
+            await Dialogs.ShowMessageAsync(Strings.Repo_OpSetUpstream, Strings.Repo_SetUpstreamNoRemoteBranches).ConfigureAwait(true);
+            return;
+        }
+
+        var current = branch.Upstream?.RemoteBranchForPull;
+        var selected = current is not null && remoteBranches.Contains(current)
+            ? current
+            : remoteBranches.FirstOrDefault(name => name.EndsWith("/" + branch.Name, StringComparison.Ordinal));
+        var message = current is null
+            ? string.Format(Strings.Repo_SetUpstreamPrompt, branch.Name)
+            : string.Format(Strings.Repo_ChangeUpstreamPrompt, branch.Name, current);
+        var upstream = await Dialogs.PickAsync(Strings.Repo_OpSetUpstream, message, remoteBranches, selected).ConfigureAwait(true);
+        if (upstream is null || string.Equals(upstream, current, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        ProcessResult result = await Handler.SetUpstreamAsync(Path, branch.Name, upstream).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpSetUpstream, result, reloadAll: true).ConfigureAwait(true);
+    }
+
+    private async Task UnsetUpstreamAsync(BranchRef? branch)
+    {
+        if (branch is not { HasUpstream: true })
+        {
+            return;
+        }
+
+        ProcessResult result = await Handler.UnsetUpstreamAsync(Path, branch.Name).ConfigureAwait(true);
+        await HandleOperationResultAsync(Strings.Repo_OpUnsetUpstream, result, reloadAll: true).ConfigureAwait(true);
     }
 
     private async Task DeleteBranchAsync(BranchRef? branch)

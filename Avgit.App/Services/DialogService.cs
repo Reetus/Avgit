@@ -22,6 +22,12 @@ public interface IDialogService
 
     /// <summary>Offers several actions; returns the chosen option, or null when cancelled.</summary>
     Task<string?> ChooseAsync(string title, string message, IReadOnlyList<string> options);
+
+    /// <summary>
+    /// Picks one item from a list that may be long (filterable); <paramref name="selected"/>
+    /// starts selected. Returns the item, or null when cancelled.
+    /// </summary>
+    Task<string?> PickAsync(string title, string message, IReadOnlyList<string> items, string? selected = null);
     Task ShowMessageAsync(string title, string message);
 
     /// <summary>
@@ -194,6 +200,91 @@ public sealed class DialogService : IDialogService
         var window = new TrimBranchesWindow { DataContext = viewModel };
         await window.ShowDialog(Owner);
         return viewModel.Accepted;
+    }
+
+    public async Task<string?> PickAsync(string title, string message, IReadOnlyList<string> items, string? selected = null)
+    {
+        if (Owner is null)
+        {
+            return null;
+        }
+
+        string? result = null;
+        Window window = CreatePickWindow(title, message, items, selected, item => result = item);
+        await window.ShowDialog(Owner);
+        return result;
+    }
+
+    /// <summary>
+    /// The window behind <see cref="PickAsync"/>: a message, a filter box, the list and
+    /// OK/Cancel. <paramref name="accept"/> receives the item chosen with OK, Enter or a
+    /// double-click, before the window closes.
+    /// </summary>
+    internal static Window CreatePickWindow(string title, string message, IReadOnlyList<string> items, string? selected,
+        Action<string> accept)
+    {
+        Window window = CreateWindow(title, 480, 470);
+        var list = new ListBox
+        {
+            Height = 270,
+            ItemsSource = items,
+            SelectedItem = selected,
+            BorderBrush = new SolidColorBrush(Color.Parse("#3F3F46")),
+            BorderThickness = new Thickness(1)
+        };
+        var filter = new TextBox { PlaceholderText = Strings.Dialog_PickFilter };
+        var ok = new Button { Content = Strings.Common_OK, Width = 90, Classes = { "accent" }, IsDefault = true };
+        var cancel = new Button { Content = Strings.Common_Cancel, Width = 90, IsCancel = true };
+
+        void Accept()
+        {
+            if (list.SelectedItem is string item)
+            {
+                accept(item);
+                window.Close();
+            }
+        }
+
+        filter.TextChanged += (_, _) =>
+        {
+            var text = filter.Text ?? string.Empty;
+            var keep = list.SelectedItem as string;
+            List<string> shown = [.. items.Where(i => i.Contains(text, StringComparison.OrdinalIgnoreCase))];
+            list.ItemsSource = shown;
+            // Keep the selection while it still matches; otherwise offer the first match.
+            list.SelectedItem = keep is not null && shown.Contains(keep) ? keep : shown.FirstOrDefault();
+        };
+        list.SelectionChanged += (_, _) => ok.IsEnabled = list.SelectedItem is not null;
+        list.DoubleTapped += (_, _) => Accept();
+        ok.IsEnabled = list.SelectedItem is not null;
+        ok.Click += (_, _) => Accept();
+        cancel.Click += (_, _) => window.Close();
+        window.Opened += (_, _) =>
+        {
+            if (list.SelectedItem is { } item)
+            {
+                list.ScrollIntoView(item);
+            }
+
+            filter.Focus();
+        };
+
+        var buttons = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Spacing = 8
+        };
+        buttons.Children.Add(cancel);
+        buttons.Children.Add(ok);
+
+        var panel = new StackPanel { Margin = new Thickness(18), Spacing = 10 };
+        panel.Children.Add(new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap, Foreground = Brushes.White });
+        panel.Children.Add(filter);
+        panel.Children.Add(list);
+        panel.Children.Add(buttons);
+        window.Content = panel;
+        return window;
     }
 
     public async Task<bool> ConfirmAsync(string title, string message)
