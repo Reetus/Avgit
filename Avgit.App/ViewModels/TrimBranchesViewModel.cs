@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using Avalonia.Media;
 using Avgit.Core.Model;
 
 namespace Avgit.App.ViewModels;
@@ -41,6 +42,9 @@ public sealed partial class TrimBranchRow : ObservableObject
     public string UpstreamText => Branch.Upstream is { Gone: true } tracking
         ? string.Format(Strings.Trim_UpstreamDeleted, tracking.RemoteBranchForPull)
         : Strings.Trim_NeverPushed;
+
+    /// <summary>A deleted remote branch is struck through; "never pushed" is plain.</summary>
+    public TextDecorationCollection? UpstreamDecorations => Branch.Upstream is { Gone: true } ? TextDecorations.Strikethrough : null;
 
     /// <summary>Fully merged into the current branch, so <c>git branch -d</c> can delete it.</summary>
     public bool IsMerged { get; }

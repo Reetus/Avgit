@@ -39,13 +39,17 @@
                   <Grid ColumnDefinitions="Auto,*,120,Auto">
                     <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" MinWidth="0"
                               VerticalAlignment="Center" ToolTip.Tip="{x:Static res:Strings.Trim_RowToolTip}" />
-                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center" Margin="2,0,10,0">
-                      <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
-                                   TextTrimming="CharacterEllipsis" />
-                        <TextBlock Text="{Binding UpstreamText}" Classes="muted" FontSize="11"
-                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                      </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center" Margin="4,0,10,0">
+                      <!-- Pills wrap to a second line instead of running into the date and
+                           status columns; a pill wider than the row trims with an ellipsis. -->
+                      <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="3">
+                        <Border Classes="pill branch" ToolTip.Tip="{Binding Name}">
+                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        </Border>
+                        <Border Classes="pill faded" ToolTip.Tip="{Binding UpstreamText}">
+                          <TextBlock Text="{Binding UpstreamText}" TextDecorations="{Binding UpstreamDecorations}" />
+                        </Border>
+                      </WrapPanel>
                       <TextBlock Text="{Binding Details}" Classes="muted" FontSize="11"
                                  TextTrimming="CharacterEllipsis" />
                     </StackPanel>
