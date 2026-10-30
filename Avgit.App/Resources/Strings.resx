@@ -144,6 +144,10 @@
     <value>Create Branch...</value>
     <comment>Repository menu item</comment>
   </data>
+  <data name="Main_TrimBranches" xml:space="preserve">
+    <value>Trim Branches...</value>
+    <comment>Repository menu item: delete local branches whose remote branch was deleted</comment>
+  </data>
   <data name="Main_CreateTag" xml:space="preserve">
     <value>Create Tag...</value>
     <comment>Repository menu item</comment>
@@ -259,6 +263,18 @@
   <data name="Repo_View_NewBranch" xml:space="preserve">
     <value>+ New branch</value>
     <comment>Sidebar button</comment>
+  </data>
+  <data name="Repo_View_TrimBranches" xml:space="preserve">
+    <value>Trim branches...</value>
+    <comment>Sidebar button in the BRANCHES section</comment>
+  </data>
+  <data name="Repo_View_TrimBranchesToolTip" xml:space="preserve">
+    <value>Delete local branches whose remote branch was deleted</value>
+    <comment>Tooltip on Trim branches...</comment>
+  </data>
+  <data name="Repo_View_UpstreamGone" xml:space="preserve">
+    <value>gone</value>
+    <comment>Small marker next to a branch whose remote branch was deleted</comment>
   </data>
   <data name="Repo_View_OpenWorktree" xml:space="preserve">
     <value>Open worktree</value>
@@ -631,6 +647,134 @@
   <data name="Rebase_RunRebase" xml:space="preserve">
     <value>Run rebase</value>
     <comment>Button: start the rebase</comment>
+  </data>
+  <data name="Trim_Title" xml:space="preserve">
+    <value>Trim branches</value>
+    <comment>Trim branches window title and summary dialog title</comment>
+  </data>
+  <data name="Trim_Description" xml:space="preserve">
+    <value>Local branches whose remote branch was deleted, for example after its pull request was merged. &quot;merged&quot; means fully merged into {0}; squash-merged branches always show as not merged.</value>
+    <comment>Instructions at the top of the Trim branches window; {0} = current branch name (or HEAD)</comment>
+  </data>
+  <data name="Trim_FetchFirst" xml:space="preserve">
+    <value>Fetch first</value>
+    <comment>Check box: run git fetch --prune before listing</comment>
+  </data>
+  <data name="Trim_FetchFirstToolTip" xml:space="preserve">
+    <value>Run git fetch --prune before listing, so branches deleted on the remote show up</value>
+    <comment>Tooltip on Fetch first; &quot;git fetch --prune&quot; is a command</comment>
+  </data>
+  <data name="Trim_OlderThan" xml:space="preserve">
+    <value>Last commit older than</value>
+    <comment>Label before the age filter (Any / 1 day / 7 days ...)</comment>
+  </data>
+  <data name="Trim_AgeAny" xml:space="preserve">
+    <value>Any</value>
+    <comment>Age filter option: no age limit</comment>
+  </data>
+  <data name="Trim_Age1Day" xml:space="preserve">
+    <value>1 day</value>
+    <comment>Age filter option</comment>
+  </data>
+  <data name="Trim_Age7Days" xml:space="preserve">
+    <value>7 days</value>
+    <comment>Age filter option</comment>
+  </data>
+  <data name="Trim_Age30Days" xml:space="preserve">
+    <value>30 days</value>
+    <comment>Age filter option</comment>
+  </data>
+  <data name="Trim_Age90Days" xml:space="preserve">
+    <value>90 days</value>
+    <comment>Age filter option</comment>
+  </data>
+  <data name="Trim_IncludeNeverPushed" xml:space="preserve">
+    <value>Also include branches that were never pushed</value>
+    <comment>Check box: also list branches without an upstream</comment>
+  </data>
+  <data name="Trim_RowToolTip" xml:space="preserve">
+    <value>Delete this branch</value>
+    <comment>Tooltip on a row&apos;s check box</comment>
+  </data>
+  <data name="Trim_Fetching" xml:space="preserve">
+    <value>Fetching...</value>
+    <comment>Shown in the list while fetching</comment>
+  </data>
+  <data name="Trim_ReadingBranches" xml:space="preserve">
+    <value>Reading branches...</value>
+    <comment>Shown in the list while loading</comment>
+  </data>
+  <data name="Trim_EmptyGone" xml:space="preserve">
+    <value>No branches whose remote branch was deleted match the filter.</value>
+    <comment>Empty-state text</comment>
+  </data>
+  <data name="Trim_EmptyWithNeverPushed" xml:space="preserve">
+    <value>No branches without a remote branch match the filter.</value>
+    <comment>Empty-state text when never-pushed branches are included</comment>
+  </data>
+  <data name="Trim_DeleteOne" xml:space="preserve">
+    <value>Delete 1 branch</value>
+    <comment>Delete button when one branch is ticked</comment>
+  </data>
+  <data name="Trim_DeleteMany" xml:space="preserve">
+    <value>Delete {0} branches</value>
+    <comment>Delete button; {0} = number of ticked branches (0 or more than 1)</comment>
+  </data>
+  <data name="Trim_StatusMerged" xml:space="preserve">
+    <value>merged</value>
+    <comment>Row status: every commit is in the current branch</comment>
+  </data>
+  <data name="Trim_StatusNotMerged" xml:space="preserve">
+    <value>not merged</value>
+    <comment>Row status (shown as a warning): some commits are not in the current branch</comment>
+  </data>
+  <data name="Trim_MergedToolTip" xml:space="preserve">
+    <value>Every commit on this branch is in the current branch.</value>
+    <comment>Tooltip on the merged status</comment>
+  </data>
+  <data name="Trim_NotMergedToolTip" xml:space="preserve">
+    <value>Some commits are not in the current branch. A squash-merged pull request always looks like this; otherwise those commits are only recoverable from the reflog after deleting.</value>
+    <comment>Tooltip on the not merged status</comment>
+  </data>
+  <data name="Trim_UpstreamDeleted" xml:space="preserve">
+    <value>{0} (deleted)</value>
+    <comment>Row: the gone remote branch; {0} = remote branch name such as origin/feature</comment>
+  </data>
+  <data name="Trim_NeverPushed" xml:space="preserve">
+    <value>never pushed</value>
+    <comment>Row: the branch has no remote branch</comment>
+  </data>
+  <data name="Trim_RowDetails" xml:space="preserve">
+    <value>{0} · {1}</value>
+    <comment>Row second line; {0} = author of the last commit, {1} = its subject</comment>
+  </data>
+  <data name="Trim_JustNow" xml:space="preserve">
+    <value>just now</value>
+    <comment>Last commit date less than a minute ago</comment>
+  </data>
+  <data name="Trim_MinuteAgo" xml:space="preserve">
+    <value>1 minute ago</value>
+    <comment>Last commit date</comment>
+  </data>
+  <data name="Trim_MinutesAgo" xml:space="preserve">
+    <value>{0} minutes ago</value>
+    <comment>Last commit date; {0} = number of minutes (2 to 59)</comment>
+  </data>
+  <data name="Trim_HourAgo" xml:space="preserve">
+    <value>1 hour ago</value>
+    <comment>Last commit date</comment>
+  </data>
+  <data name="Trim_HoursAgo" xml:space="preserve">
+    <value>{0} hours ago</value>
+    <comment>Last commit date; {0} = number of hours (2 to 23)</comment>
+  </data>
+  <data name="Trim_DayAgo" xml:space="preserve">
+    <value>1 day ago</value>
+    <comment>Last commit date</comment>
+  </data>
+  <data name="Trim_DaysAgo" xml:space="preserve">
+    <value>{0} days ago</value>
+    <comment>Last commit date; {0} = number of days (2 to 29); older dates show as yyyy-MM-dd</comment>
   </data>
   <data name="Main_LinkedWorktreeOfFormat" xml:space="preserve">
     <value>Linked worktree of {0}</value>
@@ -1867,7 +2011,7 @@ Releases: {0}/releases</value>
     <comment>History branch filter option that shows all branches</comment>
   </data>
   <data name="Repo_RepoTypeLinkedWorktree" xml:space="preserve">
-    <value>Git Â· linked worktree</value>
+    <value>Git · linked worktree</value>
     <comment>Repository type label for a linked worktree tab</comment>
   </data>
   <data name="Repo_OpFetch" xml:space="preserve">
@@ -2511,6 +2655,62 @@ Open that worktree?</value>
   <data name="Repo_DeleteBranchConfirm" xml:space="preserve">
     <value>Delete branch '{0}'?</value>
     <comment>Confirmation message; {0} = branch name</comment>
+  </data>
+  <data name="Repo_TrimUnmergedTitle" xml:space="preserve">
+    <value>Delete unmerged branches</value>
+    <comment>Confirmation title when trimming branches that are not merged</comment>
+  </data>
+  <data name="Repo_TrimUnmergedConfirmOne" xml:space="preserve">
+    <value>1 of these isn&apos;t merged into {0}; its commits will only be recoverable from the reflog.</value>
+    <comment>Confirmation when exactly one ticked branch is not merged; {0} = current branch name (or HEAD)</comment>
+  </data>
+  <data name="Repo_TrimUnmergedConfirmMany" xml:space="preserve">
+    <value>{0} of these aren&apos;t merged into {1}; their commits will only be recoverable from the reflog.</value>
+    <comment>Confirmation when several ticked branches are not merged; {0} = number of unmerged branches, {1} = current branch name (or HEAD)</comment>
+  </data>
+  <data name="Repo_StatusTrimDeleting" xml:space="preserve">
+    <value>Deleting branches...</value>
+    <comment>Status message while Trim branches deletes</comment>
+  </data>
+  <data name="Repo_StatusTrimDeletedOne" xml:space="preserve">
+    <value>Deleted 1 branch.</value>
+    <comment>Status message after Trim branches deleted one branch</comment>
+  </data>
+  <data name="Repo_StatusTrimDeletedMany" xml:space="preserve">
+    <value>Deleted {0} branches.</value>
+    <comment>Status message after Trim branches; {0} = number of deleted branches (0 or more than 1)</comment>
+  </data>
+  <data name="Repo_StatusTrimPartial" xml:space="preserve">
+    <value>Trim branches: {0} deleted, {1} failed.</value>
+    <comment>Status message when some deletions failed; {0} = number deleted, {1} = number that failed</comment>
+  </data>
+  <data name="Repo_TrimSummaryDeletedOne" xml:space="preserve">
+    <value>Deleted 1 branch. To restore it, run git branch &lt;name&gt; &lt;sha&gt;:</value>
+    <comment>First line of the Trim branches summary; &quot;git branch &lt;name&gt; &lt;sha&gt;&quot; is a command and stays untranslated</comment>
+  </data>
+  <data name="Repo_TrimSummaryDeletedMany" xml:space="preserve">
+    <value>Deleted {0} branches. To restore one, run git branch &lt;name&gt; &lt;sha&gt;:</value>
+    <comment>First line of the Trim branches summary; {0} = number of deleted branches; &quot;git branch &lt;name&gt; &lt;sha&gt;&quot; is a command and stays untranslated</comment>
+  </data>
+  <data name="Repo_TrimSummaryDeletedLine" xml:space="preserve">
+    <value>  {0}  {1}</value>
+    <comment>One deleted branch in the summary; {0} = branch name, {1} = short commit SHA</comment>
+  </data>
+  <data name="Repo_TrimSummaryFailedHeader" xml:space="preserve">
+    <value>Could not delete:</value>
+    <comment>Heading before the branches that failed to delete</comment>
+  </data>
+  <data name="Repo_TrimSummaryFailedLine" xml:space="preserve">
+    <value>  {0}: {1}</value>
+    <comment>One failed branch in the summary; {0} = branch name, {1} = git&apos;s error message</comment>
+  </data>
+  <data name="Repo_TrimFetchFailed" xml:space="preserve">
+    <value>Fetch failed: {0}</value>
+    <comment>Shown in the Trim branches dialog; {0} = git&apos;s error message</comment>
+  </data>
+  <data name="Repo_TrimUnknownError" xml:space="preserve">
+    <value>unknown error</value>
+    <comment>Used when git gave no error text</comment>
   </data>
   <data name="Repo_CreateWorktreeTitle" xml:space="preserve">
     <value>Create worktree</value>

@@ -136,4 +136,8 @@
     <value>{0} (truncated)</value>
     <comment>{0} = hunk range caption</comment>
   </data>
+  <data name="Branch_UpstreamGoneToolTip" xml:space="preserve">
+    <value>The remote branch {0} was deleted</value>
+    <comment>Tooltip on the &quot;gone&quot; marker in the sidebar; {0} = remote branch name such as origin/feature</comment>
+  </data>
 </root>

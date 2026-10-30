@@ -142,6 +142,19 @@ public class BranchRef
     /// <summary>A branch can be given its own worktree only while no worktree has it checked out.</summary>
     public bool CanAddWorktree => Kind == RefKind.Branch && !IsCheckedOut && WorktreePath is null;
 
+    /// <summary>Committer date of the tip commit, or null when git did not report one.</summary>
+    public DateTimeOffset? LastCommitDate { get; set; }
+
+    public string LastCommitAuthor { get; set; } = string.Empty;
+    public string LastCommitSubject { get; set; } = string.Empty;
+
+    /// <summary>The upstream is configured but its remote-tracking branch no longer exists (deleted on the remote, then pruned).</summary>
+    public bool UpstreamGone => Upstream is { Gone: true };
+
+    public string UpstreamGoneToolTip => Upstream is { Gone: true } tracking
+        ? string.Format(CoreStrings.Branch_UpstreamGoneToolTip, tracking.RemoteBranchForPull)
+        : string.Empty;
+
     public string UpstreamText
     {
         get
@@ -168,6 +181,9 @@ public struct UpstreamTrack
     public string? RemoteBranchForPull { get; set; }
     public uint Ahead { get; set; }
     public uint Behind { get; set; }
+
+    /// <summary>git reports the upstream as <c>[gone]</c>: its remote-tracking branch was removed.</summary>
+    public bool Gone { get; set; }
 }
 
 public struct StashRecord

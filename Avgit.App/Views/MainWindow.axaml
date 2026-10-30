@@ -45,6 +45,7 @@
         <MenuItem Header="{x:Static res:Strings.Main_ForcePushWithLease}" Command="{Binding Repository.ForcePushCommand}" />
         <Separator />
         <MenuItem Header="{x:Static res:Strings.Main_CreateBranch}" Command="{Binding Repository.CreateBranchCommand}" />
+        <MenuItem Header="{x:Static res:Strings.Main_TrimBranches}" Command="{Binding Repository.TrimBranchesCommand}" />
         <MenuItem Header="{x:Static res:Strings.Main_CreateTag}" Command="{Binding Repository.CreateTagCommand}" />
         <MenuItem Header="{x:Static res:Strings.Main_StashChanges}" Command="{Binding Repository.StashCommand}" />
         <Separator />

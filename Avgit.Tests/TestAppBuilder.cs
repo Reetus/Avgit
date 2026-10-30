@@ -3,6 +3,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avgit.App;
 using Avgit.App.Services;
+using Avgit.App.ViewModels;
 using Avgit.Tests;
 
 [assembly: AvaloniaTestApplication(typeof(TestAppBuilder))]
@@ -73,6 +74,22 @@ public sealed class FakeDialogService : Avgit.App.Services.IDialogService
     {
         Messages.Add($"{title}: {message}");
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Answers the trim-branches dialog once its list has loaded: may change the
+    /// options or ticks, then returns true for Delete. Null cancels.
+    /// </summary>
+    public Func<TrimBranchesViewModel, Task<bool>>? TrimBranchesResponse { get; set; }
+
+    /// <summary>Every trim-branches dialog shown, as loaded when it was answered.</summary>
+    public List<TrimBranchesViewModel> TrimBranchesDialogs { get; } = [];
+
+    public async Task<bool> TrimBranchesAsync(TrimBranchesViewModel viewModel)
+    {
+        TrimBranchesDialogs.Add(viewModel);
+        await viewModel.Loading;
+        return TrimBranchesResponse is { } respond && await respond(viewModel);
     }
 }
 

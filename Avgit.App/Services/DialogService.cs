@@ -23,6 +23,12 @@ public interface IDialogService
     /// <summary>Offers several actions; returns the chosen option, or null when cancelled.</summary>
     Task<string?> ChooseAsync(string title, string message, IReadOnlyList<string> options);
     Task ShowMessageAsync(string title, string message);
+
+    /// <summary>
+    /// Shows the trim-branches checklist (which loads itself); true when the user
+    /// chose Delete, with the ticked branches in <see cref="TrimBranchesViewModel.SelectedRows"/>.
+    /// </summary>
+    Task<bool> TrimBranchesAsync(TrimBranchesViewModel viewModel);
 }
 
 /// <summary>Small programmatic dialogs; avoids a dependency on a dialog package.</summary>
@@ -176,6 +182,18 @@ public sealed class DialogService : IDialogService
         var window = new InteractiveRebaseWindow { DataContext = viewModel };
         await window.ShowDialog(Owner);
         return viewModel.Accepted ? viewModel.ToPlan() : null;
+    }
+
+    public async Task<bool> TrimBranchesAsync(TrimBranchesViewModel viewModel)
+    {
+        if (Owner is null)
+        {
+            return false;
+        }
+
+        var window = new TrimBranchesWindow { DataContext = viewModel };
+        await window.ShowDialog(Owner);
+        return viewModel.Accepted;
     }
 
     public async Task<bool> ConfirmAsync(string title, string message)

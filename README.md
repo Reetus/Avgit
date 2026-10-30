@@ -23,6 +23,7 @@ Inspired by Sourcetree. Avgit is an independent project and is not affiliated wi
 - Commit and amend, with `commit.template` prefill, sign-off and GPG signing.
 - Commit context menu: checkout, create branch/tag here, merge, rebase onto, **interactive rebase** with per-commit action dropdowns and reordering (including root commits), single or multi-commit cherry-pick/revert, compare with base, hard reset and copy SHA.
 - Branches: create with checkout, checkout, delete. Selecting a branch jumps the history to its tip commit; double-click checks it out.
+- **Trim branches** (sidebar BRANCHES section or Repository > Trim Branches...): after GitHub deletes a merged pull request's branch, lists the local branches whose remote branch is gone, optionally fetching (with prune) first. Filter by the age of the last commit (remembered) and include never-pushed branches on request; the current branch and branches checked out in a worktree are never offered. Each row shows the last commit, author, subject and whether it is merged into the current branch; squash-merged branches show as not merged and are still ticked, with one extra confirmation before they are force-deleted. The summary lists each deleted branch with its SHA so `git branch <name> <sha>` restores it. Branches whose remote branch is gone are marked "gone" in the sidebar.
 - Remote management: add, edit (rename or change URL) and remove remotes from the sidebar.
 - Tags: create, annotated tags, delete.
 - Stashes: save (including untracked files), apply, pop, drop and preview.
@@ -238,6 +239,7 @@ The test suite covers:
 - Commit-graph layout: lane assignment, merges, colours, paging continuity, edge continuity over random histories, and a headless render check.
 - End-to-end Git operations against real temporary repositories (status, staging, commits, logs, diffs, branches, tags, stashes, merges, rebases, cherry-picks, clones).
 - Push rejection handling: parsing of real `git push --porcelain` output, and recovery flows (pull with rebase or merge, force with lease, stale lease, server rejection) against a real remote.
+- Trim branches: `[gone]` upstream parsing, candidate filtering (current, worktree and never-pushed branches, last-commit age) and deleting merged (`-d`) and squash-merged (`-D`, after confirmation) branches against a real remote that deleted them.
 - Amend message handling, commit-selection races during refresh, and file-status selection stability.
 - Large-repository behaviour: lazy tab restore, history paging, history cache, untracked folders, inactive-tab watcher, diff virtualization and commit-graph writing.
 - Terminal launcher selection per platform.

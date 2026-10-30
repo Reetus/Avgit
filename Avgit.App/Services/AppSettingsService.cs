@@ -30,6 +30,8 @@ public sealed class AppSettings
     public bool ShowAllBranches { get; set; } = true;
     /// <summary>Download new releases from GitHub in the background; they install on restart.</summary>
     public bool CheckForUpdates { get; set; } = true;
+    /// <summary>Trim branches: only list branches whose last commit is at least this many days old (0 = any age).</summary>
+    public int TrimBranchesOlderThanDays { get; set; } = 7;
 }
 
 public sealed class CustomActionSetting
