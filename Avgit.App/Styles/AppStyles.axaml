@@ -151,6 +151,48 @@
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
+  <!-- Rounded label for branch names and markers, like the history's ref pills. The text
+       trims with an ellipsis when the pill is given less width than it wants. -->
+  <Style Selector="Border.pill">
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="7,0" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+
+  <Style Selector="Border.pill > TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+
+  <Style Selector="Border.pill.branch">
+    <Setter Property="Background" Value="#400E639C" />
+    <Setter Property="BorderBrush" Value="#3B82C4" />
+  </Style>
+
+  <!-- Outlined and muted: something that is gone or only informational. -->
+  <Style Selector="Border.pill.faded">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="#5A5A60" />
+  </Style>
+
+  <Style Selector="Border.pill.faded > TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource Muted}" />
+  </Style>
+
+  <Style Selector="Border.pill.small">
+    <Setter Property="Height" Value="14" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="Padding" Value="5,0" />
+  </Style>
+
+  <Style Selector="Border.pill.small > TextBlock">
+    <Setter Property="FontSize" Value="9" />
+  </Style>
+
   <Style Selector="Expander /template/ ContentPresenter">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />

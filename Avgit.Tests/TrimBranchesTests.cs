@@ -159,6 +159,46 @@ public class TrimBranchesParsingTests
         int olderThanDays)
         => new("main", olderThanDays, _ => Task.FromResult(new TrimBranchesSnapshot(branches, merged, null)), () => Now);
 
+    [AvaloniaFact]
+    public async Task Long_branch_names_trim_inside_their_pills_instead_of_overlapping()
+    {
+        List<BranchRef> branches =
+        [
+            Branch("FD-46664-AlignCapacityPlanningGenerationFlowExcelReport", gone: true, daysOld: 40),
+            Branch("FD-42548-ChangeInvoiceGroupingModeMaxLimit50K-with-an-even-longer-suffix-that-cannot-fit", gone: true, daysOld: 45),
+            Branch("short", gone: true, daysOld: 50)
+        ];
+        TrimBranchesViewModel vm = Create(branches, [], olderThanDays: 7);
+        await vm.LoadAsync();
+        var window = new TrimBranchesWindow { DataContext = vm, Width = 860, Height = 560 };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            ItemsControl list = window.FindControl<ItemsControl>("BranchList")!;
+            foreach (Control row in list.GetRealizedContainers())
+            {
+                WrapPanel pills = row.GetVisualDescendants().OfType<WrapPanel>().Single();
+                TextBlock date = row.GetVisualDescendants().OfType<TextBlock>()
+                    .Single(t => t.Text == ((TrimBranchRow)row.DataContext!).LastCommitText);
+                var dateLeft = date.TranslatePoint(new Point(0, 0), row)!.Value.X;
+                foreach (Border pill in pills.Children.OfType<Border>())
+                {
+                    var right = pill.TranslatePoint(new Point(pill.Bounds.Width, 0), row)!.Value.X;
+                    Assert.True(right <= dateLeft, $"a pill ends at {right}, past the date column at {dateLeft}");
+                }
+            }
+
+            Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "avgit-headless"));
+            window.CaptureRenderedFrame()!.Save(Path.Combine(Path.GetTempPath(), "avgit-headless", "trim-branches-long.png"),
+                PngBitmapEncoderOptions.Default);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private static BranchRef Branch(string name, bool? gone, int daysOld, bool checkedOut = false, string? worktree = null)
         => new()
         {
@@ -535,7 +575,8 @@ public class TrimBranchesRepositoryTests
         var markers = window.GetVisualDescendants().OfType<TextBlock>()
             .Where(t => t.Text == "gone" && t.IsEffectivelyVisible).ToList();
         Assert.Equal(3, markers.Count);
-        Assert.Contains(markers, m => ToolTip.GetTip(m) as string == "The remote branch origin/merged-f was deleted");
+        // The marker is a pill; its border carries the tooltip.
+        Assert.Contains(markers, m => m.Parent is Border pill && ToolTip.GetTip(pill) as string == "The remote branch origin/merged-f was deleted");
         window.CaptureRenderedFrame()!.Save(Path.Combine(ArtifactDirectory, "trim-branches-sidebar.png"), PngBitmapEncoderOptions.Default);
 
         window.Close();

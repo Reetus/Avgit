@@ -63,9 +63,10 @@
                         <TextBlock Text="{Binding Name}" FontSize="11"
                                    TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
                         <!-- The upstream was deleted on the remote (e.g. after a pull request was merged). -->
-                        <TextBlock Grid.Column="1" Text="{x:Static res:Strings.Repo_View_UpstreamGone}" Classes="muted" FontSize="9" Margin="5,0,0,0"
-                                   VerticalAlignment="Center" Background="Transparent"
-                                   IsVisible="{Binding UpstreamGone}" ToolTip.Tip="{Binding UpstreamGoneToolTip}" />
+                        <Border Grid.Column="1" Classes="pill faded small" Margin="5,0,0,0"
+                                IsVisible="{Binding UpstreamGone}" ToolTip.Tip="{Binding UpstreamGoneToolTip}">
+                          <TextBlock Text="{x:Static res:Strings.Repo_View_UpstreamGone}" />
+                        </Border>
                       </Grid>
                       <!-- Checked out in another worktree: it cannot be checked out here. -->
                       <PathIcon Grid.Column="2" Data="{StaticResource IconWorktree}" Width="13" Height="11"
