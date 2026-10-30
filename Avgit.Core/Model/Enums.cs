@@ -130,5 +130,8 @@ public enum DiffRequestKind
     Staged,
     Commit,
     CommitRange,
-    FileContent
+    FileContent,
+
+    /// <summary>A stash (<see cref="DiffSpec.Revision"/>) against the commit it was made on, untracked files included.</summary>
+    Stash
 }

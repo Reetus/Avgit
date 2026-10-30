@@ -165,7 +165,7 @@ public class ImageDiffTests
     }
 
     /// <summary>Writes a solid <paramref name="argb"/> PNG.</summary>
-    private static void WritePng(string path, int width, int height, uint argb)
+    internal static void WritePng(string path, int width, int height, uint argb)
     {
         using var bitmap = new WriteableBitmap(new PixelSize(width, height), new Vector(96, 96),
             PixelFormat.Bgra8888, AlphaFormat.Unpremul);

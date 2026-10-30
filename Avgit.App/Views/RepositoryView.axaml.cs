@@ -8,12 +8,29 @@ namespace Avgit.App.Views;
 
 public partial class RepositoryView : UserControl
 {
+    private RepositoryViewModel? _repository;
+
     public RepositoryView()
     {
         InitializeComponent();
+        DataContextChanged += (_, _) =>
+        {
+            _repository?.StashViewRequested -= OnStashViewRequested;
+            _repository = DataContext as RepositoryViewModel;
+            _repository?.StashViewRequested += OnStashViewRequested;
+        };
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+    /// <summary>A stash is shown in the History tab's panes, so bring that tab forward.</summary>
+    private void OnStashViewRequested()
+    {
+        if (this.FindControl<TabControl>("MainTabs") is { } tabs)
+        {
+            tabs.SelectedIndex = 0;
+        }
+    }
 
     private void OnBranchDoubleTapped(object? sender, TappedEventArgs e)
     {

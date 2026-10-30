@@ -172,9 +172,16 @@ public struct UpstreamTrack
 
 public struct StashRecord
 {
+    /// <summary>The stash's reflog name (<c>stash@{n}</c>); it shifts as stashes are added or dropped.</summary>
     public string Id;
     public string Created;
     public string Text;
+
+    /// <summary>The stash commit; unlike <see cref="Id"/> it stays the same while the stash exists.</summary>
+    public string Sha;
+
+    /// <summary>The abbreviated commit HEAD pointed at when the stash was made (its first parent).</summary>
+    public string BaseShortSha;
 }
 
 /// <summary>Filter for a page of history.</summary>

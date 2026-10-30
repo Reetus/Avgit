@@ -58,6 +58,10 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private CommitSide? _compareBase;
     private CommitPair? _requestedComparePair;
     private CommitPair? _displayedComparePair;
+    // A stash clicked in the sidebar is shown in the same panes instead of a commit.
+    // It is tracked by SHA: its stash@{n} name shifts as stashes come and go.
+    private StashEntry? _viewedStash;
+    private StashEntry? _selectedStash;
     private bool _restoringCommitSelection;
     private Task? _selectionTask;
     private int _workingDiffGeneration;
@@ -291,6 +295,11 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
                 _selectionTask = SelectCommitAsync(value);
             }
+            else if (value is not null && _viewedStash is not null)
+            {
+                // Selecting the commit the list already has leaves the stash view.
+                _selectionTask = SelectCommitAsync(value);
+            }
         }
     }
 
@@ -308,8 +317,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         switch (_selectedCommits.Count)
         {
-            case 1 when _comparePair is not null:
-                // Back from a comparison to one commit: show that commit again.
+            case 1 when _comparePair is not null || _viewedStash is not null:
+                // Back from a comparison or a stash to one commit: show that commit again.
                 SetContextCommit(_selectedCommits[0]);
                 break;
             case 2:
@@ -458,6 +467,52 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public string CompareTargetSha => _comparePair?.Target.ShortSha ?? string.Empty;
     public string CompareTargetSubject => _comparePair?.Target.Title ?? string.Empty;
 
+    /// <summary>The stash selected in the sidebar; selecting one shows it in the history's right-hand panes.</summary>
+    public StashEntry? SelectedStash
+    {
+        get => _selectedStash;
+        set
+        {
+            // Null comes from the list clearing its selection when the stashes are
+            // reloaded; that does not leave the stash view.
+            if (SetProperty(ref _selectedStash, value) && value is not null)
+            {
+                StashViewRequested?.Invoke();
+                _selectionTask = ShowStashAsync(value);
+            }
+        }
+    }
+
+    /// <summary>Raised when the user selects a stash, so the History tab can be brought forward.</summary>
+    public event Action? StashViewRequested;
+
+    /// <summary>The stash shown in the right-hand panes, or null when they show commits.</summary>
+    public StashEntry? ViewedStash => _viewedStash;
+
+    public bool IsViewingStash => _viewedStash is not null;
+
+    /// <summary>The right-hand panes show one commit (not a comparison or a stash).</summary>
+    public bool IsShowingCommitDetails => !IsComparingCommits && !IsViewingStash;
+
+    private void SetViewedStash(StashEntry? stash)
+    {
+        if (ReferenceEquals(_viewedStash, stash))
+        {
+            return;
+        }
+
+        _viewedStash = stash;
+        OnPropertyChanged(nameof(ViewedStash));
+        OnPropertyChanged(nameof(IsViewingStash));
+        OnPropertyChanged(nameof(IsShowingCommitDetails));
+        if (stash is null && _selectedStash is not null)
+        {
+            // Unselect the sidebar row so clicking it again shows the stash again.
+            _selectedStash = null;
+            OnPropertyChanged(nameof(SelectedStash));
+        }
+    }
+
     private void SetComparePair(CommitPair? pair)
     {
         if (Equals(_comparePair, pair))
@@ -467,6 +522,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         _comparePair = pair;
         OnPropertyChanged(nameof(IsComparingCommits));
+        OnPropertyChanged(nameof(IsShowingCommitDetails));
         OnPropertyChanged(nameof(CompareBaseSha));
         OnPropertyChanged(nameof(CompareBaseSubject));
         OnPropertyChanged(nameof(CompareTargetSha));
@@ -1166,6 +1222,24 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             Stashes.Add(new StashEntry(stash));
         }
 
+        if (_viewedStash is { } viewed)
+        {
+            StashEntry? current = Stashes.FirstOrDefault(s => string.Equals(s.Sha, viewed.Sha, StringComparison.Ordinal));
+            if (current is null)
+            {
+                // The stash was popped or dropped: show the selected commit again.
+                _selectionTask = SelectCommitAsync(SelectedCommit);
+            }
+            else
+            {
+                // Still there, perhaps under a new stash@{n}; a stash's contents never
+                // change, so the panes are kept and only the entry is replaced.
+                SetViewedStash(current);
+                _selectedStash = current;
+                OnPropertyChanged(nameof(SelectedStash));
+            }
+        }
+
         Worktrees.Clear();
         for (var i = 0; i < refs.Worktrees.Count; i++)
         {
@@ -1439,6 +1513,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         // A watcher refresh must not clear and rebuild the commit diff when the
         // selected commit is unchanged; that caused a visible flash.
+        if (_viewedStash is not null)
+        {
+            // The panes show a stash; reloading history does not change it (refs
+            // reloading leaves the stash view if the stash is gone).
+            return;
+        }
+
         if (compareToShow is not null)
         {
             await ShowCompareAsync(compareToShow).ConfigureAwait(true);
@@ -1531,6 +1612,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         _requestedComparePair = null;
         _displayedComparePair = null;
         SetComparePair(null);
+        SetViewedStash(null);
         if (row is null)
         {
             _displayedCommitSha = null;
@@ -1597,9 +1679,10 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     private async Task LoadCommitDiffAsync()
     {
         ChangedFile? file = SelectedCommitFile;
+        StashEntry? stash = _viewedStash;
         CommitPair? pair = _comparePair;
         CommitRowViewModel? commit = SelectedCommit;
-        if (file is null || (pair is null && commit is null))
+        if (file is null || (stash is null && pair is null && commit is null))
         {
             CommitDiff.Clear(Strings.Repo_DiffSelectCommitFile);
             return;
@@ -1608,15 +1691,18 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         var generation = ++_commitDiffGeneration;
         _commitDiffCts?.Cancel();
         CancellationTokenSource cts = _commitDiffCts = new CancellationTokenSource();
-        var revision = pair?.Target.Sha ?? commit!.Row.CommitId;
+        var revision = stash?.Sha ?? pair?.Target.Sha ?? commit!.Row.CommitId;
         var baseSha = pair?.Base.Sha;
         var request = new DiffSpec
         {
-            Kind = pair is not null ? DiffRequestKind.CommitRange : DiffRequestKind.Commit,
+            Kind = stash is not null ? DiffRequestKind.Stash
+                : pair is not null ? DiffRequestKind.CommitRange : DiffRequestKind.Commit,
             BaseRevision = baseSha,
             Revision = revision,
             // Parents are known from history, so the diff needs no rev-list lookup.
-            FirstParent = pair is not null ? null : (commit!.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : string.Empty),
+            FirstParent = stash is not null || pair is not null
+                ? null
+                : (commit!.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : string.Empty),
             Files = BuildDiffPaths(file),
             Context = DiffContext,
             IgnoreWhitespace = IgnoreWhitespace
@@ -1628,21 +1714,25 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
             var raw = await Handler.GetDiffAsync(Path, request, cts.Token).ConfigureAwait(true);
             // Drop the result if a newer diff was requested or the selection moved to
             // another commit meanwhile (rows are re-created on refresh, so compare SHAs).
+            // A stash and a commit can share neither panes nor results.
             if (generation != _commitDiffGeneration
+                || !string.Equals(_viewedStash?.Sha, stash?.Sha, StringComparison.Ordinal)
                 || !Equals(_comparePair, pair)
-                || (pair is null && !string.Equals(SelectedCommit?.Row.CommitId, commit!.Row.CommitId, StringComparison.Ordinal)))
+                || (stash is null && pair is null
+                    && !string.Equals(SelectedCommit?.Row.CommitId, commit!.Row.CommitId, StringComparison.Ordinal)))
             {
                 return;
             }
 
-            if (ReportHandlerError(Strings.Repo_ErrorLoadCommitDiff))
+            if (ReportHandlerError(stash is not null ? Strings.Repo_ErrorLoadStashDiff : Strings.Repo_ErrorLoadCommitDiff))
             {
                 return;
             }
 
             var env = new DiffSetup
             {
-                Subject = pair is not null ? DiffSubject.Range : DiffSubject.SingleCommit,
+                Subject = stash is not null ? DiffSubject.StashSnapshot
+                    : pair is not null ? DiffSubject.Range : DiffSubject.SingleCommit,
                 Scope = DiffScope.WorkTreeVsHead
             };
             List<FileDiff> files = await Task.Run(() => ParseDiff(raw, env)).ConfigureAwait(true);
@@ -1651,7 +1741,8 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            if (files.Count == 0 && file.Status != PathState.Removed)
+            // The work-tree copy is no stand-in for a stashed file, which may differ from it.
+            if (files.Count == 0 && file.Status != PathState.Removed && stash is null)
             {
                 var abs = file.FullPath;
                 if (File.Exists(abs))
@@ -1662,16 +1753,23 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
                 }
             }
 
-            var title = pair is not null
-                ? $"{pair.Base.ShortSha}..{pair.Target.ShortSha}  {file.RelativePath}"
-                : $"{commit!.Row.ShortId}  {file.RelativePath}";
-            var oldRevision = pair is not null
-                ? pair.Base.Sha
-                : (commit!.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : null);
+            var title = stash is not null
+                ? string.Format(Strings.Repo_StashDiffTitle, stash.ShortSha, file.RelativePath)
+                : pair is not null
+                    ? $"{pair.Base.ShortSha}..{pair.Target.ShortSha}  {file.RelativePath}"
+                    : $"{commit!.Row.ShortId}  {file.RelativePath}";
+            // A stash's first parent is the commit it was made on; its untracked
+            // files are in its third parent rather than in the stash commit itself.
+            var oldRevision = stash is not null
+                ? stash.Sha + "^1"
+                : pair is not null
+                    ? pair.Base.Sha
+                    : (commit!.Row.ParentIds.Length > 0 ? commit.Row.ParentIds[0] : null);
+            var newRevision = stash is not null && file.Status == PathState.Untracked ? stash.Sha + "^3" : revision;
             CommitDiff.SetFiles(files, title, canStage: false, canUnstage: false, canDiscard: false,
                 imageSides: f => DiffImages.SidesFor(f,
                     oldRevision is null ? null : p => ImageOrigin.Object($"{oldRevision}:{p}"),
-                    p => ImageOrigin.Object($"{revision}:{p}")));
+                    p => ImageOrigin.Object($"{newRevision}:{p}")));
         }
         finally
         {
@@ -1698,6 +1796,7 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         _requestedCommitSha = null;
         _displayedCommitSha = null;
         _requestedComparePair = pair;
+        SetViewedStash(null);
         SetComparePair(pair);
         SetLoadingCommitDetails(true);
         try
@@ -1766,6 +1865,74 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         }
 
         await ShowCompareAsync(new CommitPair(pair.Target, pair.Base), keepSelectedFile: true).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Shows a stash's changed files (untracked ones included) and their diff in the
+    /// right-hand panes, compared with the commit the stash was made on.
+    /// </summary>
+    private async Task ShowStashAsync(StashEntry stash)
+    {
+        var generation = ++_commitSelectionGeneration;
+        _commitSelectionCts?.Cancel();
+        CancellationTokenSource cts = _commitSelectionCts = new CancellationTokenSource();
+
+        // The panes no longer show a commit or a comparison.
+        _requestedCommitSha = null;
+        _displayedCommitSha = null;
+        _requestedComparePair = null;
+        _displayedComparePair = null;
+        SetComparePair(null);
+        SetViewedStash(stash);
+        SetLoadingCommitDetails(true);
+        try
+        {
+            Handler.ClearLastError();
+            IReadOnlyList<ChangedFile> changes =
+                await Handler.GetStashChangesAsync(Path, stash.Sha, cts.Token).ConfigureAwait(true);
+            if (generation != _commitSelectionGeneration)
+            {
+                return;
+            }
+
+            CommitFiles.Clear();
+            if (ReportHandlerError(Strings.Repo_ErrorReadStash))
+            {
+                CommitDiff.Clear(Strings.Repo_DiffCouldNotReadStash);
+                return;
+            }
+
+            foreach (ChangedFile change in changes)
+            {
+                CommitFiles.Add(change);
+            }
+
+            _selectedCommitFile = CommitFiles.FirstOrDefault();
+            OnPropertyChanged(nameof(SelectedCommitFile));
+            if (_selectedCommitFile is not null)
+            {
+                await LoadCommitDiffAsync().ConfigureAwait(true);
+            }
+            else
+            {
+                CommitDiff.Clear(Strings.Repo_DiffNoChangesInStash);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // A newer selection superseded this stash.
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            if (generation == _commitSelectionGeneration)
+            {
+                SetLoadingCommitDetails(false);
+            }
+        }
     }
 
     private async Task CompareWithBaseAsync()

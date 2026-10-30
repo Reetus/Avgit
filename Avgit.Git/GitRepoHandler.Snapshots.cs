@@ -552,7 +552,7 @@ public sealed partial class GitRepoHandler
         Task<ProcessResult> refsTask = GitAsync(path, cancellationToken, "for-each-ref", "--format=" + BranchRefFormat,
             "refs/heads", "refs/remotes", "refs/tags");
         Task<ProcessResult> remotesTask = GitAsync(path, cancellationToken, "remote", "-v");
-        Task<ProcessResult> stashesTask = GitAsync(path, cancellationToken, "stash", "list", "--format=%gd\t%ci\t%s");
+        Task<ProcessResult> stashesTask = GitAsync(path, cancellationToken, "stash", "list", StashListFormat);
         Task<ProcessResult> worktreesTask = GitAsync(path, cancellationToken, "worktree", "list", "--porcelain");
         await Task.WhenAll(refsTask, remotesTask, stashesTask, worktreesTask).ConfigureAwait(false);
 
@@ -917,18 +917,33 @@ public sealed partial class GitRepoHandler
         return remotes;
     }
 
+    /// <summary>
+    /// <c>git stash list</c> format read by <see cref="ParseStashes"/>: name, date, stash
+    /// commit, abbreviated parents (the first is the commit stashed on) and the
+    /// subject, last so a tab in it does not shift the other fields.
+    /// </summary>
+    private const string StashListFormat = "--format=%gd\t%ci\t%H\t%p\t%s";
+
     private static List<StashRecord> ParseStashes(string output)
     {
         var list = new List<StashRecord>();
         foreach (var line in output.Split('\n'))
         {
-            var parts = line.TrimEnd('\r').Split('\t');
-            if (parts.Length < 3)
+            var parts = line.TrimEnd('\r').Split('\t', 5);
+            if (parts.Length < 5)
             {
                 continue;
             }
 
-            list.Add(new StashRecord { Id = parts[0], Created = parts[1], Text = parts[2] });
+            var parents = parts[3].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            list.Add(new StashRecord
+            {
+                Id = parts[0],
+                Created = parts[1],
+                Sha = parts[2],
+                BaseShortSha = parents.Length > 0 ? parents[0] : string.Empty,
+                Text = parts[4]
+            });
         }
 
         return list;

@@ -263,7 +263,8 @@ public class CommitCompareTests
         // The user goes back to one commit while the comparison is still loading.
         vm.SetContextCommit(single);
         vm.SetSelectedCommits([single]);
-        await WaitForAsync(() => vm.CommitInfo?.Sha == single.Row.CommitId);
+        await WaitForAsync(() => vm.CommitInfo?.Sha == single.Row.CommitId
+            && vm.CommitDiff.Title.StartsWith(single.Row.ShortId + "  ", StringComparison.Ordinal));
 
         gate.Release();
         Dispatcher.UIThread.RunJobs();
@@ -425,11 +426,15 @@ public class GatedCommitHandler : DispatchProxy
     private IGitEngine _inner = null!;
     private Gate? _rangeGate;
     private Gate? _commitGate;
+    private Gate? _stashGate;
 
     public sealed class Gate
     {
         private readonly TaskCompletionSource _release = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public volatile bool Entered;
+
+        /// <summary>Set once the held call has returned its result.</summary>
+        public volatile bool Completed;
         public Task WaitAsync() => _release.Task;
         public void Release() => _release.TrySetResult();
     }
@@ -457,8 +462,22 @@ public class GatedCommitHandler : DispatchProxy
         return gate;
     }
 
+    /// <summary>Holds the next GetStashChangesAsync call until <see cref="Gate.Release"/>.</summary>
+    public static Gate HoldStashChanges(IGitEngine proxy)
+    {
+        var gate = new Gate();
+        ((GatedCommitHandler)(object)proxy)._stashGate = gate;
+        return gate;
+    }
+
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
+        if (targetMethod!.Name == nameof(IGitEngine.GetStashChangesAsync) && _stashGate is { } stashGate)
+        {
+            _stashGate = null;
+            return GatedStashAsync(stashGate, (string)args![0]!, (string)args[1]!);
+        }
+
         if (targetMethod!.Name == nameof(IGitEngine.GetRangeChangesAsync) && _rangeGate is { } rangeGate)
         {
             _rangeGate = null;
@@ -494,6 +513,23 @@ public class GatedCommitHandler : DispatchProxy
     {
         gate.Entered = true;
         await gate.WaitAsync();
-        return await _inner.GetCommitAsync(path, revision, ct);
+        try
+        {
+            return await _inner.GetCommitAsync(path, revision, ct);
+        }
+        finally
+        {
+            gate.Completed = true;
+        }
+    }
+
+    // Ignores the caller's cancellation, so the late result really arrives and must be ignored.
+    private async Task<IReadOnlyList<ChangedFile>> GatedStashAsync(Gate gate, string path, string stash)
+    {
+        gate.Entered = true;
+        await gate.WaitAsync();
+        IReadOnlyList<ChangedFile> result = await _inner.GetStashChangesAsync(path, stash, CancellationToken.None);
+        gate.Completed = true;
+        return result;
     }
 }
