@@ -966,6 +966,12 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
     public async Task<ProcessResult> DeleteBranchAsync(string path, string name, bool force, CancellationToken cancellationToken = default)
         => await GitAsync(path, cancellationToken, "branch", force ? "-D" : "-d", name).ConfigureAwait(false);
 
+    public async Task<ProcessResult> SetUpstreamAsync(string path, string branch, string upstream, CancellationToken cancellationToken = default)
+        => await GitAsync(path, cancellationToken, "branch", "--set-upstream-to=" + upstream, branch).ConfigureAwait(false);
+
+    public async Task<ProcessResult> UnsetUpstreamAsync(string path, string branch, CancellationToken cancellationToken = default)
+        => await GitAsync(path, cancellationToken, "branch", "--unset-upstream", branch).ConfigureAwait(false);
+
     public async Task<ProcessResult> AddWorktreeAsync(string path, string worktreePath, string? branch, bool createBranch,
         string? startPoint, CancellationToken cancellationToken = default)
     {

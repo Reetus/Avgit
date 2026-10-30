@@ -77,6 +77,10 @@ public interface IGitEngine
     Task<ProcessResult> CheckoutAsync(string path, string reference, CancellationToken cancellationToken = default);
     Task<ProcessResult> DeleteBranchAsync(string path, string name, bool force, CancellationToken cancellationToken = default);
 
+    /// <summary>Makes <paramref name="branch"/> track <paramref name="upstream"/> (a remote branch such as <c>origin/main</c>).</summary>
+    Task<ProcessResult> SetUpstreamAsync(string path, string branch, string upstream, CancellationToken cancellationToken = default);
+    Task<ProcessResult> UnsetUpstreamAsync(string path, string branch, CancellationToken cancellationToken = default);
+
     /// <summary>Local branches with their tip commit's date, author and subject; slower than the refs snapshot.</summary>
     Task<IReadOnlyList<BranchRef>> GetLocalBranchTipsAsync(string path, CancellationToken cancellationToken = default);
 

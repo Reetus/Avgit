@@ -88,6 +88,18 @@
     <value>Delete branch</value>
     <comment>Context menu item / tooltip on branch delete button</comment>
   </data>
+  <data name="Repo_View_SetUpstream" xml:space="preserve">
+    <value>Set upstream...</value>
+    <comment>Branch context menu item for a branch that tracks no remote branch; opens a picker</comment>
+  </data>
+  <data name="Repo_View_ChangeUpstream" xml:space="preserve">
+    <value>Change upstream...</value>
+    <comment>Branch context menu item for a branch that already tracks a remote branch; opens a picker</comment>
+  </data>
+  <data name="Repo_View_UnsetUpstream" xml:space="preserve">
+    <value>Unset upstream</value>
+    <comment>Branch context menu item that stops the branch tracking its remote branch</comment>
+  </data>
   <data name="Main_MenuFile" xml:space="preserve">
     <value>_File</value>
     <comment>Top-level menu; underscore marks the access key</comment>
@@ -1744,6 +1756,10 @@
     <value>Run rebase</value>
     <comment>Button that confirms the edited rebase todo list</comment>
   </data>
+  <data name="Dialog_PickFilter" xml:space="preserve">
+    <value>Filter</value>
+    <comment>Placeholder of the text box that filters a list to pick from</comment>
+  </data>
   <data name="Terminal_NoEmulatorFound" xml:space="preserve">
     <value>No terminal emulator was found. Install one (for example gnome-terminal or xterm) or set the TERMINAL environment variable.</value>
     <comment>Error; gnome-terminal, xterm and TERMINAL are program/variable names, do not translate</comment>
@@ -2683,6 +2699,26 @@ Open that worktree?</value>
   <data name="Repo_OpCheckout" xml:space="preserve">
     <value>Checkout</value>
     <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_OpSetUpstream" xml:space="preserve">
+    <value>Set upstream</value>
+    <comment>Dialog title and operation name</comment>
+  </data>
+  <data name="Repo_OpUnsetUpstream" xml:space="preserve">
+    <value>Unset upstream</value>
+    <comment>Operation name</comment>
+  </data>
+  <data name="Repo_SetUpstreamPrompt" xml:space="preserve">
+    <value>Choose the remote branch that '{0}' should track. Pull and push use it, and the sidebar shows how far ahead or behind it is.</value>
+    <comment>{0} = local branch name</comment>
+  </data>
+  <data name="Repo_ChangeUpstreamPrompt" xml:space="preserve">
+    <value>'{0}' tracks {1}. Choose the remote branch it should track instead.</value>
+    <comment>{0} = local branch name, {1} = the remote branch it tracks now (e.g. origin/main)</comment>
+  </data>
+  <data name="Repo_SetUpstreamNoRemoteBranches" xml:space="preserve">
+    <value>There are no remote branches to track. Add a remote and fetch first.</value>
+    <comment>Message when Set upstream is chosen but the repository has no remote branches</comment>
   </data>
   <data name="Repo_CheckoutReferenceConfirm" xml:space="preserve">
     <value>Check out '{0}'? HEAD may become detached.</value>

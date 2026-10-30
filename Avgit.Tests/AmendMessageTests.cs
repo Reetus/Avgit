@@ -138,6 +138,8 @@ public class AmendMessageTests
         public Task ShowMessageAsync(string title, string message) => _inner.ShowMessageAsync(title, message);
         public Task<string?> ChooseAsync(string title, string message, IReadOnlyList<string> options)
             => _inner.ChooseAsync(title, message, options);
+        public Task<string?> PickAsync(string title, string message, IReadOnlyList<string> items, string? selected = null)
+            => _inner.PickAsync(title, message, items, selected);
         public Task<bool> TrimBranchesAsync(TrimBranchesViewModel viewModel) => _inner.TrimBranchesAsync(viewModel);
     }
 }
