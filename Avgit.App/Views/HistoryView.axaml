@@ -114,7 +114,7 @@
         <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="10,8"
                 BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1">
           <Grid>
-            <StackPanel Spacing="5" IsVisible="{Binding !IsComparingCommits}">
+            <StackPanel Spacing="5" IsVisible="{Binding IsShowingCommitDetails}">
               <TextBlock Text="{Binding CommitInfo.Title}" FontSize="14" FontWeight="SemiBold"
                          TextWrapping="Wrap" />
               <TextBlock Text="{Binding CommitInfo.Message}" Classes="muted" FontSize="11" TextWrapping="Wrap"
@@ -161,6 +161,25 @@
                   <Run Text="{Binding CompareTargetSubject}" />
                 </TextBlock>
               </Grid>
+            </StackPanel>
+
+            <StackPanel x:Name="StashHeader" Spacing="5" IsVisible="{Binding IsViewingStash}">
+              <TextBlock Text="{Binding ViewedStash.Title}" FontSize="14" FontWeight="SemiBold"
+                         TextWrapping="Wrap" />
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Text="{Binding ViewedStash.Name}" FontFamily="{StaticResource MonoFont}" FontSize="11"
+                           Foreground="#58A6FF" Margin="0,0,12,0" />
+                <TextBlock Grid.Column="1" Text="{Binding ViewedStash.Date}" Classes="muted" FontSize="11" />
+              </Grid>
+              <TextBlock Text="{Binding ViewedStash.BaseText}" Classes="muted" FontSize="10" />
+              <WrapPanel Orientation="Horizontal">
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_ApplyStash}" Command="{Binding ApplyStashCommand}"
+                        CommandParameter="{Binding ViewedStash}" ToolTip.Tip="{x:Static res:Strings.History_ApplyStashToolTip}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_PopStash}" Command="{Binding PopStashCommand}"
+                        CommandParameter="{Binding ViewedStash}" ToolTip.Tip="{x:Static res:Strings.History_PopStashToolTip}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.History_DropStash}" Command="{Binding DropStashCommand}"
+                        CommandParameter="{Binding ViewedStash}" ToolTip.Tip="{x:Static res:Strings.Repo_View_DropStashToolTip}" />
+              </WrapPanel>
             </StackPanel>
           </Grid>
         </Border>

@@ -504,6 +504,18 @@
     <value>Changed files</value>
     <comment>Heading over the commit's file list</comment>
   </data>
+  <data name="History_ApplyStashToolTip" xml:space="preserve">
+    <value>Apply the stash and keep it</value>
+    <comment>Tooltip on Apply in the header of a viewed stash</comment>
+  </data>
+  <data name="History_PopStashToolTip" xml:space="preserve">
+    <value>Apply the stash and drop it</value>
+    <comment>Tooltip on Pop in the header of a viewed stash</comment>
+  </data>
+  <data name="History_DropStash" xml:space="preserve">
+    <value>Drop</value>
+    <comment>Button in the header of a viewed stash: delete the stash</comment>
+  </data>
   <data name="WorkingCopy_UnstageSelected" xml:space="preserve">
     <value>Unstage selected</value>
     <comment>Button</comment>
@@ -2006,6 +2018,14 @@ Releases: {0}/releases</value>
     <value>tag: {0}</value>
     <comment>Tag label in commit details; {0} = tag name</comment>
   </data>
+  <data name="StashInfo_OnBranchAt" xml:space="preserve">
+    <value>On {0} at {1}</value>
+    <comment>Where a viewed stash was made; {0} = branch name, {1} = short commit SHA</comment>
+  </data>
+  <data name="StashInfo_At" xml:space="preserve">
+    <value>At {0}</value>
+    <comment>Where a viewed stash was made when its branch is unknown; {0} = short commit SHA</comment>
+  </data>
   <data name="Repo_AllBranchesFilter" xml:space="preserve">
     <value>(all branches)</value>
     <comment>History branch filter option that shows all branches</comment>
@@ -2185,6 +2205,26 @@ Releases: {0}/releases</value>
   <data name="Repo_DiffNoChangesInRange" xml:space="preserve">
     <value>No changed files in this range.</value>
     <comment>Diff pane placeholder when comparing two commits</comment>
+  </data>
+  <data name="Repo_ErrorLoadStashDiff" xml:space="preserve">
+    <value>Could not load the stash diff</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_ErrorReadStash" xml:space="preserve">
+    <value>Could not read the stash</value>
+    <comment>Error context, followed by ": &lt;error&gt;"</comment>
+  </data>
+  <data name="Repo_DiffCouldNotReadStash" xml:space="preserve">
+    <value>Could not read the stash.</value>
+    <comment>Diff pane placeholder</comment>
+  </data>
+  <data name="Repo_DiffNoChangesInStash" xml:space="preserve">
+    <value>No changes in this stash.</value>
+    <comment>Diff pane placeholder when viewing a stash</comment>
+  </data>
+  <data name="Repo_StashDiffTitle" xml:space="preserve">
+    <value>stash {0}  {1}</value>
+    <comment>Diff pane title for a file of a viewed stash; {0} = short stash commit SHA, {1} = file path</comment>
   </data>
   <data name="Repo_StatusSetCompareBaseFirst" xml:space="preserve">
     <value>Set a compare base commit first.</value>

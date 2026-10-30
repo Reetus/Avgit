@@ -27,6 +27,7 @@ Inspired by Sourcetree. Avgit is an independent project and is not affiliated wi
 - Remote management: add, edit (rename or change URL) and remove remotes from the sidebar.
 - Tags: create, annotated tags, delete.
 - Stashes: save (including untracked files), apply, pop, drop and preview.
+- View a stash: click a stash in the sidebar to see it in the History tab's right-hand panes, with its message, date, the branch and commit it was made on, Apply / Pop / Drop buttons, its changed files (untracked files it saved are marked `?`) and a read-only diff of each file (images as an image comparison). Double-click still applies it. Clicking a commit returns to the commit's details; the view follows the stash across refreshes even as its `stash@{n}` number changes, and leaves it once the stash is popped or dropped.
 - Fetch, pull (optionally with rebase), push (including choosing a remote and pushing a detached HEAD to a named branch), force push with lease, fetch-all, merge, rebase, hard reset, cherry-pick and revert.
 - Rejected pushes explain why and offer the matching next step:
   - Remote has unfetched commits (`fetch first`): pull with rebase or merge, then push, or fetch only. Force is not offered, because it would discard commits you have never seen.
@@ -259,7 +260,7 @@ dotnet test Avgit.Tests --filter "FullyQualifiedName~ReadmeScreenshots"
 - Click a branch in the sidebar to jump the history to that branch's tip commit.
 - Double-click a branch in the sidebar to check it out.
 - Double-click a tag to check it out (detached HEAD confirmation).
-- Double-click a stash to apply it.
+- Click a stash to view its changes; double-click still applies it.
 - Repositories open in closable tabs above the toolbar; use `+` to return to home/recent repositories and × in the tab header to close one.
 - Right-click a commit for checkout, branch/tag, merge, rebase, interactive rebase, reset and copy-SHA actions.
 - In the diff viewer, tick line checkboxes and use **Stage selected lines** to stage a partial hunk.

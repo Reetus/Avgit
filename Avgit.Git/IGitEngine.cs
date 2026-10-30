@@ -34,6 +34,12 @@ public interface IGitEngine
     /// <summary>Paths that differ between two revisions.</summary>
     Task<IReadOnlyList<ChangedFile>> GetRangeChangesAsync(string path, string fromRevision, string toRevision, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Paths a stash changed relative to the commit it was made on. Untracked files it
+    /// saved are included with <see cref="PathState.Untracked"/> (git 2.32 or later).
+    /// </summary>
+    Task<IReadOnlyList<ChangedFile>> GetStashChangesAsync(string path, string stash, CancellationToken cancellationToken = default);
+
     // Batched reads for the UI: one or few git processes each, errors returned
     // in the result (not LastError) so they can run concurrently.
     Task<StatusSnapshot> GetStatusSnapshotAsync(string path, PathState mask = PathState.WorkingCopyMask, CancellationToken cancellationToken = default);

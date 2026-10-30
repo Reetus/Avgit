@@ -317,6 +317,64 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         return ParseNameStatus(path, result.Output);
     }
 
+    public async Task<IReadOnlyList<ChangedFile>> GetStashChangesAsync(string path, string stash, CancellationToken cancellationToken = default)
+    {
+        // The untracked files are the tree of the stash's third parent, which exists
+        // only for stashes made with --include-untracked.
+        Task<ProcessResult> untrackedTask = GitAsync(path, cancellationToken, "ls-tree", "-r", "-z", "--name-only", stash + "^3");
+        ProcessResult result = await StashShowAsync(path, cancellationToken, ["--name-status", "-z", "-M", "-C"], stash).ConfigureAwait(false);
+        ProcessResult untracked = await untrackedTask.ConfigureAwait(false);
+        if (!result.Success)
+        {
+            ReportFailure("git stash show", result);
+            return [];
+        }
+
+        List<ChangedFile> files = ParseNameStatus(path, result.Output);
+        if (untracked.Success)
+        {
+            var untrackedPaths = untracked.Output.Split('\0', StringSplitOptions.RemoveEmptyEntries).ToHashSet(StringComparer.Ordinal);
+            foreach (ChangedFile file in files)
+            {
+                if (file.Status == PathState.New && untrackedPaths.Contains(file.RelativePath))
+                {
+                    file.Status = PathState.Untracked;
+                    file.IndexStatus = PathState.Untracked;
+                }
+            }
+        }
+
+        return files;
+    }
+
+    /// <summary>
+    /// Runs <c>git stash show</c> with untracked files included. That option needs git
+    /// 2.32; older versions reject it, so a failure retries with tracked changes only.
+    /// </summary>
+    private async Task<ProcessResult> StashShowAsync(string path, CancellationToken cancellationToken,
+        IReadOnlyList<string> options, string stash)
+    {
+        ProcessResult result = await GitAsync(path, cancellationToken, BuildStashShow(true)).ConfigureAwait(false);
+        if (result.Success || result.Cancelled)
+        {
+            return result;
+        }
+
+        return await GitAsync(path, cancellationToken, BuildStashShow(false)).ConfigureAwait(false);
+
+        List<string> BuildStashShow(bool includeUntracked)
+        {
+            List<string> args = ["stash", "show", .. options];
+            if (includeUntracked)
+            {
+                args.Add("--include-untracked");
+            }
+
+            args.Add(stash);
+            return args;
+        }
+    }
+
     public async Task<BinaryProcessResult> GetFileBytesAsync(string path, string objectSpec, long maxBytes,
         CancellationToken cancellationToken = default)
     {
@@ -477,6 +535,49 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
                     var abs = Path.Combine(path, rel.Replace('/', Path.DirectorySeparatorChar));
                     FileDiff file = SyntheticDiff.CreateContentFile(rel, abs, new DiffSetup { Subject = DiffSubject.PendingFiles });
                     return PatchBuilder.CreatePatchFromFile(file);
+                }
+            case DiffRequestKind.Stash:
+                {
+                    var stash = request.Revision ?? "stash@{0}";
+                    List<string> options = ["--no-color", "--no-ext-diff", "--src-prefix=a/", "--dst-prefix=b/", $"--unified={request.Context}"];
+                    if (ignoreWhitespace is not null)
+                    {
+                        options.Add(ignoreWhitespace);
+                    }
+
+                    options.Add("-M");
+                    options.Add("-C");
+                    if (files.Count == 0)
+                    {
+                        ProcessResult all = await StashShowAsync(path, cancellationToken, ["-p", .. options], stash).ConfigureAwait(false);
+                        if (!all.Success)
+                        {
+                            ReportFailure("git stash show", all);
+                        }
+
+                        return all.Output;
+                    }
+
+                    // git stash show takes no paths. A tracked file's change is the stash
+                    // against its first parent; an untracked file is in the third parent,
+                    // a root commit, so showing that commit gives it as an addition.
+                    ProcessResult tracked = await GitAsync(path, cancellationToken,
+                        ["diff", .. options, stash + "^1", stash, "--", .. files]).ConfigureAwait(false);
+                    if (!tracked.Success)
+                    {
+                        ReportFailure("git diff", tracked);
+                        return tracked.Output;
+                    }
+
+                    if (tracked.Output.Length > 0)
+                    {
+                        return tracked.Output;
+                    }
+
+                    // Fails when the stash has no untracked files; there is then no diff.
+                    ProcessResult untracked = await GitAsync(path, cancellationToken,
+                        ["show", "--format=", .. options, stash + "^3", "--", .. files]).ConfigureAwait(false);
+                    return untracked.Success ? untracked.Output : string.Empty;
                 }
         }
 
@@ -806,7 +907,7 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
     public async Task<IReadOnlyList<StashRecord>> GetStashesAsync(string path, CancellationToken cancellationToken = default)
     {
 
-        ProcessResult result = await GitAsync(path, cancellationToken, "stash", "list", "--format=%gd\t%ci\t%s").ConfigureAwait(false);
+        ProcessResult result = await GitAsync(path, cancellationToken, "stash", "list", StashListFormat).ConfigureAwait(false);
         if (!result.Success)
         {
             ReportFailure("git stash", result);

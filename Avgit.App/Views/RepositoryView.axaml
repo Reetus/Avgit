@@ -229,7 +229,8 @@
                       Command="{Binding StashCommand}" />
               <TextBlock Text="{x:Static res:Strings.Repo_View_NoStashes}" Classes="muted" FontSize="10" Margin="8,3"
                          IsVisible="{Binding !HasStashes}" />
-              <ListBox ItemsSource="{Binding Stashes}" DoubleTapped="OnStashDoubleTapped"
+              <ListBox x:Name="StashList" ItemsSource="{Binding Stashes}"
+                       SelectedItem="{Binding SelectedStash, Mode=TwoWay}" DoubleTapped="OnStashDoubleTapped"
                        HorizontalAlignment="Stretch">
                 <ListBox.ItemTemplate>
                   <DataTemplate>
@@ -277,7 +278,7 @@
 
     <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" />
 
-    <TabControl Grid.Column="2">
+    <TabControl x:Name="MainTabs" Grid.Column="2">
       <TabItem Header="{x:Static res:Strings.Repo_View_HistoryTab}">
         <views:HistoryView />
       </TabItem>

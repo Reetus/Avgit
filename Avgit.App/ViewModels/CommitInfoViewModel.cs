@@ -22,8 +22,31 @@ public sealed class CommitInfoViewModel(CommitRecord details)
 
 public sealed class StashEntry(StashRecord stash)
 {
+    /// <summary><c>stash@{n}</c>, used by apply, pop and drop; it shifts as stashes come and go.</summary>
     public string Name { get; } = stash.Id;
     public string Date { get; } = stash.Created;
     public string Description { get; } = stash.Text;
+
+    /// <summary>The stash commit, which identifies the stash across refreshes.</summary>
+    public string Sha { get; } = stash.Sha;
+    public string ShortSha => Sha.Length > 7 ? Sha[..7] : Sha;
+    public string BaseShortSha { get; } = stash.BaseShortSha;
     public string Display => string.IsNullOrEmpty(Description) ? Name : $"{Name}  {Description}";
+
+    // git describes a stash as "On <branch>: <message>", or "WIP on <branch>: <sha> <subject>"
+    // when it was made without a message.
+    private int BranchStart => Description.StartsWith("WIP on ", StringComparison.Ordinal) ? 7
+        : Description.StartsWith("On ", StringComparison.Ordinal) ? 3 : -1;
+
+    private int BranchEnd => BranchStart < 0 ? -1 : Description.IndexOf(": ", BranchStart, StringComparison.Ordinal);
+
+    /// <summary>The stash message without git's "On &lt;branch&gt;:" prefix.</summary>
+    public string Title => BranchEnd < 0 || Description.StartsWith("WIP ", StringComparison.Ordinal)
+        ? (Description.Length > 0 ? Description : Name)
+        : Description[(BranchEnd + 2)..];
+
+    /// <summary>"On &lt;branch&gt; at &lt;sha&gt;": where the stash was made.</summary>
+    public string BaseText => BranchEnd < 0
+        ? string.Format(Strings.StashInfo_At, BaseShortSha)
+        : string.Format(Strings.StashInfo_OnBranchAt, Description[BranchStart..BranchEnd], BaseShortSha);
 }
