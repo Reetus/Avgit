@@ -19,8 +19,13 @@
               </StackPanel>
             </Expander.Header>
             <StackPanel HorizontalAlignment="Stretch">
-              <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_NewBranch}" HorizontalAlignment="Left"
-                      Command="{Binding CreateBranchCommand}" />
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_NewBranch}" HorizontalAlignment="Left"
+                        Command="{Binding CreateBranchCommand}" />
+                <Button Classes="flat" Content="{x:Static res:Strings.Repo_View_TrimBranches}"
+                        Command="{Binding TrimBranchesCommand}"
+                        ToolTip.Tip="{x:Static res:Strings.Repo_View_TrimBranchesToolTip}" />
+              </StackPanel>
               <ListBox ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch, Mode=TwoWay}"
                        DoubleTapped="OnBranchDoubleTapped" HorizontalAlignment="Stretch">
                 <ListBox.ContextMenu>
@@ -44,8 +49,15 @@
                     <Grid ColumnDefinitions="14,*,Auto,Auto,Auto" Height="22">
                       <TextBlock Text="●" Foreground="#3FB950" FontSize="10" VerticalAlignment="Center"
                                  IsVisible="{Binding IsCheckedOut}" />
-                      <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11"
-                                 TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                      <!-- Left-aligned so the marker sits right after the name, which still trims when long. -->
+                      <Grid Grid.Column="1" ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding Name}" FontSize="11"
+                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        <!-- The upstream was deleted on the remote (e.g. after a pull request was merged). -->
+                        <TextBlock Grid.Column="1" Text="{x:Static res:Strings.Repo_View_UpstreamGone}" Classes="muted" FontSize="9" Margin="5,0,0,0"
+                                   VerticalAlignment="Center" Background="Transparent"
+                                   IsVisible="{Binding UpstreamGone}" ToolTip.Tip="{Binding UpstreamGoneToolTip}" />
+                      </Grid>
                       <!-- Checked out in another worktree: it cannot be checked out here. -->
                       <PathIcon Grid.Column="2" Data="{StaticResource IconWorktree}" Width="13" Height="11"
                                 Foreground="#58A6FF" Margin="6,0,0,0" VerticalAlignment="Center"

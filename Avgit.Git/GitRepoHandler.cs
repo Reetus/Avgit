@@ -693,12 +693,57 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
         return ParseBranches(result.Output);
     }
 
-    private static void ParseTrack(string text, out uint ahead, out uint behind)
+    /// <summary>Local branches with their tip commit's date, author and subject (one <c>for-each-ref</c>).</summary>
+    public async Task<IReadOnlyList<BranchRef>> GetLocalBranchTipsAsync(string path, CancellationToken cancellationToken = default)
+    {
+        ProcessResult result = await GitAsync(path, cancellationToken, "for-each-ref", "--format=" + BranchTipFormat, "refs/heads")
+            .ConfigureAwait(false);
+        if (!result.Success)
+        {
+            ReportFailure("git for-each-ref", result);
+            return [];
+        }
+
+        return ParseBranches(result.Output);
+    }
+
+    /// <summary>
+    /// Local branches whose tips are reachable from <paramref name="revision"/>
+    /// (<c>git branch --merged</c>). Empty when there is no such commit yet.
+    /// </summary>
+    public async Task<IReadOnlyList<string>> GetMergedBranchesAsync(string path, string revision = "HEAD",
+        CancellationToken cancellationToken = default)
+    {
+        // Full ref names: refname:short checks every name for ambiguity.
+        ProcessResult result = await GitAsync(path, cancellationToken, "branch", "--merged", revision,
+            "--format=%(refname)").ConfigureAwait(false);
+        if (!result.Success)
+        {
+            ReportFailure("git branch --merged", result);
+            return [];
+        }
+
+        return [.. result.Output.Split('\n')
+            .Select(line => line.TrimEnd('\r'))
+            .Where(line => line.StartsWith("refs/heads/", StringComparison.Ordinal))
+            .Select(line => line["refs/heads/".Length..])];
+    }
+
+    // %(upstream:track) from for-each-ref is untranslated plumbing output:
+    // "[ahead 1]", "[behind 2]", "[ahead 1, behind 2]" or "[gone]".
+    private static void ParseTrack(string text, out uint ahead, out uint behind, out bool gone)
     {
         ahead = 0;
         behind = 0;
+        gone = false;
         if (string.IsNullOrWhiteSpace(text))
         {
+            return;
+        }
+
+        if (text.Trim() == "[gone]")
+        {
+            gone = true;
             return;
         }
 

@@ -71,6 +71,12 @@ public interface IGitEngine
     Task<ProcessResult> CheckoutAsync(string path, string reference, CancellationToken cancellationToken = default);
     Task<ProcessResult> DeleteBranchAsync(string path, string name, bool force, CancellationToken cancellationToken = default);
 
+    /// <summary>Local branches with their tip commit's date, author and subject; slower than the refs snapshot.</summary>
+    Task<IReadOnlyList<BranchRef>> GetLocalBranchTipsAsync(string path, CancellationToken cancellationToken = default);
+
+    /// <summary>Local branches fully merged into <paramref name="revision"/> (<c>git branch --merged</c>).</summary>
+    Task<IReadOnlyList<string>> GetMergedBranchesAsync(string path, string revision = "HEAD", CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Adds a worktree at <paramref name="worktreePath"/>. With <paramref name="createBranch"/>, creates
     /// <paramref name="branch"/> at <paramref name="startPoint"/> (HEAD when null); otherwise checks out the
