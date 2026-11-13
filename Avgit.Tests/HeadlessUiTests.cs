@@ -358,6 +358,91 @@ public class HeadlessUiTests
     }
 
     [AvaloniaFact]
+    public async Task Tabs_that_do_not_fit_scroll_with_the_wheel_and_list_in_the_overflow_menu()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        var repos = new List<TempRepo>();
+        try
+        {
+            var settings = new AppSettingsService(Path.Combine(ArtifactDirectory, "settings-taboverflow.json"));
+            var vm = new MainWindowViewModel(settings, new FakeDialogService());
+            var window = new MainWindow { DataContext = vm, Width = 1200, Height = 800 };
+            window.Show();
+
+            Button overflow = window.FindControl<Button>("RepositoryTabsOverflow")!;
+            ListBox tabs = window.FindControl<ListBox>("RepositoryTabs")!;
+
+            repos.Add(await TempRepo.CreateAsync(withHistory: false));
+            await vm.OpenPathAsync(repos[0].Path);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(overflow.IsVisible);
+
+            // Temp repository names are long, so a handful of tabs is wider than the window.
+            for (var i = 1; i < 8; i++)
+            {
+                repos.Add(await TempRepo.CreateAsync(withHistory: false));
+                await vm.OpenPathAsync(repos[i].Path);
+            }
+
+            Dispatcher.UIThread.RunJobs();
+            ScrollViewer scroller = tabs.GetVisualDescendants().OfType<ScrollViewer>().First();
+            Assert.True(scroller.Extent.Width > scroller.Viewport.Width);
+            Assert.True(overflow.IsVisible);
+            Assert.DoesNotContain(
+                tabs.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ScrollBar>(),
+                bar => bar.IsVisible && bar.Orientation == Avalonia.Layout.Orientation.Horizontal);
+
+            // The newest tab is selected and scrolled into view; the wheel scrolls back.
+            Assert.True(scroller.Offset.X > 0);
+            var before = scroller.Offset.X;
+            Point overTabs = tabs.TranslatePoint(new Point(40, 10), window)!.Value;
+            window.MouseWheel(overTabs, new Vector(0, 1));
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(scroller.Offset.X < before);
+
+            WriteableBitmap? frame = window.CaptureRenderedFrame();
+            Assert.NotNull(frame);
+            frame!.Save(Path.Combine(ArtifactDirectory, "repository-tabs-overflow.png"), PngBitmapEncoderOptions.Default);
+
+            // Picking a repository from the overflow list selects its tab and scrolls to it.
+            vm.ShowHomeCommand.Execute(null);
+            Point overButton = overflow.TranslatePoint(new Point(10, 10), window)!.Value;
+            window.MouseDown(overButton, MouseButton.Left);
+            window.MouseUp(overButton, MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+            ListBox list = Assert.IsType<ListBox>((overflow.Flyout as Flyout)?.Content);
+            Assert.True(overflow.Flyout!.IsOpen);
+            Assert.Same(vm.Repository, list.SelectedItem);
+            Assert.Equal(vm.Repositories.Count, list.ItemCount);
+
+            Control firstRow = Assert.IsAssignableFrom<Control>(list.ContainerFromIndex(0));
+            firstRow.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
+            Dispatcher.UIThread.RunJobs();
+            Assert.Same(vm.Repositories[0], vm.Repository);
+            Assert.False(vm.WelcomeVisible);
+            Assert.False(overflow.Flyout.IsOpen);
+            Assert.Equal(0, scroller.Offset.X);
+
+            // Closing tabs until they fit hides the button again.
+            vm.CloseOtherRepositoriesCommand.Execute(vm.Repositories[0]);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(overflow.IsVisible);
+            window.Close();
+        }
+        finally
+        {
+            foreach (TempRepo repo in repos)
+            {
+                repo.Dispose();
+            }
+        }
+    }
+
+    [AvaloniaFact]
     public async Task Selecting_a_branch_selects_its_tip_commit()
     {
         if (!await TempRepo.GitAvailableAsync())

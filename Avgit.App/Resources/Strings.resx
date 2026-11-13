@@ -208,6 +208,10 @@
     <value>Close repository</value>
     <comment>Tooltip on the tab close button</comment>
   </data>
+  <data name="Main_AllRepositoriesToolTip" xml:space="preserve">
+    <value>Show all open repositories</value>
+    <comment>Tooltip on the button that lists every open tab when they do not all fit</comment>
+  </data>
   <data name="Main_HomeToolTip" xml:space="preserve">
     <value>Home / recent repositories</value>
     <comment>Tooltip on the + button next to the tabs</comment>

@@ -62,12 +62,14 @@
 
     <Border DockPanel.Dock="Top" Background="{StaticResource Panel}"
             BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,1" Padding="6,2">
-      <Grid ColumnDefinitions="*,Auto,Auto">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+        <!-- No scrollbar: it overlaid the tabs whenever the pointer came near. Tabs that do not
+             fit are reached with the mouse wheel or the overflow list (see the code-behind). -->
         <ListBox x:Name="RepositoryTabs" Grid.Column="0" Classes="repotabs"
                  ItemsSource="{Binding Repositories}"
                  SelectedItem="{Binding Repository, Mode=TwoWay}"
                  SelectionMode="Single"
-                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                  ScrollViewer.VerticalScrollBarVisibility="Disabled">
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
@@ -101,9 +103,34 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
-        <ProgressBar Grid.Column="1" Width="70" Height="4" IsIndeterminate="True"
+        <Button x:Name="RepositoryTabsOverflow" Grid.Column="1" Classes="flat" Width="28" Height="30"
+                Margin="4,0,0,0" Padding="0" VerticalAlignment="Center" IsVisible="False"
+                ToolTip.Tip="{x:Static res:Strings.Main_AllRepositoriesToolTip}">
+          <Path Data="M 0,0 L 4.5,4.5 L 9,0" Stroke="{StaticResource Muted}" StrokeThickness="1.5"
+                StrokeLineCap="Round" StrokeJoin="Round"
+                HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedRight" Opened="OnRepositoryOverflowOpened">
+              <ListBox ItemsSource="{Binding Repositories}" SelectionMode="Single"
+                       MinWidth="220" MaxWidth="460" MaxHeight="480"
+                       Tapped="OnRepositoryOverflowTapped" KeyDown="OnRepositoryOverflowKeyDown">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Margin="6,3" Spacing="1">
+                      <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis"
+                                 Opacity="{Binding TabOpacity}" />
+                      <TextBlock Text="{Binding Path}" Classes="muted" FontSize="10"
+                                 TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+        <ProgressBar Grid.Column="2" Width="70" Height="4" IsIndeterminate="True"
                      IsVisible="{Binding IsHomeBusy}" VerticalAlignment="Center" Margin="0,0,8,0" />
-        <Button Grid.Column="2" Classes="flat" Content="+" FontSize="18" Width="32" Height="30"
+        <Button Grid.Column="3" Classes="flat" Content="+" FontSize="18" Width="32" Height="30"
                 Margin="6,0,0,0" VerticalAlignment="Center"
                 ToolTip.Tip="{x:Static res:Strings.Main_HomeToolTip}"
                 Command="{Binding ShowHomeCommand}" />
