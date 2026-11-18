@@ -3,6 +3,17 @@ name: Release
 # Builds Windows and Linux packages with Velopack and publishes them as one
 # GitHub release. Installed copies of Avgit check GitHub Releases on startup
 # and update themselves from it.
+#
+# Windows binaries (Avgit.exe, Setup.exe, the updater) are signed with Azure
+# Artifact/Trusted Signing (account and profile in
+# branding/windows/trusted-signing.json). Login uses GitHub OIDC, so no client
+# secret is stored; these repository secrets identify the service principal:
+#   AZURE_CLIENT_ID        the avgit-github-signing app registration's ID
+#   AZURE_TENANT_ID        the Entra tenant ID
+#   AZURE_SUBSCRIPTION_ID  the subscription holding the signing account
+# The app has the "Artifact Signing Certificate Profile Signer" role on the
+# signing account and a federated credential for this repository's main branch,
+# so the workflow must be run from main.
 
 on:
   workflow_dispatch:
@@ -63,6 +74,9 @@ jobs:
     name: Package (${{ matrix.rid }})
     needs: [validate, test]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      id-token: write # OIDC token for the Azure login that signs the Windows build
     strategy:
       matrix:
         include:
@@ -111,12 +125,39 @@ jobs:
             printf 'Avgit %s\n' "$VERSION" > "$RUNNER_TEMP/release-notes.md"
           fi
 
+      # vpk signs through DefaultAzureCredential, which picks up this Azure CLI login.
+      - name: Azure login (OIDC)
+        if: runner.os == 'Windows'
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: >
           ./branding/windows/build-setup.ps1 -Version $env:VERSION -Runtime $env:RID -Channel $env:RID
           -Output $env:OUT -ReleaseNotes "$env:RUNNER_TEMP/release-notes.md"
+          -AzureTrustedSignFile ./branding/windows/trusted-signing.json
+
+      - name: Check signatures
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # vpk signs a staged copy, so check the exe inside the portable zip, not the publish folder.
+          $portable = Join-Path $env:RUNNER_TEMP portable
+          Expand-Archive (Get-ChildItem "$env:OUT/*-Portable.zip" | Select-Object -First 1).FullName $portable
+          $files = @(Get-ChildItem $portable -Recurse -Include Avgit.exe, Update.exe) + @(Get-ChildItem "$env:OUT/*-Setup.exe")
+          if ($files.Count -lt 3) { throw "Expected Avgit.exe, Update.exe and Setup.exe; found $($files.Name -join ', ')." }
+          $bad = $false
+          foreach ($file in $files) {
+            $sig = Get-AuthenticodeSignature $file.FullName
+            Write-Host ("{0}: {1} ({2})" -f $file.Name, $sig.Status, $sig.SignerCertificate.Subject)
+            if ($sig.Status -ne 'Valid') { $bad = $true }
+          }
+          if ($bad) { throw 'A Windows binary is not validly signed.' }
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
