@@ -1042,9 +1042,18 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
     /// that is unset (stock git outside Git for Windows), git >= 2.33 refuses to pull
     /// divergent branches at all, so the default is then an explicit merge.
     /// </param>
-    public async Task<ProcessResult> PullAsync(string path, bool? rebase = null, CancellationToken cancellationToken = default)
+    /// <param name="autostash">
+    /// Stash tracked working-copy changes before pulling and re-apply them afterwards.
+    /// git exits 0 even when re-applying conflicts, storing the changes as a new stash entry instead.
+    /// </param>
+    public async Task<ProcessResult> PullAsync(string path, bool? rebase = null, bool autostash = false, CancellationToken cancellationToken = default)
     {
         var args = new List<string> { "pull" };
+        if (autostash)
+        {
+            args.Add("--autostash");
+        }
+
         if (rebase is null)
         {
             ProcessResult configured = await GitAsync(path, cancellationToken, "config", "--get", "pull.rebase").ConfigureAwait(false);

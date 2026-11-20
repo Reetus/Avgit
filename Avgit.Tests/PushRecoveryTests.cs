@@ -131,11 +131,13 @@ public class PushRecoveryTests
     {
         command.Execute(null);
         var started = Environment.TickCount64;
-        while (vm.IsBusy)
+        // An AsyncRelayCommand cannot execute while it is running, which also covers work a
+        // command does before or after the IsBusy section of RunOperationAsync.
+        while (vm.IsBusy || !command.CanExecute(null))
         {
             if (Environment.TickCount64 - started > 30000)
             {
-                throw new TimeoutException("Push did not finish.");
+                throw new TimeoutException("Command did not finish.");
             }
 
             await Task.Delay(25);
@@ -211,6 +213,54 @@ public class PushRecoveryTests
         Assert.True(pull.Success, pull.Combined);
         var parents = (await GitAsync(s.Repo.Path, "rev-list", "--parents", "-n", "1", "HEAD")).Output.Trim().Split(' ');
         Assert.Equal(2, parents.Length); // rebased onto theirs, no merge commit
+    }
+
+    [AvaloniaFact]
+    public async Task Stash_and_pull_keeps_tracked_changes_and_leaves_no_stash()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        using Scenario s = await CreateAsync();
+        var otherSha = await OtherPushesAsync(s, "theirs.txt");
+        var readme = Path.Combine(s.Repo.Path, "readme.txt");
+        await File.WriteAllTextAsync(readme, "mine\n");
+        (RepositoryViewModel? vm, FakeDialogService? dialogs) = await OpenAsync(s);
+        using RepositoryViewModel _ = vm;
+
+        await RunAsync(vm, vm.StashAndPullCommand);
+
+        Assert.Empty(dialogs.Messages);
+        Assert.Equal(otherSha, (await GitAsync(s.Repo.Path, "rev-parse", "HEAD")).Output.Trim());
+        Assert.Equal("mine\n", (await File.ReadAllTextAsync(readme)).ReplaceLineEndings("\n"));
+        Assert.Empty((await GitAsync(s.Repo.Path, "stash", "list")).Output.Trim());
+    }
+
+    [AvaloniaFact]
+    public async Task Stash_and_pull_reports_conflicts_when_reapplying_and_keeps_the_stash()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        using Scenario s = await CreateAsync();
+        await File.WriteAllTextAsync(Path.Combine(s.Other, "readme.txt"), "theirs\n");
+        await GitAsync(s.Other, "commit", "-q", "-am", "other: readme");
+        await GitAsync(s.Other, "push", "-q");
+        await File.WriteAllTextAsync(Path.Combine(s.Repo.Path, "readme.txt"), "mine\n");
+        (RepositoryViewModel? vm, FakeDialogService? dialogs) = await OpenAsync(s);
+        using RepositoryViewModel _ = vm;
+
+        await RunAsync(vm, vm.StashAndPullCommand);
+
+        var shown = Assert.Single(dialogs.Messages);
+        Assert.Contains("conflict", shown);
+        Assert.Equal(Avgit.App.Resources.Strings.Repo_StatusStashAndPullConflicts, vm.StatusMessage);
+        Assert.Contains("autostash", (await GitAsync(s.Repo.Path, "stash", "list")).Output);
+        Assert.Contains("UU readme.txt", (await GitAsync(s.Repo.Path, "status", "--porcelain")).Output);
     }
 
     [AvaloniaFact]

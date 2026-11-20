@@ -101,7 +101,7 @@ public interface IGitEngine
     Task<ProcessResult> DeleteTagAsync(string path, string name, CancellationToken cancellationToken = default);
 
     Task<ProcessResult> FetchAsync(string path, string? remote = null, CancellationToken cancellationToken = default);
-    Task<ProcessResult> PullAsync(string path, bool? rebase = null, CancellationToken cancellationToken = default);
+    Task<ProcessResult> PullAsync(string path, bool? rebase = null, bool autostash = false, CancellationToken cancellationToken = default);
     Task<ProcessResult> PushAsync(string path, string? remote = null, string? branch = null, bool setUpstream = false, bool force = false, string? detachedTarget = null, CancellationToken cancellationToken = default);
 
     Task<ProcessResult> StashSaveAsync(string path, string message, bool includeUntracked, CancellationToken cancellationToken = default);
