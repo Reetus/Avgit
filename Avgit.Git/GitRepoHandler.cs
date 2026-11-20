@@ -1042,9 +1042,18 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
     /// that is unset (stock git outside Git for Windows), git >= 2.33 refuses to pull
     /// divergent branches at all, so the default is then an explicit merge.
     /// </param>
-    public async Task<ProcessResult> PullAsync(string path, bool? rebase = null, CancellationToken cancellationToken = default)
+    /// <param name="autostash">
+    /// Stash tracked working-copy changes before pulling and re-apply them afterwards.
+    /// git exits 0 even when re-applying conflicts; see <see cref="AutostashConflicted"/>.
+    /// </param>
+    public async Task<ProcessResult> PullAsync(string path, bool? rebase = null, bool autostash = false, CancellationToken cancellationToken = default)
     {
         var args = new List<string> { "pull" };
+        if (autostash)
+        {
+            args.Add("--autostash");
+        }
+
         if (rebase is null)
         {
             ProcessResult configured = await GitAsync(path, cancellationToken, "config", "--get", "pull.rebase").ConfigureAwait(false);
@@ -1060,6 +1069,13 @@ public sealed partial class GitRepoHandler(string executablePath = "git") : IGit
 
         return await GitAsync(path, cancellationToken, args).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// True when <c>git pull --autostash</c> pulled but could not cleanly re-apply the stashed
+    /// changes. git still exits 0 and keeps the stash entry, leaving the conflicts in the working copy.
+    /// </summary>
+    public static bool AutostashConflicted(ProcessResult result)
+        => result.Combined.Contains("Applying autostash resulted in conflicts", StringComparison.Ordinal);
 
     public async Task<ProcessResult> PushAsync(string path, string? remote = null, string? branch = null,
         bool setUpstream = false, bool force = false, string? detachedTarget = null,

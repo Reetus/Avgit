@@ -52,6 +52,14 @@
     <value>Stash</value>
     <comment>Toolbar button: stash working changes</comment>
   </data>
+  <data name="Main_StashAndPull" xml:space="preserve">
+    <value>Stash &amp; Pull</value>
+    <comment>Menu item / toolbar button: git pull --autostash (stash tracked changes, pull, re-apply them)</comment>
+  </data>
+  <data name="Main_StashAndPullToolTip" xml:space="preserve">
+    <value>Stash your changes to tracked files, pull, then re-apply them</value>
+    <comment>Tooltip on the Stash &amp; Pull toolbar button</comment>
+  </data>
   <data name="Repo_View_Checkout" xml:space="preserve">
     <value>Checkout</value>
     <comment>Context menu item / button: check out the branch or commit</comment>
@@ -2061,6 +2069,24 @@ Releases: {0}/releases</value>
   <data name="Repo_OpPull" xml:space="preserve">
     <value>Pull</value>
     <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_OpStashAndPull" xml:space="preserve">
+    <value>Stash &amp; pull</value>
+    <comment>Operation name; shown in status/dialog titles</comment>
+  </data>
+  <data name="Repo_StashAndPullConflictsTitle" xml:space="preserve">
+    <value>Stash &amp; pull: conflicts</value>
+    <comment>Dialog title when the pull succeeded but re-applying the stashed changes conflicted</comment>
+  </data>
+  <data name="Repo_StashAndPullConflicts" xml:space="preserve">
+    <value>The pull succeeded, but your stashed changes conflict with what was pulled.
+
+Resolve the conflicts in the working copy. Your changes are also kept in the stash list; drop that entry once you are done.</value>
+    <comment>Dialog message when re-applying the autostash conflicted</comment>
+  </data>
+  <data name="Repo_StatusStashAndPullConflicts" xml:space="preserve">
+    <value>Pulled; re-applying your changes conflicted (kept in the stash)</value>
+    <comment>Status message</comment>
   </data>
   <data name="Repo_OpPullWithRebase" xml:space="preserve">
     <value>Pull with rebase</value>

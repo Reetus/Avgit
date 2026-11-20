@@ -129,12 +129,13 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         FetchCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpFetch, ct => Handler.FetchAsync(Path, null, ct)));
-        PullCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpPull, ct => Handler.PullAsync(Path, null, ct)));
+        PullCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpPull, ct => Handler.PullAsync(Path, cancellationToken: ct)));
+        StashAndPullCommand = new AsyncRelayCommand(StashAndPullAsync);
         PushCommand = new AsyncRelayCommand(PushAsync);
         OpenRemoteCommand = new RelayCommand(OpenRemote);
         PushToRemoteCommand = new AsyncRelayCommand(PushToRemoteAsync);
         ForcePushCommand = new AsyncRelayCommand(ForcePushAsync);
-        PullRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpPullWithRebase, ct => Handler.PullAsync(Path, true, ct)));
+        PullRebaseCommand = new AsyncRelayCommand(() => RunOperationAsync(Strings.Repo_OpPullWithRebase, ct => Handler.PullAsync(Path, true, cancellationToken: ct)));
         FetchAllCommand = new AsyncRelayCommand(FetchAllAsync);
         CommitCommand = new AsyncRelayCommand(CommitAsync);
         StageAllCommand = new AsyncRelayCommand(() => StageFilesAsync(UnstagedFiles));
@@ -948,6 +949,9 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
     public ICommand RefreshCommand { get; }
     public ICommand FetchCommand { get; }
     public ICommand PullCommand { get; }
+
+    /// <summary>Pulls with <c>--autostash</c>: tracked changes are stashed, the remote pulled, then the changes re-applied.</summary>
+    public ICommand StashAndPullCommand { get; }
     public ICommand PushCommand { get; }
     public ICommand OpenRemoteCommand { get; }
     public ICommand PushToRemoteCommand { get; }
@@ -3095,6 +3099,21 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
         ProcessResult result = await Handler.StashSaveAsync(Path, prompt.Value.Value ?? string.Empty, prompt.Value.Flag).ConfigureAwait(true);
         await HandleOperationResultAsync(Strings.Repo_OpStash, result, reloadAll: false).ConfigureAwait(true);
         await LoadRefsCoreAsync().ConfigureAwait(true);
+    }
+
+    private async Task StashAndPullAsync()
+    {
+        ProcessResult? result = null;
+        await RunOperationAsync(Strings.Repo_OpStashAndPull, async ct =>
+            result = await Handler.PullAsync(Path, autostash: true, cancellationToken: ct).ConfigureAwait(true)).ConfigureAwait(true);
+
+        // git reports success even when the stashed changes conflict with what was pulled;
+        // the stash entry is kept and the conflicts are left in the working copy.
+        if (result is { Success: true } && GitRepoHandler.AutostashConflicted(result))
+        {
+            StatusMessage = Strings.Repo_StatusStashAndPullConflicts;
+            await Dialogs.ShowMessageAsync(Strings.Repo_StashAndPullConflictsTitle, Strings.Repo_StashAndPullConflicts).ConfigureAwait(true);
+        }
     }
 
     private async Task CheckoutBranchAsync(BranchRef? branch)

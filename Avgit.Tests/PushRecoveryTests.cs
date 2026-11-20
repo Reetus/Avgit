@@ -214,6 +214,54 @@ public class PushRecoveryTests
     }
 
     [AvaloniaFact]
+    public async Task Stash_and_pull_keeps_tracked_changes_and_leaves_no_stash()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        using Scenario s = await CreateAsync();
+        var otherSha = await OtherPushesAsync(s, "theirs.txt");
+        var readme = Path.Combine(s.Repo.Path, "readme.txt");
+        await File.WriteAllTextAsync(readme, "mine\n");
+        (RepositoryViewModel? vm, FakeDialogService? dialogs) = await OpenAsync(s);
+        using RepositoryViewModel _ = vm;
+
+        await RunAsync(vm, vm.StashAndPullCommand);
+
+        Assert.Empty(dialogs.Messages);
+        Assert.Equal(otherSha, (await GitAsync(s.Repo.Path, "rev-parse", "HEAD")).Output.Trim());
+        Assert.Equal("mine\n", (await File.ReadAllTextAsync(readme)).ReplaceLineEndings("\n"));
+        Assert.Empty((await GitAsync(s.Repo.Path, "stash", "list")).Output.Trim());
+    }
+
+    [AvaloniaFact]
+    public async Task Stash_and_pull_reports_conflicts_when_reapplying_and_keeps_the_stash()
+    {
+        if (!await TempRepo.GitAvailableAsync())
+        {
+            return;
+        }
+
+        using Scenario s = await CreateAsync();
+        await File.WriteAllTextAsync(Path.Combine(s.Other, "readme.txt"), "theirs\n");
+        await GitAsync(s.Other, "commit", "-q", "-am", "other: readme");
+        await GitAsync(s.Other, "push", "-q");
+        await File.WriteAllTextAsync(Path.Combine(s.Repo.Path, "readme.txt"), "mine\n");
+        (RepositoryViewModel? vm, FakeDialogService? dialogs) = await OpenAsync(s);
+        using RepositoryViewModel _ = vm;
+
+        await RunAsync(vm, vm.StashAndPullCommand);
+
+        var shown = Assert.Single(dialogs.Messages);
+        Assert.Contains("conflict", shown);
+        Assert.Equal(Avgit.App.Resources.Strings.Repo_StatusStashAndPullConflicts, vm.StatusMessage);
+        Assert.Contains("autostash", (await GitAsync(s.Repo.Path, "stash", "list")).Output);
+        Assert.Contains("UU readme.txt", (await GitAsync(s.Repo.Path, "status", "--porcelain")).Output);
+    }
+
+    [AvaloniaFact]
     public async Task Non_fast_forward_offers_force_with_lease_which_replaces_the_remote_branch()
     {
         if (!await TempRepo.GitAvailableAsync())
