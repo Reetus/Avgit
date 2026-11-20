@@ -3103,17 +3103,25 @@ public sealed partial class RepositoryViewModel : ObservableObject, IDisposable
 
     private async Task StashAndPullAsync()
     {
+        var stashBefore = await GetStashTipAsync().ConfigureAwait(true);
         ProcessResult? result = null;
         await RunOperationAsync(Strings.Repo_OpStashAndPull, async ct =>
             result = await Handler.PullAsync(Path, autostash: true, cancellationToken: ct).ConfigureAwait(true)).ConfigureAwait(true);
 
-        // git reports success even when the stashed changes conflict with what was pulled;
-        // the stash entry is kept and the conflicts are left in the working copy.
-        if (result is { Success: true } && GitRepoHandler.AutostashConflicted(result))
+        // git exits 0 even when the stashed changes conflict with what was pulled: it leaves the
+        // conflicts in the working copy and stores the changes as a new stash entry. The message
+        // it prints differs between git versions, so detect the new entry instead.
+        if (result is { Success: true } && await GetStashTipAsync().ConfigureAwait(true) != stashBefore)
         {
             StatusMessage = Strings.Repo_StatusStashAndPullConflicts;
             await Dialogs.ShowMessageAsync(Strings.Repo_StashAndPullConflictsTitle, Strings.Repo_StashAndPullConflicts).ConfigureAwait(true);
         }
+    }
+
+    private async Task<string?> GetStashTipAsync()
+    {
+        ProcessResult result = await Handler.RunAsync(Path, ["rev-parse", "-q", "--verify", "refs/stash"]).ConfigureAwait(true);
+        return result.Success ? result.Output.Trim() : null;
     }
 
     private async Task CheckoutBranchAsync(BranchRef? branch)

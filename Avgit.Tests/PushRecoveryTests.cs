@@ -131,11 +131,13 @@ public class PushRecoveryTests
     {
         command.Execute(null);
         var started = Environment.TickCount64;
-        while (vm.IsBusy)
+        // An AsyncRelayCommand cannot execute while it is running, which also covers work a
+        // command does before or after the IsBusy section of RunOperationAsync.
+        while (vm.IsBusy || !command.CanExecute(null))
         {
             if (Environment.TickCount64 - started > 30000)
             {
-                throw new TimeoutException("Push did not finish.");
+                throw new TimeoutException("Command did not finish.");
             }
 
             await Task.Delay(25);
